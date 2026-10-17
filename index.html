@@ -4,67 +4,160 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Producción Escénica</title>
+    <!-- Librerías públicas via CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        :root{--bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#4f46e5;--brand2:#4338ca;--green:#10b981;--yellow:#f59e0b;--red:#ef4444}
-        *{box-sizing:border-box}
-        body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
-        .topbar{position:sticky;top:0;z-index:10;display:flex;gap:10px;align-items:center;padding:12px 18px;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 1px 3px rgba(0,0,0,.05)}
-        .topbar button,.topbar .btn{background:#f1f5f9;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:13px;font-weight:600;cursor:pointer;transition:0.2s}
-        .topbar button:hover,.topbar .btn:hover{background:#e2e8f0}
-        #topbar-title{font-weight:800;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--brand)}
-        main{max-width:1050px;margin:0 auto;padding:24px 18px 80px}
-        h1{font-size:24px;margin:6px 0 18px;font-weight:800}
-        h2{font-size:16px;margin:24px 0 12px;color:var(--brand);font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
-        .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.02)}
-        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-        .pcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,.02)}
-        .pcard h3{margin:0;font-size:18px;font-weight:700}
-        .muted{color:var(--muted);font-size:13px}
-        .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--brand);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:0.2s}
-        .btn:hover{background:var(--brand2)}
-        .btn.sec{background:#f1f5f9;color:var(--ink);border:1px solid var(--line)}
-        .btn.sec:hover{background:#e2e8f0}
-        .btn.danger{background:#fee2e2;color:var(--red);border:1px solid #fecaca}
-        .btn.danger:hover{background:#fecaca}
-        .btn.sm{padding:6px 12px;font-size:12px}
-        .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-        details{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:12px 16px;margin-bottom:16px}
-        details summary{cursor:pointer;font-weight:700;color:var(--brand);outline:none}
-        form{display:grid;gap:12px;margin-top:12px}
-        .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-        label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);font-weight:600}
-        input,select,textarea{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#f8fafc;color:var(--ink);width:100%;outline:none;transition:0.2s}
-        input:focus,select:focus,textarea:focus{border-color:var(--brand);background:#fff;box-shadow:0 0 0 3px rgba(79,70,229,0.1)}
-        textarea{min-height:80px;resize:vertical}
-        table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;font-size:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.02)}
-        th,td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
-        th{background:#f8fafc;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
-        tr:last-child td{border-bottom:none}
-        tr:hover{background:#f8fafc}
-        .chip{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700}
-        .c-green{background:#d1fae5;color:#065f46}
-        .c-yellow{background:#fef3c7;color:#92400e}
-        .c-red{background:#fee2e2;color:#991b1b}
-        .pill{display:inline-block;padding:4px 10px;border-radius:6px;background:#f1f5f9;font-size:12px;font-weight:600;color:var(--muted)}
-        a{color:var(--brand);text-decoration:none;font-weight:600}
-        a:hover{text-decoration:underline}
-        @media(max-width:600px){th,td{padding:8px 10px;font-size:13px}}
+        :root {
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --ink: #0f172a;
+            --muted: #64748b;
+            --line: #e2e8f0;
+            --brand: #4f46e5;
+            --brand2: #4338ca;
+            --green: #10b981;
+            --yellow: #f59e0b;
+            --red: #ef4444;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            font-size: 15px;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        /* MODO OSCURO */
+        body.dark {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --ink: #f8fafc;
+            --muted: #94a3b8;
+            --line: #334155;
+            --brand: #6366f1;
+            --brand2: #818cf8;
+        }
+        body.dark input, body.dark select, body.dark textarea { background: #334155; color: #f8fafc; border-color: #475569; }
+        body.dark th { background: #0f172a; }
+        body.dark .btn.sec { background: #334155; color: #f8fafc; }
+        body.dark .btn.sec:hover { background: #475569; }
+        body.dark .pill { background: #334155; color: #cbd5e1; }
+        body.dark tr:hover { background: #1e293b; }
+        body.dark details { background: var(--card); border-color: #475569; }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 12px 18px;
+            background: var(--card);
+            border-bottom: 1px solid var(--line);
+            box-shadow: 0 1px 3px rgba(0,0,0,.05);
+            flex-wrap: wrap;
+        }
+        .topbar button, .topbar .btn {
+            background: #f1f5f9;
+            color: var(--ink);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 7px 11px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .topbar button:hover, .topbar .btn:hover { background: #e2e8f0; }
+        body.dark .topbar button, body.dark .topbar .btn { background: #334155; color: #fff; border-color: #475569; }
+        body.dark .topbar button:hover { background: #475569; }
+        
+        #topbar-title {
+            font-weight: 800;
+            flex: 1;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--brand);
+            min-width: 150px;
+        }
+        main { max-width: 1050px; margin: 0 auto; padding: 24px 18px 80px; }
+        h1 { font-size: 24px; margin: 6px 0 18px; font-weight: 800; }
+        h2 { font-size: 16px; margin: 24px 0 12px; color: var(--brand); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.02); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .pcard { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.02); }
+        .pcard h3 { margin: 0; font-size: 18px; font-weight: 700; }
+        .muted { color: var(--muted); font-size: 13px; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--brand); color: #fff; border: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; transition: 0.2s; }
+        .btn:hover { background: var(--brand2); }
+        .btn.sec { background: #f1f5f9; color: var(--ink); border: 1px solid var(--line); }
+        .btn.sec:hover { background: #e2e8f0; }
+        .btn.danger { background: #fee2e2; color: var(--red); border: 1px solid #fecaca; }
+        .btn.danger:hover { background: #fecaca; }
+        body.dark .btn.danger { background: #7f1d1d; color: #fca5a5; border-color: #991b1b; }
+        .btn.sm { padding: 6px 12px; font-size: 12px; }
+        .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        details { background: var(--card); border: 1px dashed var(--line); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; }
+        details summary { cursor: pointer; font-weight: 700; color: var(--brand); outline: none; }
+        form { display: grid; gap: 12px; margin-top: 12px; }
+        .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); font-weight: 600; }
+        input, select, textarea { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #f8fafc; color: var(--ink); width: 100%; outline: none; transition: 0.2s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--brand); background: var(--card); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        textarea { min-height: 80px; resize: vertical; }
+        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; font-size: 14px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.02); }
+        th, td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+        th { background: #f8fafc; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: #f8fafc; }
+        .chip { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+        .c-green { background: #d1fae5; color: #065f46; }
+        .c-yellow { background: #fef3c7; color: #92400e; }
+        .c-red { background: #fee2e2; color: #991b1b; }
+        body.dark .c-green { background: #064e3b; color: #6ee7b7; }
+        body.dark .c-yellow { background: #78350f; color: #fcd34d; }
+        body.dark .c-red { background: #7f1d1d; color: #fca5a5; }
+        .pill { display: inline-block; padding: 4px 10px; border-radius: 6px; background: #f1f5f9; font-size: 12px; font-weight: 600; color: var(--muted); }
+        a { color: var(--brand); text-decoration: none; font-weight: 600; }
+        a:hover { text-decoration: underline; }
+        .search-box { margin-bottom: 16px; }
+        @media(max-width:600px){ th, td { padding: 8px 10px; font-size: 13px; } }
     </style>
 </head>
 <body>
 
-<header class="topbar" id="topbar" style="display:none">
+<header class="topbar" id="topbar">
   <button id="btn-home">⌂ Proyectos</button>
   <span id="topbar-title">Registro de Producción Escénica</span>
-  <button id="btn-logout" class="danger">Salir</button>
+  <button id="btn-sync" title="Sincronizar con Supabase">🔄 Sincronizar</button>
+  <button id="btn-export-json" title="Exportar copia JSON">💾 Backup</button>
+  <button id="btn-import-json" title="Importar copia JSON">📂 Cargar</button>
+  <input type="file" id="input-import-file" accept=".json" style="display:none">
+  <button id="btn-theme" title="Cambiar tema">🌙</button>
 </header>
+
 <main id="app"></main>
 
 <script>
+// CONFIGURACIÓN DE SUPABASE
 const SUPABASE_URL = 'https://uaqktciswfjzcorrevrh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_JoSi5-B_NIAD12NDtpaSQw_Yxp6HMbj';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let supabaseClient = null;
+
+if (window.supabase) {
+    try {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } catch(e) { console.error('Error al conectar con Supabase:', e); }
+}
 
 const $ = s => document.querySelector(s);
 const uid = () => crypto.randomUUID();
@@ -72,181 +165,303 @@ const hoy = () => new Date().toISOString().slice(0,10);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const colorClass = n => n >= 8 ? 'c-green' : n >= 5 ? 'c-yellow' : 'c-red';
 
-let DB = { proyectos:[], alumnos:[], roles:[], asignaciones:[], eventos:[], faltas:[], ajustes:[], colaboraciones:[] };
-let view = { name:'proyectos', proyectoId:null, alumnoId:null };
-let sessionEmail = localStorage.getItem('prod_session_email');
+const STORAGE_KEY = 'prod_escenica_hybrid_db';
+
+let DB = {
+  proyectos: [], alumnos: [], roles: [], asignaciones: [],
+  eventos: [], faltas: [], ajustes: [], colaboraciones: []
+};
+
+let view = { name: 'proyectos', proyectoId: null, alumnoId: null };
+let alumnoFiltroBusqueda = '';
 
 const ROLES_DEFECTO = [
-  ['Actor principal',3],['Coreógrafo',3],['Actor secundario',2],['Bailarín',2],
-  ['Escenógrafo',1.5],['Vestuario',1.5],['Regidor',1.5],['Guionista',1.5],
-  ['Prensa y cartelería',1.5],['Técnico',1],['Extra',1],['Tramoya (día de función)',2]
+  ['Actor principal', 3], ['Coreógrafo', 3], ['Actor secundario', 2], ['Bailarín', 2],
+  ['Escenógrafo', 1.5], ['Vestuario', 1.5], ['Regidor', 1.5], ['Guionista', 1.5],
+  ['Prensa y cartelería', 1.5], ['Técnico', 1], ['Extra', 1], ['Tramoya (día de función)', 2]
 ];
-const TIPO_EVENTO = {solidario:'Solidario',presentacion:'Presentación',preestreno:'Preestreno',estreno:'Estreno',bolo:'Bolo',otro:'Otro'};
 
+const TIPO_EVENTO = { solidario: 'Solidario', presentacion: 'Presentación', preestreno: 'Preestreno', estreno: 'Estreno', bolo: 'Bolo', otro: 'Otro' };
+
+const initTheme = () => {
+  if (localStorage.getItem('prod_theme') === 'dark') {
+    document.body.classList.add('dark');
+    $('#btn-theme').textContent = '☀️';
+  }
+};
+
+$('#btn-theme').addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  localStorage.setItem('prod_theme', isDark ? 'dark' : 'light');
+  $('#btn-theme').textContent = isDark ? '☀️' : '🌙';
+});
+
+// BACKUP JSON
+$('#btn-export-json').addEventListener('click', () => {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(DB, null, 2));
+  const anchor = document.createElement('a');
+  anchor.setAttribute("href", dataStr);
+  anchor.setAttribute("download", `backup_produccion_escenica_${hoy()}.json`);
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+});
+
+$('#btn-import-json').addEventListener('click', () => {
+  $('#input-import-file').click();
+});
+
+$('#input-import-file').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = evt => {
+    try {
+      const importedData = JSON.parse(evt.target.result);
+      if (importedData && typeof importedData === 'object' && Array.isArray(importedData.proyectos)) {
+        DB = importedData;
+        saveLocal();
+        render();
+        alert('Copia de seguridad importada correctamente.');
+      } else {
+        alert('Formato de copia de seguridad no válido.');
+      }
+    } catch (err) { alert('Error al cargar el archivo JSON.'); }
+  };
+  reader.readAsText(file);
+});
+
+// CARGA DE DATOS HÍBRIDA (Cloud + Local)
 async function loadData() {
   $('#app').innerHTML = '<div class="card" style="text-align:center;padding:40px;">Cargando datos...</div>';
-  try {
-    const p = await supabaseClient.from('proyectos').select('*').order('created_at');
-    const a = await supabaseClient.from('alumnos').select('*');
-    const r = await supabaseClient.from('roles').select('*');
-    const asg = await supabaseClient.from('asignaciones').select('*');
-    const e = await supabaseClient.from('eventos').select('*');
-    const f = await supabaseClient.from('faltas').select('*');
-    const aj = await supabaseClient.from('ajustes').select('*');
-    const c = await supabaseClient.from('colaboraciones').select('*');
+  let loadedFromCloud = false;
 
-    DB.proyectos = p.data || [];
-    DB.alumnos = a.data || [];
-    DB.roles = r.data || [];
-    DB.asignaciones = asg.data || [];
-    DB.eventos = e.data || [];
-    DB.faltas = f.data || [];
-    DB.ajustes = aj.data || [];
-    DB.colaboraciones = c.data || [];
-    render();
-  } catch (err) {
-    $('#app').innerHTML = `<div class="card" style="color:red">Error de conexión: ${esc(err.message)}</div>`;
+  if (supabaseClient) {
+    try {
+      const [p, a, r, asg, e, f, aj, c] = await Promise.all([
+        supabaseClient.from('proyectos').select('*').order('created_at', { ascending: true }),
+        supabaseClient.from('alumnos').select('*'),
+        supabaseClient.from('roles').select('*'),
+        supabaseClient.from('asignaciones').select('*'),
+        supabaseClient.from('eventos').select('*'),
+        supabaseClient.from('faltas').select('*'),
+        supabaseClient.from('ajustes').select('*'),
+        supabaseClient.from('colaboraciones').select('*')
+      ]);
+
+      if (!p.error) {
+        DB.proyectos = p.data || [];
+        DB.alumnos = a.data || [];
+        DB.roles = r.data || [];
+        DB.asignaciones = asg.data || [];
+        DB.eventos = e.data || [];
+        DB.faltas = f.data || [];
+        DB.ajustes = aj.data || [];
+        DB.colaboraciones = c.data || [];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+        loadedFromCloud = true;
+      }
+    } catch (err) {
+      console.warn("Supabase no alcanzable, cargando LocalStorage...", err);
+    }
   }
-}
 
-function renderLogin() {
-  $('#topbar').style.display = 'none';
-  $('#app').innerHTML = `
-    <div class="card" style="max-width:400px;margin:60px auto;text-align:center;padding:40px 30px;">
-      <div style="font-size:40px;margin-bottom:15px;">🎭</div>
-      <h2 style="margin-top:0;color:var(--ink);text-transform:none;">Acceso Profesorado</h2>
-      <p class="muted" style="margin-bottom:25px;">Introduce tu correo para acceder a tus proyectos.</p>
-      <form id="login-form">
-        <input type="email" id="login-email" placeholder="profesor@murciaeduca.es" required style="text-align:center;">
-        <button class="btn" type="submit" style="width:100%;margin-top:10px;">Entrar</button>
-      </form>
-    </div>`;
-  $('#login-form').onsubmit = (e) => {
-    e.preventDefault();
-    const email = $('#login-email').value;
-    localStorage.setItem('prod_session_email', email);
-    sessionEmail = email;
-    initApp();
-  };
-}
-
-function initApp() {
-  if (!sessionEmail) {
-    renderLogin();
-  } else {
-    $('#topbar').style.display = 'flex';
-    loadData();
+  if (!loadedFromCloud) {
+    const local = localStorage.getItem(STORAGE_KEY);
+    if (local) {
+      try { DB = JSON.parse(local); } catch(e){}
+    }
   }
+
+  render();
 }
 
-function calcAlumno(p, a){
-  const asg = DB.asignaciones.filter(x=>x.alumno_id===a.id);
+function saveLocal() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+}
+
+// CÁLCULOS MATEMÁTICOS DE CALIFICACIÓN
+function calcAlumno(p, a) {
+  const asg = DB.asignaciones.filter(x => x.alumno_id === a.id);
   let pts = 0;
-  const detalle = asg.map(x=>{
-    const rol = DB.roles.find(r=>r.id===x.rol_id);
-    const peso = rol ? Number(rol.peso_base)||0 : 0;
-    const fi = x.intensidad==='principal' ? 1 : x.intensidad==='secundario' ? 0.6 : 0.3;
-    const fv = x.valoracion==='bien' ? 1 : x.valoracion==='aceptable' ? 0.5 : 0;
-    const pto = peso*fi*fv;
+  const detalle = asg.map(x => {
+    const rol = DB.roles.find(r => r.id === x.rol_id);
+    const peso = rol ? Number(rol.peso_base) || 0 : 0;
+    const fi = x.intensidad === 'principal' ? 1 : x.intensidad === 'secundario' ? 0.6 : 0.3;
+    const fv = x.valoracion === 'bien' ? 1 : x.valoracion === 'aceptable' ? 0.5 : 0;
+    const pto = peso * fi * fv;
     pts += pto;
-    return {...x, rolNombre: rol ? rol.nombre : '(rol borrado)', peso, pto};
+    return { ...x, rolNombre: rol ? rol.nombre : '(rol borrado)', peso, pto };
   });
-  const faltasNJ = DB.faltas.filter(f=>f.alumno_id===a.id && !f.justificada).length;
-  const penal = faltasNJ * (Number(p.penalizacion_falta)||0);
-  return {asg:detalle, pts:Math.max(0, pts-penal), faltasNJ, penal};
+  const faltasNJ = DB.faltas.filter(f => f.alumno_id === a.id && !f.justificada).length;
+  const penal = faltasNJ * (Number(p.penalizacion_falta) || 0);
+  return { asg: detalle, pts: Math.max(0, pts - penal), faltasNJ, penal };
 }
 
-function calcGrupo(p){
-  const als = DB.alumnos.filter(a=>a.proyecto_id===p.id);
-  const base = als.map(a=>({alumno:a, ...calcAlumno(p,a)}));
-  const maxPts = base.length ? Math.max(...base.map(b=>b.pts)) : 0;
-  const techo = Number(p.techo_referencia)||12;
-  const pr = Number(p.peso_roles)||0.7, pa = Number(p.peso_ajuste)||0.3;
-  return base.map(b=>{
-    const notaTecho = Math.min(10, (b.pts/techo)*10);
-    const notaNorm = maxPts>0 ? (b.pts/maxPts)*10 : 0;
-    const aj = DB.ajustes.find(x=>x.alumno_id===b.alumno.id);
-    const ajN = aj ? Number(aj.nota) : null;
-    const finalTecho = ajN===null ? notaTecho : pr*notaTecho + pa*ajN;
-    const finalNorm  = ajN===null ? notaNorm  : pr*notaNorm  + pa*ajN;
-    return {...b, notaTecho, notaNorm, ajuste:ajN, finalTecho, finalNorm};
+function calcGrupo(p) {
+  const als = DB.alumnos.filter(a => a.proyecto_id === p.id);
+  const base = als.map(a => ({ alumno: a, ...calcAlumno(p, a) }));
+  const maxPts = base.length ? Math.max(...base.map(b => b.pts)) : 0;
+  const techo = Number(p.techo_referencia) || 12;
+  const pr = Number(p.peso_roles) || 0.7, pa = Number(p.peso_ajuste) || 0.3;
+  return base.map(b => {
+    const notaTecho = Math.min(10, (b.pts / techo) * 10);
+    const notaNorm = maxPts > 0 ? (b.pts / maxPts) * 10 : 0;
+    const aj = DB.ajustes.find(x => x.alumno_id === b.alumno.id);
+    const ajN = aj && aj.nota !== undefined && aj.nota !== '' ? Number(aj.nota) : null;
+    const finalTecho = ajN === null ? notaTecho : pr * notaTecho + pa * ajN;
+    const finalNorm = ajN === null ? notaNorm : pr * notaNorm + pa * ajN;
+    return { ...b, notaTecho, notaNorm, ajuste: ajN, finalTecho, finalNorm };
   });
 }
 
-function eventoNombre(p, id){
-  if(!id) return '—';
-  const e = DB.eventos.find(x=>x.id===id);
+function eventoNombre(p, id) {
+  if (!id) return '—';
+  const e = DB.eventos.find(x => x.id === id);
   return e ? e.nombre : '—';
 }
 
-function printHTML(titulo, cuerpo){
-  const w = window.open('', '_blank');
-  w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>${esc(titulo)}</title><style>
-    @page{size:A4;margin:15mm}
-    body{font-family:system-ui,Arial,sans-serif;color:#111;font-size:12px}
-    h1{font-size:20px;margin:0 0 4px}
-    h2{font-size:14px;margin:16px 0 6px;border-bottom:1px solid #ccc;padding-bottom:3px}
-    table{width:100%;border-collapse:collapse;margin:6px 0}
-    th,td{border:1px solid #bbb;padding:5px 6px;text-align:left;vertical-align:top}
-    th{background:#f0f0f0;font-size:11px;text-transform:uppercase}
-    .chip{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:600}
-    .c-green{background:#d7f5dd;color:#0b6b2a}
-    .c-yellow{background:#fff3cd;color:#8a6100}
-    .c-red{background:#fbdada;color:#9b1c1c}
-    .muted{color:#666}.small{font-size:10px;color:#666}
-  </style></head><body>${cuerpo}</body></html>`);
-  w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
-}
-
-function imprimirFicha(p, a){
+// EXPORTACIÓN A PDF / IMPRESIÓN CON JSPDF
+function exportarAlumnoPDF(p, a) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const c = calcAlumno(p, a);
-  const filas = c.asg.map(x=>`<tr>
-    <td>${esc(x.rolNombre)}</td>
-    <td>${esc(x.intensidad)}</td>
-    <td><span class="chip ${x.valoracion==='bien'?'c-green':x.valoracion==='aceptable'?'c-yellow':'c-red'}">${esc(x.valoracion)}</span></td>
-    <td>${esc(x.notas||'')}</td></tr>`).join('');
-  const html = `
-    <h1>${esc(a.nombre)}</h1>
-    <div class="muted">${esc(p.nombre)} · ${esc(a.curso||'')} ${esc(a.grupo||'')} · ${hoy()}</div>
-    <h2>Roles</h2>
-    <table><thead><tr><th>Rol</th><th>Intensidad</th><th>Valoración</th><th>Observaciones</th></tr></thead>
-    <tbody>${filas || '<tr><td colspan="4">Sin roles asignados</td></tr>'}</tbody></table>
-    ${c.faltasNJ>0 ? `<p><strong>Faltas no justificadas:</strong> ${c.faltasNJ}</p>` : ''}
-    ${a.notas_ficha ? `<h2>Observaciones</h2><p>${esc(a.notas_ficha).replace(/\n/g,'<br>')}</p>` : ''}`;
-  printHTML('Ficha de '+a.nombre, html);
+
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(79, 70, 229);
+  doc.text("FICHA INDIVIDUAL DE EVALUACIÓN", 14, 20);
+
+  doc.setFontSize(14);
+  doc.setTextColor(15, 23, 42);
+  doc.text(a.nombre.toUpperCase(), 14, 28);
+
+  doc.setFont("Helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  doc.text(`Proyecto: ${p.nombre} | Curso: ${a.curso || ''} ${a.grupo || ''} | Fecha: ${hoy()}`, 14, 34);
+
+  doc.setDrawColor(226, 232, 240);
+  doc.line(14, 38, 196, 38);
+
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(79, 70, 229);
+  doc.text("ROLES Y PARTICIPACIÓN", 14, 46);
+
+  let y = 52;
+  doc.setFillColor(241, 245, 249);
+  doc.rect(14, y, 182, 7, 'F');
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(9);
+  doc.setTextColor(51, 65, 85);
+  doc.text("ROL", 16, y + 5);
+  doc.text("INTENSIDAD", 70, y + 5);
+  doc.text("VALORACIÓN", 110, y + 5);
+  doc.text("OBSERVACIONES", 150, y + 5);
+
+  y += 7;
+  doc.setFont("Helvetica", "normal");
+
+  if (c.asg.length === 0) {
+    doc.text("Sin roles asignados", 16, y + 6);
+    y += 10;
+  } else {
+    c.asg.forEach((x) => {
+      doc.text(String(x.rolNombre).substring(0, 28), 16, y + 5);
+      doc.text(String(x.intensidad), 70, y + 5);
+      doc.text(String(x.valoracion), 110, y + 5);
+      doc.text(String(x.notas || '—').substring(0, 20), 150, y + 5);
+      y += 7;
+    });
+  }
+
+  y += 5;
+  if (c.faltasNJ > 0) {
+    doc.setFont("Helvetica", "bold");
+    doc.setTextColor(220, 38, 38);
+    doc.text(`Faltas no justificadas registradas: ${c.faltasNJ}`, 14, y);
+    y += 8;
+  }
+
+  if (a.notas_ficha) {
+    doc.setFont("Helvetica", "bold");
+    doc.setTextColor(79, 70, 229);
+    doc.text("OBSERVACIONES GENERALES", 14, y + 4);
+    y += 10;
+    doc.setFont("Helvetica", "normal");
+    doc.setTextColor(15, 23, 42);
+    const splitNotes = doc.splitTextToSize(a.notas_ficha, 180);
+    doc.text(splitNotes, 14, y);
+  }
+
+  doc.save(`Ficha_${a.nombre.replace(/\s+/g, '_')}.pdf`);
 }
 
-function imprimirComparativa(p){
+function exportarComparativaPDF(p) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   const g = calcGrupo(p);
-  const metodo = p.metodo_nota||'techo';
-  const filas = g.sort((x,y)=> (metodo==='techo'? y.finalTecho-x.finalTecho : y.finalNorm-x.finalNorm)).map(r=>`
-    <tr><td>${esc(r.alumno.nombre)}</td><td>${r.pts.toFixed(1)}</td>
-    <td><span class="chip ${colorClass(r.notaTecho)}">${r.notaTecho.toFixed(1)}</span></td>
-    <td><span class="chip ${colorClass(r.notaNorm)}">${r.notaNorm.toFixed(1)}</span></td>
-    <td>${r.ajuste===null?'—':r.ajuste}</td>
-    <td><span class="chip ${colorClass(r.finalTecho)}">${r.finalTecho.toFixed(1)}</span></td>
-    <td><span class="chip ${colorClass(r.finalNorm)}">${r.finalNorm.toFixed(1)}</span></td></tr>`).join('');
-  const html = `<h1>Comparativa · ${esc(p.nombre)}</h1>
-    <div class="muted">Método activo: ${metodo} · Techo: ${p.techo_referencia} · Pesos: ${p.peso_roles}/${p.peso_ajuste} · ${hoy()}</div>
-    <table><thead><tr><th>Alumno</th><th>Puntos</th><th>Nota roles (techo)</th><th>Nota roles (norm.)</th><th>Ajuste</th><th>Final (techo)</th><th>Final (norm.)</th></tr></thead>
-    <tbody>${filas||'<tr><td colspan="7">Sin alumnos</td></tr>'}</tbody></table>
-    <p class="small">Uso interno del profesorado. No distribuir al alumnado.</p>`;
-  printHTML('Comparativa '+p.nombre, html);
+  const metodo = p.metodo_nota || 'techo';
+
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(79, 70, 229);
+  doc.text(`COMPARATIVA GENERAL · ${p.nombre.toUpperCase()}`, 14, 18);
+
+  doc.setFontSize(9);
+  doc.setFont("Helvetica", "normal");
+  doc.setTextColor(100, 116, 139);
+  doc.text(`Método activo: ${metodo} | Techo ref: ${p.techo_referencia} | Pesos: ${p.peso_roles}/${p.peso_ajuste} | Penalización falta: ${p.penalizacion_falta} | ${hoy()}`, 14, 24);
+
+  let y = 30;
+  doc.setFillColor(241, 245, 249);
+  doc.rect(14, y, 269, 7, 'F');
+  doc.setFont("Helvetica", "bold");
+  doc.setTextColor(51, 65, 85);
+  doc.text("ALUMNO", 16, y + 5);
+  doc.text("PUNTOS", 90, y + 5);
+  doc.text("NOTA ROLES (TECHO)", 120, y + 5);
+  doc.text("NOTA ROLES (NORM)", 170, y + 5);
+  doc.text("AJUSTE", 220, y + 5);
+  doc.text("FINAL", 250, y + 5);
+
+  y += 7;
+  doc.setFont("Helvetica", "normal");
+
+  const orden = [...g].sort((x, y) => metodo === 'techo' ? y.finalTecho - x.finalTecho : y.finalNorm - x.finalNorm);
+
+  orden.forEach((r) => {
+    const finalVal = (metodo === 'techo' ? r.finalTecho : r.finalNorm).toFixed(1);
+    doc.text(String(r.alumno.nombre).substring(0, 35), 16, y + 5);
+    doc.text(r.pts.toFixed(1), 90, y + 5);
+    doc.text(r.notaTecho.toFixed(1), 120, y + 5);
+    doc.text(r.notaNorm.toFixed(1), 170, y + 5);
+    doc.text(r.ajuste === null ? '—' : String(r.ajuste), 220, y + 5);
+    doc.setFont("Helvetica", "bold");
+    doc.text(finalVal, 250, y + 5);
+    doc.setFont("Helvetica", "normal");
+    y += 6.5;
+  });
+
+  doc.save(`Comparativa_${p.nombre.replace(/\s+/g, '_')}.pdf`);
 }
 
-function render(){
-  const p = view.proyectoId ? DB.proyectos.find(x=>x.id===view.proyectoId) : null;
+// VISTAS SPA
+function render() {
+  const p = view.proyectoId ? DB.proyectos.find(x => x.id === view.proyectoId) : null;
   $('#topbar-title').textContent = p ? p.nombre : 'Registro de Producción Escénica';
   const app = $('#app');
-  if(view.name==='proyectos') app.innerHTML = renderProyectos();
-  else if(view.name==='proyecto') app.innerHTML = renderProyecto(p);
-  else if(view.name==='alumnos') app.innerHTML = renderAlumnos(p);
-  else if(view.name==='alumno') app.innerHTML = renderAlumno(p, DB.alumnos.find(a=>a.id===view.alumnoId));
-  else if(view.name==='comparativa') app.innerHTML = renderComparativa(p);
-  window.scrollTo(0,0);
+  if (view.name === 'proyectos') app.innerHTML = renderProyectos();
+  else if (view.name === 'proyecto') app.innerHTML = renderProyecto(p);
+  else if (view.name === 'alumnos') app.innerHTML = renderAlumnos(p);
+  else if (view.name === 'alumno') app.innerHTML = renderAlumno(p, DB.alumnos.find(a => a.id === view.alumnoId));
+  else if (view.name === 'comparativa') app.innerHTML = renderComparativa(p);
+  window.scrollTo(0, 0);
 }
 
-function renderProyectos(){
+function renderProyectos() {
   return `<h1>Proyectos</h1>
   <details><summary>+ Nuevo proyecto</summary>
     <form data-action="crear-proyecto">
@@ -263,25 +478,25 @@ function renderProyectos(){
     </form>
   </details>
   <div class="grid">
-    ${DB.proyectos.length ? DB.proyectos.map(p=>`
+    ${DB.proyectos.length ? DB.proyectos.map(p => `
       <div class="pcard">
         <h3>${esc(p.nombre)}</h3>
-        <div class="muted">${esc(p.curso)} · ${esc(p.optativa||'—')}</div>
-        <div><span class="pill">${p.estado==='activo'?'Activo':'Archivado'}</span></div>
+        <div class="muted">${esc(p.curso)} ·${esc(p.optativa || '—')}</div>
+        <div><span class="pill">${p.estado === 'activo' ? 'Activo' : 'Archivado'}</span></div>
         <div class="row" style="margin-top:auto;">
           <button class="btn sm" data-action="abrir-proyecto" data-id="${p.id}">Abrir</button>
-          <button class="btn sm sec" data-action="archivar-proyecto" data-id="${p.id}">${p.estado==='activo'?'Archivar':'Reactivar'}</button>
+          <button class="btn sm sec" data-action="archivar-proyecto" data-id="${p.id}">${p.estado === 'activo' ? 'Archivar' : 'Reactivar'}</button>
           <button class="btn sm danger" data-action="borrar-proyecto" data-id="${p.id}">Borrar</button>
         </div>
       </div>`).join('') : '<div class="card muted">Todavía no hay proyectos. Crea el primero arriba.</div>'}
   </div>`;
 }
 
-function renderProyecto(p){
-  if(!p) return '<div class="card">Proyecto no encontrado.</div>';
-  const eventos = DB.eventos.filter(e=>e.proyecto_id===p.id);
-  const roles = DB.roles.filter(r=>r.proyecto_id===p.id);
-  const nAl = DB.alumnos.filter(a=>a.proyecto_id===p.id).length;
+function renderProyecto(p) {
+  if (!p) return '<div class="card">Proyecto no encontrado.</div>';
+  const eventos = DB.eventos.filter(e => e.proyecto_id === p.id);
+  const roles = DB.roles.filter(r => r.proyecto_id === p.id);
+  const nAl = DB.alumnos.filter(a => a.proyecto_id === p.id).length;
   return `<h1>${esc(p.nombre)}</h1>
   <div class="row" style="margin-bottom:20px">
     <button class="btn" data-action="ver-alumnos" style="background:var(--ink);">Alumnos (${nAl})</button>
@@ -293,27 +508,27 @@ function renderProyecto(p){
     <div class="grid2">
       <label>Nombre<input name="nombre" value="${esc(p.nombre)}" required></label>
       <label>Curso<select name="curso">
-        ${['4ESO','1BACH','otro'].map(c=>`<option value="${c}" ${p.curso===c?'selected':''}>${c}</option>`).join('')}
+        ${['4ESO', '1BACH', 'otro'].map(c => `<option value="${c}" ${p.curso === c ? 'selected' : ''}>${c}</option>`).join('')}
       </select></label>
-      <label>Optativa<input name="optativa" value="${esc(p.optativa||'')}"></label>
-      <label>Inicio<input type="date" name="fecha_inicio" value="${esc(p.fecha_inicio||'')}"></label>
-      <label>Fin<input type="date" name="fecha_fin" value="${esc(p.fecha_fin||'')}"></label>
+      <label>Optativa<input name="optativa" value="${esc(p.optativa || '')}"></label>
+      <label>Inicio<input type="date" name="fecha_inicio" value="${esc(p.fecha_inicio || '')}"></label>
+      <label>Fin<input type="date" name="fecha_fin" value="${esc(p.fecha_fin || '')}"></label>
     </div>
-    <label>Notas<textarea name="notas">${esc(p.notas||'')}</textarea></label>
+    <label>Notas<textarea name="notas">${esc(p.notas || '')}</textarea></label>
     <div class="row"><button class="btn" type="submit">Guardar datos</button></div>
   </form>
 
   <h2>Ajustes de valoración</h2>
   <form class="card" data-action="guardar-ajustes">
     <div class="grid2">
-      <label>Techo de referencia (puntos = 10)<input type="number" step="0.5" min="1" name="techo_referencia" value="${Number(p.techo_referencia)||12}"></label>
+      <label>Techo de referencia (puntos = 10)<input type="number" step="0.5" min="1" name="techo_referencia" value="${Number(p.techo_referencia) || 12}"></label>
       <label>Método de nota<select name="metodo_nota">
-        <option value="techo" ${p.metodo_nota==='techo'?'selected':''}>Techo de referencia</option>
-        <option value="normalizada" ${p.metodo_nota==='normalizada'?'selected':''}>Normalizada al máximo</option>
+        <option value="techo" ${p.metodo_nota === 'techo' ? 'selected' : ''}>Techo de referencia</option>
+        <option value="normalizada" ${p.metodo_nota === 'normalizada' ? 'selected' : ''}>Normalizada al máximo</option>
       </select></label>
-      <label>Peso nota de roles (0-1)<input type="number" step="0.05" min="0" max="1" name="peso_roles" value="${Number(p.peso_roles)||0.7}"></label>
-      <label>Peso ajuste del profesor (0-1)<input type="number" step="0.05" min="0" max="1" name="peso_ajuste" value="${Number(p.peso_ajuste)||0.3}"></label>
-      <label>Penalización por falta no justificada<input type="number" step="0.1" min="0" name="penalizacion_falta" value="${Number(p.penalizacion_falta)||0.5}"></label>
+      <label>Peso nota de roles (0-1)<input type="number" step="0.05" min="0" max="1" name="peso_roles" value="${Number(p.peso_roles) || 0.7}"></label>
+      <label>Peso ajuste del profesor (0-1)<input type="number" step="0.05" min="0" max="1" name="peso_ajuste" value="${Number(p.peso_ajuste) || 0.3}"></label>
+      <label>Penalización por falta no justificada<input type="number" step="0.1" min="0" name="penalizacion_falta" value="${Number(p.penalizacion_falta) || 0.5}"></label>
     </div>
     <div class="row"><button class="btn" type="submit">Guardar ajustes</button></div>
   </form>
@@ -325,7 +540,7 @@ function renderProyecto(p){
       <div class="grid2">
         <label>Nombre<input name="nombre" required placeholder="Concierto solidario Aspajunide"></label>
         <label>Tipo<select name="tipo">
-          ${Object.entries(TIPO_EVENTO).map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}
+          ${Object.entries(TIPO_EVENTO).map(([v, t]) => `<option value="${v}">${t}</option>`).join('')}
         </select></label>
         <label>Trimestre<select name="trimestre"><option>1</option><option>2</option><option>3</option></select></label>
         <label>Fecha<input type="date" name="fecha" value="${hoy()}"></label>
@@ -343,53 +558,69 @@ function renderProyecto(p){
   <div class="row" style="margin-top:12px"><button class="btn sec sm" data-action="add-rol-libre">+ Añadir rol libre</button></div>`;
 }
 
-function renderTablaEventos(eventos){
-  if(!eventos.length) return '<div class="card muted">Sin eventos todavía.</div>';
+function renderTablaEventos(eventos) {
+  if (!eventos.length) return '<div class="card muted">Sin eventos todavía.</div>';
   return `<table><thead><tr><th>Evento</th><th>Tipo</th><th>T</th><th>Fecha</th><th>Sede</th><th>Formato</th><th>Estado</th><th></th></tr></thead><tbody>
-  ${eventos.map(e=>`<tr>
+  ${eventos.map(e => `<tr>
     <td><strong>${esc(e.nombre)}</strong></td>
-    <td>${esc(TIPO_EVENTO[e.tipo]||e.tipo)}</td>
+    <td>${esc(TIPO_EVENTO[e.tipo] || e.tipo)}</td>
     <td>${esc(e.trimestre)}</td>
     <td>${esc(e.fecha)}</td>
-    <td>${esc(e.sede||'—')}</td>
-    <td>${e.formato==='completo'?'Completo':'Fragmento'}</td>
+    <td>${esc(e.sede || '—')}</td>
+    <td>${e.formato === 'completo' ? 'Completo' : 'Fragmento'}</td>
     <td><span class="pill">${esc(e.estado)}</span></td>
     <td><button class="btn sm danger" type="button" data-action="del-evento" data-id="${e.id}">×</button></td>
   </tr>`).join('')}</tbody></table>`;
 }
 
-function renderTablaRoles(roles){
-  if(!roles.length) return '<div class="card muted">Sin roles.</div>';
+function renderTablaRoles(roles) {
+  if (!roles.length) return '<div class="card muted">Sin roles.</div>';
   return `<table><thead><tr><th>Rol</th><th>Peso base</th><th>Tipo</th><th></th></tr></thead><tbody>
-  ${roles.map(r=>`<tr>
-    <td>${r.es_libre?`<input data-rol-id="${r.id}" data-rol-field="nombre" value="${esc(r.nombre)}" style="padding:6px;">`:esc(r.nombre)}</td>
+  ${roles.map(r => `<tr>
+    <td>${r.es_libre ? `<input data-rol-id="${r.id}" data-rol-field="nombre" value="${esc(r.nombre)}" style="padding:6px;">` : esc(r.nombre)}</td>
     <td><input type="number" step="0.5" min="0" style="max-width:90px;padding:6px;" data-rol-id="${r.id}" data-rol-field="peso_base" value="${Number(r.peso_base)}"></td>
-    <td>${r.es_libre?'<span class="pill">Libre</span>':'<span class="muted">Fijo</span>'}</td>
-    <td>${r.es_libre?`<button class="btn sm danger" type="button" data-action="del-rol" data-id="${r.id}">Borrar</button>`:''}</td>
+    <td>${r.es_libre ? '<span class="pill">Libre</span>' : '<span class="muted">Fijo</span>'}</td>
+    <td>${r.es_libre ? `<button class="btn sm danger" type="button" data-action="del-rol" data-id="${r.id}">Borrar</button>` : ''}</td>
   </tr>`).join('')}</tbody></table>`;
 }
 
-function renderAlumnos(p){
-  const als = DB.alumnos.filter(a=>a.proyecto_id===p.id);
+function renderAlumnos(p) {
+  let als = DB.alumnos.filter(a => a.proyecto_id === p.id);
+  
+  if (alumnoFiltroBusqueda.trim()) {
+    const q = alumnoFiltroBusqueda.toLowerCase().trim();
+    als = als.filter(a => 
+      (a.nombre || '').toLowerCase().includes(q) ||
+      (a.curso || '').toLowerCase().includes(q) ||
+      (a.grupo || '').toLowerCase().includes(q)
+    );
+  }
+
   const g = calcGrupo(p);
-  const rows = als.map(a=>{
-    const r = g.find(x=>x.alumno.id===a.id);
-    const final = p.metodo_nota==='normalizada' ? r.finalNorm : r.finalTecho;
+  const rows = als.map(a => {
+    const r = g.find(x => x.alumno.id === a.id);
+    const final = p.metodo_nota === 'normalizada' ? r.finalNorm : r.finalTecho;
     return `<tr>
       <td><a href="#" data-action="abrir-alumno" data-id="${a.id}">${esc(a.nombre)}</a></td>
-      <td>${esc(a.curso||'')}</td>
-      <td>${esc(a.grupo||'')}</td>
+      <td>${esc(a.curso || '')}</td>
+      <td>${esc(a.grupo || '')}</td>
       <td><span class="pill">${r.asg.length}</span></td>
       <td>${r.pts.toFixed(1)}</td>
       <td><span class="chip ${colorClass(final)}">${final.toFixed(1)}</span></td>
       <td><button class="btn sm danger" type="button" data-action="del-alumno" data-id="${a.id}">×</button></td>
     </tr>`;
   }).join('');
+
   return `<h1>Alumnos · ${esc(p.nombre)}</h1>
-  <div class="row" style="margin-bottom:20px">
+  <div class="row" style="margin-bottom:16px">
     <button class="btn sec" data-action="abrir-proyecto" data-id="${p.id}">← Volver al proyecto</button>
     <button class="btn" data-action="ver-comparativa" style="background:var(--ink);">Comparativa</button>
   </div>
+
+  <div class="search-box">
+    <input type="text" id="input-search-alumno" placeholder="🔍 Buscar por nombre, curso o grupo..." value="${esc(alumnoFiltroBusqueda)}">
+  </div>
+
   <details><summary>+ Añadir alumno</summary>
     <form data-action="add-alumno">
       <div class="grid2">
@@ -400,47 +631,47 @@ function renderAlumnos(p){
       <div class="row"><button class="btn" type="submit">Añadir alumno</button></div>
     </form>
   </details>
-  ${als.length ? `<table><thead><tr><th>Alumno</th><th>Curso</th><th>Grupo</th><th>Roles</th><th>Puntos</th><th>Nota</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="card muted">Sin alumnos todavía.</div>'}`;
+  ${als.length ? `<table><thead><tr><th>Alumno</th><th>Curso</th><th>Grupo</th><th>Roles</th><th>Puntos</th><th>Nota</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="card muted">No se encontraron alumnos.</div>'}`;
 }
 
-function renderAlumno(p, a){
-  if(!a) return '<div class="card">Alumno no encontrado.</div>';
+function renderAlumno(p, a) {
+  if (!a) return '<div class="card">Alumno no encontrado.</div>';
   const c = calcAlumno(p, a);
-  const g = calcGrupo(p).find(x=>x.alumno.id===a.id);
-  const aj = DB.ajustes.find(x=>x.alumno_id===a.id);
-  const roles = DB.roles.filter(r=>r.proyecto_id===p.id);
-  const eventos = DB.eventos.filter(e=>e.proyecto_id===p.id);
+  const g = calcGrupo(p).find(x => x.alumno.id === a.id);
+  const aj = DB.ajustes.find(x => x.alumno_id === a.id);
+  const roles = DB.roles.filter(r => r.proyecto_id === p.id);
+  const eventos = DB.eventos.filter(e => e.proyecto_id === p.id);
   const es4 = p.curso === '4ESO';
-  const colab = DB.colaboraciones.find(x=>x.alumno_id===a.id);
+  const colab = DB.colaboraciones.find(x => x.alumno_id === a.id);
 
-  const filasAsg = c.asg.map(x=>`<tr>
+  const filasAsg = c.asg.map(x => `<tr>
     <td><strong>${esc(x.rolNombre)}</strong></td>
     <td>${esc(x.intensidad)}</td>
-    <td><span class="chip ${x.valoracion==='bien'?'c-green':x.valoracion==='aceptable'?'c-yellow':'c-red'}">${esc(x.valoracion)}</span></td>
+    <td><span class="chip ${x.valoracion === 'bien' ? 'c-green' : x.valoracion === 'aceptable' ? 'c-yellow' : 'c-red'}">${esc(x.valoracion)}</span></td>
     <td>T${esc(x.trimestre)}</td>
     <td>${esc(eventoNombre(p, x.evento_id))}</td>
     <td>${x.pto.toFixed(2)}</td>
     <td><button class="btn sm danger" type="button" data-action="del-asignacion" data-id="${x.id}">×</button></td>
   </tr>`).join('');
 
-  const filasFaltas = DB.faltas.filter(f=>f.alumno_id===a.id).map(f=>`<tr>
+  const filasFaltas = DB.faltas.filter(f => f.alumno_id === a.id).map(f => `<tr>
     <td>${esc(f.fecha)}</td>
-    <td>${f.tipo==='actuacion'?'Actuación':'Ensayo'}</td>
-    <td>${f.justificada?'Sí':'No'}</td>
+    <td>${f.tipo === 'actuacion' ? 'Actuación' : 'Ensayo'}</td>
+    <td>${f.justificada ? 'Sí' : 'No'}</td>
     <td><button class="btn sm danger" type="button" data-action="del-falta" data-id="${f.id}">×</button></td>
   </tr>`).join('');
 
-  const final = p.metodo_nota==='normalizada' ? g.finalNorm : g.finalTecho;
+  const final = p.metodo_nota === 'normalizada' ? g.finalNorm : g.finalTecho;
 
   return `<h1>${esc(a.nombre)}</h1>
   <div class="row" style="margin-bottom:20px">
     <button class="btn sec" data-action="ver-alumnos">← Volver a alumnos</button>
-    <button class="btn" data-action="imprimir-ficha" data-id="${a.id}" style="background:var(--ink);">🖨 Imprimir ficha</button>
+    <button class="btn" data-action="pdf-alumno" data-id="${a.id}" style="background:var(--ink);">📄 Descargar PDF Ficha</button>
   </div>
 
   <div class="card" style="background:#f8fafc; border-left:4px solid var(--brand);">
     <div class="row" style="justify-content:space-between">
-      <div><strong style="font-size:16px;">${esc(a.curso||'')} ${esc(a.grupo||'')}</strong></div>
+      <div><strong style="font-size:16px;">${esc(a.curso || '')} ${esc(a.grupo || '')}</strong></div>
       <div>Puntos: <strong style="font-size:16px;">${c.pts.toFixed(1)}</strong> &nbsp;·&nbsp; Nota roles: <strong style="font-size:16px;">${g.notaTecho.toFixed(1)}</strong> &nbsp;·&nbsp; Final: <span class="chip ${colorClass(final)}" style="font-size:14px;">${final.toFixed(1)}</span></div>
     </div>
     <div class="muted" style="margin-top:10px;">Faltas no justificadas: <strong>${c.faltasNJ}</strong> (Penalización: −${c.penal.toFixed(1)} pts)</div>
@@ -452,7 +683,7 @@ function renderAlumno(p, a){
     <form data-action="add-asignacion">
       <div class="grid2">
         <label>Rol<select name="rol_id" required>
-          ${roles.map(r=>`<option value="${r.id}">${esc(r.nombre)} (${Number(r.peso_base)})</option>`).join('')}
+          ${roles.map(r => `<option value="${r.id}">${esc(r.nombre)} (${Number(r.peso_base)})</option>`).join('')}
         </select></label>
         <label>Intensidad<select name="intensidad">
           <option value="principal">Principal (×1.0)</option>
@@ -466,7 +697,7 @@ function renderAlumno(p, a){
         </select></label>
         <label>Trimestre<select name="trimestre"><option>1</option><option>2</option><option>3</option></select></label>
         <label>Evento (opcional)<select name="evento_id"><option value="">—</option>
-          ${eventos.map(e=>`<option value="${e.id}">${esc(e.nombre)}</option>`).join('')}
+          ${eventos.map(e => `<option value="${e.id}">${esc(e.nombre)}</option>`).join('')}
         </select></label>
       </div>
       <label>Observaciones<input name="notas" placeholder="Aprendió el papel, faltó a dos ensayos..."></label>
@@ -490,16 +721,16 @@ function renderAlumno(p, a){
   <h2>Ajuste del profesor</h2>
   <form class="card" data-action="guardar-ajuste">
     <div class="grid2">
-      <label>Nota (0-10)<input type="number" min="0" max="10" step="0.1" name="nota" value="${aj?Number(aj.nota):''}" placeholder="Ej. 8"></label>
+      <label>Nota (0-10)<input type="number" min="0" max="10" step="0.1" name="nota" value="${aj && aj.nota !== undefined ? Number(aj.nota) : ''}" placeholder="Ej. 8"></label>
     </div>
-    <label>Comentario<input name="comentario" value="${esc(aj?aj.comentario:'')}" placeholder="Actitud, implicación, comportamiento..."></label>
+    <label>Comentario<input name="comentario" value="${esc(aj ? aj.comentario : '')}" placeholder="Actitud, implicación, comportamiento..."></label>
     <div class="row"><button class="btn" type="submit">Guardar ajuste</button></div>
   </form>
 
   <h2>Notas</h2>
   <form class="card" data-action="guardar-notas">
-    <label>Notas privadas (no salen en la ficha del alumno)<textarea name="notas_privadas">${esc(a.notas_privadas||'')}</textarea></label>
-    <label>Notas para la ficha (sí salen en el PDF)<textarea name="notas_ficha">${esc(a.notas_ficha||'')}</textarea></label>
+    <label>Notas privadas (no salen en la ficha del alumno)<textarea name="notas_privadas">${esc(a.notas_privadas || '')}</textarea></label>
+    <label>Notas para la ficha (sí salen en el PDF)<textarea name="notas_ficha">${esc(a.notas_ficha || '')}</textarea></label>
     <div class="row"><button class="btn" type="submit">Guardar notas</button></div>
   </form>
 
@@ -508,155 +739,338 @@ function renderAlumno(p, a){
     <div class="grid2">
       <label>Estado<select name="estado">
         <option value="">—</option>
-        <option value="hecho" ${colab&&colab.estado==='hecho'?'selected':''}>Ha hecho</option>
-        <option value="no_hecho" ${colab&&colab.estado==='no_hecho'?'selected':''}>No ha hecho</option>
-        <option value="no_vino" ${colab&&colab.estado==='no_vino'?'selected':''}>No ha venido</option>
+        <option value="hecho" ${colab && colab.estado === 'hecho' ? 'selected' : ''}>Ha hecho</option>
+        <option value="no_hecho" ${colab && colab.estado === 'no_hecho' ? 'selected' : ''}>No ha hecho</option>
+        <option value="no_vino" ${colab && colab.estado === 'no_vino' ? 'selected' : ''}>No ha venido</option>
       </select></label>
     </div>
-    <label>Notas<input name="notas" value="${esc(colab?colab.notas:'')}" placeholder="Ensayo general + función de fin de curso"></label>
+    <label>Notas<input name="notas" value="${esc(colab ? colab.notas : '')}" placeholder="Ensayo general + función de fin de curso"></label>
     <div class="row"><button class="btn" type="submit">Guardar colaboración</button></div>
   </form>` : ''}`;
 }
 
-function renderComparativa(p){
+function renderComparativa(p) {
   const g = calcGrupo(p);
   const metodo = p.metodo_nota || 'techo';
-  const orden = [...g].sort((x,y)=> metodo==='techo' ? y.finalTecho-x.finalTecho : y.finalNorm-x.finalNorm);
-  const filas = orden.map(r=>`<tr>
+  const orden = [...g].sort((x, y) => metodo === 'techo' ? y.finalTecho - x.finalTecho : y.finalNorm - x.finalNorm);
+  const filas = orden.map(r => `<tr>
     <td><a href="#" data-action="abrir-alumno" data-id="${r.alumno.id}">${esc(r.alumno.nombre)}</a></td>
     <td>${r.pts.toFixed(1)}</td>
     <td><span class="chip ${colorClass(r.notaTecho)}">${r.notaTecho.toFixed(1)}</span></td>
     <td><span class="chip ${colorClass(r.notaNorm)}">${r.notaNorm.toFixed(1)}</span></td>
-    <td>${r.ajuste===null?'—':r.ajuste}</td>
-    <td><span class="chip ${colorClass(r.finalTecho)}">${r.finalTecho.toFixed(1)} ${metodo==='techo'?'★':''}</span></td>
-    <td><span class="chip ${colorClass(r.finalNorm)}">${r.finalNorm.toFixed(1)} ${metodo==='normalizada'?'★':''}</span></td>
+    <td>${r.ajuste === null ? '—' : r.ajuste}</td>
+    <td><span class="chip ${colorClass(r.finalTecho)}">${r.finalTecho.toFixed(1)} ${metodo === 'techo' ? '★' : ''}</span></td>
+    <td><span class="chip ${colorClass(r.finalNorm)}">${r.finalNorm.toFixed(1)} ${metodo === 'normalizada' ? '★' : ''}</span></td>
   </tr>`).join('');
   return `<h1>Comparativa · ${esc(p.nombre)}</h1>
   <div class="row" style="margin-bottom:20px">
     <button class="btn sec" data-action="abrir-proyecto" data-id="${p.id}">← Volver al proyecto</button>
     <button class="btn sec" data-action="ver-alumnos">Alumnos</button>
-    <button class="btn" data-action="imprimir-comparativa" style="background:var(--ink);">🖨 Imprimir comparativa</button>
+    <button class="btn" data-action="pdf-comparativa" style="background:var(--ink);">📄 Descargar PDF Comparativa</button>
   </div>
   <div class="card muted" style="background:#f8fafc;">Método activo: <strong>${metodo}</strong> · Techo: ${p.techo_referencia} · Pesos: ${p.peso_roles} / ${p.peso_ajuste} · Penalización falta: ${p.penalizacion_falta}</div>
   ${g.length ? `<table><thead><tr><th>Alumno</th><th>Puntos</th><th>Nota roles (techo)</th><th>Nota roles (norm.)</th><th>Ajuste</th><th>Final (techo)</th><th>Final (norm.)</th></tr></thead><tbody>${filas}</tbody></table>` : '<div class="card muted">Sin alumnos.</div>'}
   <p class="muted" style="text-align:center;margin-top:20px;">Uso interno del profesorado. La ficha que se enseña al alumno es la individual, sin puntos ni comparativa.</p>`;
 }
 
-document.addEventListener('click', async e=>{
-  const el = e.target.closest('[data-action]');
-  if(!el) return;
-  const act = el.dataset.action, id = el.dataset.id;
-  if(el.tagName === 'A') e.preventDefault();
-  
-  switch(act){
-    case 'home': view={name:'proyectos',proyectoId:null,alumnoId:null}; render(); break;
-    case 'abrir-proyecto': view={name:'proyecto',proyectoId:id,alumnoId:null}; render(); break;
-    case 'ver-alumnos': view={name:'alumnos',proyectoId:view.proyectoId,alumnoId:null}; render(); break;
-    case 'ver-comparativa': view={name:'comparativa',proyectoId:view.proyectoId,alumnoId:null}; render(); break;
-    case 'abrir-alumno': view={name:'alumno',proyectoId:view.proyectoId,alumnoId:id}; render(); break;
-    case 'imprimir-ficha': imprimirFicha(DB.proyectos.find(x=>x.id===view.proyectoId), DB.alumnos.find(x=>x.id===id)); break;
-    case 'imprimir-comparativa': imprimirComparativa(DB.proyectos.find(x=>x.id===view.proyectoId)); break;
-    
-    case 'borrar-proyecto': 
-      if(confirm('¿Borrar el proyecto y todos sus datos?')) { await supabaseClient.from('proyectos').delete().eq('id', id); view={name:'proyectos',proyectoId:null,alumnoId:null}; loadData(); } 
-      break;
-    case 'archivar-proyecto': {
-      const p = DB.proyectos.find(x=>x.id===id);
-      const nuevoEstado = p.estado==='activo'?'archivado':'activo';
-      await supabaseClient.from('proyectos').update({estado: nuevoEstado}).eq('id', id); loadData(); break;
-    }
-    case 'del-alumno': if(confirm('¿Borrar alumno y todos sus datos?')) { await supabaseClient.from('alumnos').delete().eq('id', id); loadData(); } break;
-    case 'del-asignacion': await supabaseClient.from('asignaciones').delete().eq('id', id); loadData(); break;
-    case 'del-falta': await supabaseClient.from('faltas').delete().eq('id', id); loadData(); break;
-    case 'del-evento': if(confirm('¿Borrar evento?')) { await supabaseClient.from('eventos').delete().eq('id', id); loadData(); } break;
-    case 'del-rol': {
-      if(DB.asignaciones.some(x=>x.rol_id===id)) { alert('No se puede borrar: hay asignaciones con este rol.'); break; }
-      await supabaseClient.from('roles').delete().eq('id', id); loadData(); break;
-    }
-    case 'add-rol-libre': {
-      const n = DB.roles.filter(r=>r.proyecto_id===view.proyectoId && r.es_libre).length + 1;
-      await supabaseClient.from('roles').insert([{id: uid(), proyecto_id:view.proyectoId, nombre:'Rol libre '+n, peso_base:1, es_libre:true}]);
-      loadData(); break;
+// EVENTOS Y EVENT LISTENERS
+document.addEventListener('input', e => {
+  if (e.target.id === 'input-search-alumno') {
+    alumnoFiltroBusqueda = e.target.value;
+    render();
+    const input = $('#input-search-alumno');
+    if (input) {
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
     }
   }
 });
 
-document.addEventListener('change', async e=>{
-  const el = e.target.closest('[data-rol-field]');
-  if(!el) return;
-  const val = el.dataset.rolField === 'peso_base' ? Number(el.value) : el.value;
-  await supabaseClient.from('roles').update({[el.dataset.rolField]: val}).eq('id', el.dataset.rolId);
-  loadData();
+document.addEventListener('click', async e => {
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const act = el.dataset.action, id = el.dataset.id;
+  if (el.tagName === 'A') e.preventDefault();
+  
+  switch (act) {
+    case 'home':
+      view = { name: 'proyectos', proyectoId: null, alumnoId: null };
+      render();
+      break;
+    case 'abrir-proyecto':
+      view = { name: 'proyecto', proyectoId: id, alumnoId: null };
+      render();
+      break;
+    case 'ver-alumnos':
+      view = { name: 'alumnos', proyectoId: view.proyectoId, alumnoId: null };
+      render();
+      break;
+    case 'ver-comparativa':
+      view = { name: 'comparativa', proyectoId: view.proyectoId, alumnoId: null };
+      render();
+      break;
+    case 'abrir-alumno':
+      view = { name: 'alumno', proyectoId: view.proyectoId, alumnoId: id };
+      render();
+      break;
+    case 'pdf-alumno':
+      exportarAlumnoPDF(DB.proyectos.find(x => x.id === view.proyectoId), DB.alumnos.find(x => x.id === id));
+      break;
+    case 'pdf-comparativa':
+      exportarComparativaPDF(DB.proyectos.find(x => x.id === view.proyectoId));
+      break;
+    
+    case 'borrar-proyecto':
+      if (confirm('¿Borrar el proyecto y todos sus datos?')) {
+        DB.proyectos = DB.proyectos.filter(x => x.id !== id);
+        DB.alumnos = DB.alumnos.filter(x => x.proyecto_id !== id);
+        DB.roles = DB.roles.filter(x => x.proyecto_id !== id);
+        DB.eventos = DB.eventos.filter(x => x.proyecto_id !== id);
+        DB.asignaciones = DB.asignaciones.filter(x => x.proyecto_id !== id);
+        DB.faltas = DB.faltas.filter(x => x.proyecto_id !== id);
+        DB.ajustes = DB.ajustes.filter(x => x.proyecto_id !== id);
+        DB.colaboraciones = DB.colaboraciones.filter(x => x.proyecto_id !== id);
+        saveLocal();
+        if (supabaseClient) { try { await supabaseClient.from('proyectos').delete().eq('id', id); } catch(e){} }
+        view = { name: 'proyectos', proyectoId: null, alumnoId: null };
+        render();
+      }
+      break;
+    case 'archivar-proyecto': {
+      const p = DB.proyectos.find(x => x.id === id);
+      if (p) {
+        p.estado = p.estado === 'activo' ? 'archivado' : 'activo';
+        saveLocal();
+        if (supabaseClient) { try { await supabaseClient.from('proyectos').update({ estado: p.estado }).eq('id', id); } catch(e){} }
+        render();
+      }
+      break;
+    }
+    case 'del-alumno':
+      if (confirm('¿Borrar alumno y todos sus datos?')) {
+        DB.alumnos = DB.alumnos.filter(x => x.id !== id);
+        DB.asignaciones = DB.asignaciones.filter(x => x.alumno_id !== id);
+        DB.faltas = DB.faltas.filter(x => x.alumno_id !== id);
+        DB.ajustes = DB.ajustes.filter(x => x.alumno_id !== id);
+        DB.colaboraciones = DB.colaboraciones.filter(x => x.alumno_id !== id);
+        saveLocal();
+        if (supabaseClient) { try { await supabaseClient.from('alumnos').delete().eq('id', id); } catch(e){} }
+        render();
+      }
+      break;
+    case 'del-asignacion':
+      DB.asignaciones = DB.asignaciones.filter(x => x.id !== id);
+      saveLocal();
+      if (supabaseClient) { try { await supabaseClient.from('asignaciones').delete().eq('id', id); } catch(e){} }
+      render();
+      break;
+    case 'del-falta':
+      DB.faltas = DB.faltas.filter(x => x.id !== id);
+      saveLocal();
+      if (supabaseClient) { try { await supabaseClient.from('faltas').delete().eq('id', id); } catch(e){} }
+      render();
+      break;
+    case 'del-evento':
+      if (confirm('¿Borrar evento?')) {
+        DB.eventos = DB.eventos.filter(x => x.id !== id);
+        saveLocal();
+        if (supabaseClient) { try { await supabaseClient.from('eventos').delete().eq('id', id); } catch(e){} }
+        render();
+      }
+      break;
+    case 'del-rol': {
+      if (DB.asignaciones.some(x => x.rol_id === id)) {
+        alert('No se puede borrar: hay asignaciones registradas con este rol.');
+        break;
+      }
+      DB.roles = DB.roles.filter(x => x.id !== id);
+      saveLocal();
+      if (supabaseClient) { try { await supabaseClient.from('roles').delete().eq('id', id); } catch(e){} }
+      render();
+      break;
+    }
+    case 'add-rol-libre': {
+      const n = DB.roles.filter(r => r.proyecto_id === view.proyectoId && r.es_libre).length + 1;
+      const nuevoRol = { id: uid(), proyecto_id: view.proyectoId, nombre: 'Rol libre ' + n, peso_base: 1, es_libre: true };
+      DB.roles.push(nuevoRol);
+      saveLocal();
+      if (supabaseClient) { try { await supabaseClient.from('roles').insert([nuevoRol]); } catch(e){} }
+      render();
+      break;
+    }
+  }
 });
 
-document.addEventListener('submit', async e=>{
+document.addEventListener('change', async e => {
+  const el = e.target.closest('[data-rol-field]');
+  if (!el) return;
+  const val = el.dataset.rolField === 'peso_base' ? Number(el.value) : el.value;
+  const rol = DB.roles.find(r => r.id === el.dataset.rolId);
+  if (rol) {
+    rol[el.dataset.rolField] = val;
+    saveLocal();
+    if (supabaseClient) {
+      try { await supabaseClient.from('roles').update({ [el.dataset.rolField]: val }).eq('id', el.dataset.rolId); } catch(err){}
+    }
+    render();
+  }
+});
+
+document.addEventListener('submit', async e => {
   const f = e.target.closest('form[data-action]');
-  if(!f) return;
+  if (!f) return;
   e.preventDefault();
   const act = f.dataset.action;
   const fd = Object.fromEntries(new FormData(f).entries());
-  const p = DB.proyectos.find(x=>x.id===view.proyectoId);
+  const p = DB.proyectos.find(x => x.id === view.proyectoId);
 
-  switch(act){
+  switch (act) {
     case 'crear-proyecto': {
       const pid = uid();
-      await supabaseClient.from('proyectos').insert([{
-        id:pid, nombre:fd.nombre, curso:fd.curso, optativa:fd.optativa,
-        fecha_inicio:fd.fecha_inicio, fecha_fin:fd.fecha_fin, estado:'activo',
-        techo_referencia:12, metodo_nota:'techo', peso_roles:0.7, peso_ajuste:0.3, penalizacion_falta:0.5
-      }]);
-      const roles = ROLES_DEFECTO.map(r => ({id:uid(), proyecto_id:pid, nombre:r[0], peso_base:r[1], es_libre:false}));
-      roles.push({id:uid(), proyecto_id:pid, nombre:'Rol libre 1', peso_base:1, es_libre:true});
-      roles.push({id:uid(), proyecto_id:pid, nombre:'Rol libre 2', peso_base:1, es_libre:true});
-      await supabaseClient.from('roles').insert(roles);
-      view = {name:'proyecto', proyectoId:pid, alumnoId:null}; loadData(); break;
+      const nuevoP = {
+        id: pid, nombre: fd.nombre, curso: fd.curso, optativa: fd.optativa,
+        fecha_inicio: fd.fecha_inicio, fecha_fin: fd.fecha_fin, estado: 'activo',
+        techo_referencia: 12, metodo_nota: 'techo', peso_roles: 0.7, peso_ajuste: 0.3, penalizacion_falta: 0.5
+      };
+      DB.proyectos.push(nuevoP);
+
+      const rolesAdd = ROLES_DEFECTO.map(r => ({ id: uid(), proyecto_id: pid, nombre: r[0], peso_base: r[1], es_libre: false }));
+      rolesAdd.push({ id: uid(), proyecto_id: pid, nombre: 'Rol libre 1', peso_base: 1, es_libre: true });
+      rolesAdd.push({ id: uid(), proyecto_id: pid, nombre: 'Rol libre 2', peso_base: 1, es_libre: true });
+      DB.roles.push(...rolesAdd);
+      
+      saveLocal();
+      if (supabaseClient) {
+        try {
+          await supabaseClient.from('proyectos').insert([nuevoP]);
+          await supabaseClient.from('roles').insert(rolesAdd);
+        } catch(e){}
+      }
+      
+      view = { name: 'proyecto', proyectoId: pid, alumnoId: null };
+      render();
+      break;
     }
     case 'guardar-proyecto':
-      await supabaseClient.from('proyectos').update({
-        nombre:fd.nombre, curso:fd.curso, optativa:fd.optativa, fecha_inicio:fd.fecha_inicio, fecha_fin:fd.fecha_fin, notas:fd.notas
-      }).eq('id', p.id); loadData(); break;
+      if (p) {
+        Object.assign(p, {
+          nombre: fd.nombre, curso: fd.curso, optativa: fd.optativa,
+          fecha_inicio: fd.fecha_inicio, fecha_fin: fd.fecha_fin, notas: fd.notas
+        });
+        saveLocal();
+        if (supabaseClient) {
+          try { await supabaseClient.from('proyectos').update({ nombre: fd.nombre, curso: fd.curso, optativa: fd.optativa, fecha_inicio: fd.fecha_inicio, fecha_fin: fd.fecha_fin, notas: fd.notas }).eq('id', p.id); } catch(e){}
+        }
+        render();
+      }
+      break;
     case 'guardar-ajustes':
-      await supabaseClient.from('proyectos').update({
-        techo_referencia:Number(fd.techo_referencia), metodo_nota:fd.metodo_nota, peso_roles:Number(fd.peso_roles), peso_ajuste:Number(fd.peso_ajuste), penalizacion_falta:Number(fd.penalizacion_falta)
-      }).eq('id', p.id); loadData(); break;
+      if (p) {
+        Object.assign(p, {
+          techo_referencia: Number(fd.techo_referencia), metodo_nota: fd.metodo_nota,
+          peso_roles: Number(fd.peso_roles), peso_ajuste: Number(fd.peso_ajuste), penalizacion_falta: Number(fd.penalizacion_falta)
+        });
+        saveLocal();
+        if (supabaseClient) {
+          try { await supabaseClient.from('proyectos').update({ techo_referencia: Number(fd.techo_referencia), metodo_nota: fd.metodo_nota, peso_roles: Number(fd.peso_roles), peso_ajuste: Number(fd.peso_ajuste), penalizacion_falta: Number(fd.penalizacion_falta) }).eq('id', p.id); } catch(e){}
+        }
+        render();
+      }
+      break;
     case 'add-evento':
-      await supabaseClient.from('eventos').insert([{
-        id:uid(), proyecto_id:p.id, nombre:fd.nombre, tipo:fd.tipo, trimestre:fd.trimestre, fecha:fd.fecha, sede:fd.sede, formato:fd.formato, estado:fd.estado, notas:fd.notas
-      }]); loadData(); break;
+      if (p) {
+        const nuevoEv = { id: uid(), proyecto_id: p.id, nombre: fd.nombre, tipo: fd.tipo, trimestre: fd.trimestre, fecha: fd.fecha, sede: fd.sede, formato: fd.formato, estado: fd.estado, notas: fd.notas };
+        DB.eventos.push(nuevoEv);
+        saveLocal();
+        if (supabaseClient) { try { await supabaseClient.from('eventos').insert([nuevoEv]); } catch(e){} }
+        render();
+      }
+      break;
     case 'add-alumno':
-      await supabaseClient.from('alumnos').insert([{
-        id:uid(), proyecto_id:p.id, nombre:fd.nombre, curso:fd.curso, grupo:fd.grupo
-      }]); loadData(); break;
+      if (p) {
+        const nuevoAl = { id: uid(), proyecto_id: p.id, nombre: fd.nombre, curso: fd.curso, grupo: fd.grupo };
+        DB.alumnos.push(nuevoAl);
+        saveLocal();
+        if (supabaseClient) { try { await supabaseClient.from('alumnos').insert([nuevoAl]); } catch(e){} }
+        render();
+      }
+      break;
     case 'add-asignacion':
-      await supabaseClient.from('asignaciones').insert([{
-        id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, rol_id:fd.rol_id, intensidad:fd.intensidad, valoracion:fd.valoracion, trimestre:fd.trimestre, evento_id:fd.evento_id||null, notas:fd.notas
-      }]); loadData(); break;
+      if (p && view.alumnoId) {
+        const nuevaAsg = { id: uid(), proyecto_id: p.id, alumno_id: view.alumnoId, rol_id: fd.rol_id, intensidad: fd.intensidad, valoracion: fd.valoracion, trimestre: fd.trimestre, evento_id: fd.evento_id || null, notas: fd.notas };
+        DB.asignaciones.push(nuevaAsg);
+        saveLocal();
+        if (supabaseClient) { try { await supabaseClient.from('asignaciones').insert([nuevaAsg]); } catch(e){} }
+        render();
+      }
+      break;
     case 'add-falta':
-      await supabaseClient.from('faltas').insert([{
-        id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, fecha:fd.fecha, tipo:fd.tipo, justificada:(fd.justificada==='si')
-      }]); loadData(); break;
-    case 'guardar-notas':
-      await supabaseClient.from('alumnos').update({notas_privadas:fd.notas_privadas, notas_ficha:fd.notas_ficha}).eq('id', view.alumnoId);
-      alert('Notas guardadas'); loadData(); break;
+      if (p && view.alumnoId) {
+        const nuevaFalta = { id: uid(), proyecto_id: p.id, alumno_id: view.alumnoId, fecha: fd.fecha, tipo: fd.tipo, justificada: (fd.justificada === 'si') };
+        DB.faltas.push(nuevaFalta);
+        saveLocal();
+        if (supabaseClient) { try { await supabaseClient.from('faltas').insert([nuevaFalta]); } catch(e){} }
+        render();
+      }
+      break;
+    case 'guardar-notas': {
+      const a = DB.alumnos.find(x => x.id === view.alumnoId);
+      if (a) {
+        a.notas_privadas = fd.notas_privadas;
+        a.notas_ficha = fd.notas_ficha;
+        saveLocal();
+        if (supabaseClient) { try { await supabaseClient.from('alumnos').update({ notas_privadas: fd.notas_privadas, notas_ficha: fd.notas_ficha }).eq('id', view.alumnoId); } catch(e){} }
+        alert('Notas guardadas');
+        render();
+      }
+      break;
+    }
     case 'guardar-ajuste': {
-      let aj = DB.ajustes.find(x=>x.alumno_id===view.alumnoId);
-      if(!aj) await supabaseClient.from('ajustes').insert([{id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, nota:Number(fd.nota), comentario:fd.comentario}]);
-      else await supabaseClient.from('ajustes').update({nota:Number(fd.nota), comentario:fd.comentario}).eq('id', aj.id);
-      loadData(); break;
+      let aj = DB.ajustes.find(x => x.alumno_id === view.alumnoId);
+      const notaVal = fd.nota !== '' ? Number(fd.nota) : '';
+      if (!aj) {
+        aj = { id: uid(), proyecto_id: p.id, alumno_id: view.alumnoId, nota: notaVal, comentario: fd.comentario };
+        DB.ajustes.push(aj);
+        if (supabaseClient) { try { await supabaseClient.from('ajustes').insert([aj]); } catch(e){} }
+      } else {
+        aj.nota = notaVal;
+        aj.comentario = fd.comentario;
+        if (supabaseClient) { try { await supabaseClient.from('ajustes').update({ nota: notaVal, comentario: fd.comentario }).eq('id', aj.id); } catch(e){} }
+      }
+      saveLocal();
+      render();
+      break;
     }
     case 'guardar-colab': {
-      let c = DB.colaboraciones.find(x=>x.alumno_id===view.alumnoId);
-      if(!c) await supabaseClient.from('colaboraciones').insert([{id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, estado:fd.estado, notas:fd.notas}]);
-      else await supabaseClient.from('colaboraciones').update({estado:fd.estado, notas:fd.notas}).eq('id', c.id);
-      alert('Guardado'); loadData(); break;
+      let c = DB.colaboraciones.find(x => x.alumno_id === view.alumnoId);
+      if (!c) {
+        c = { id: uid(), proyecto_id: p.id, alumno_id: view.alumnoId, estado: fd.estado, notas: fd.notas };
+        DB.colaboraciones.push(c);
+        if (supabaseClient) { try { await supabaseClient.from('colaboraciones').insert([c]); } catch(e){} }
+      } else {
+        c.estado = fd.estado;
+        c.notas = fd.notas;
+        if (supabaseClient) { try { await supabaseClient.from('colaboraciones').update({ estado: fd.estado, notas: fd.notas }).eq('id', c.id); } catch(e){} }
+      }
+      saveLocal();
+      alert('Guardado');
+      render();
+      break;
     }
   }
 });
 
-$('#btn-home').addEventListener('click', ()=>{ view={name:'proyectos',proyectoId:null,alumnoId:null}; render(); });
-$('#btn-logout').addEventListener('click', ()=>{ localStorage.removeItem('prod_session_email'); sessionEmail = null; initApp(); });
+$('#btn-home').addEventListener('click', () => {
+  view = { name: 'proyectos', proyectoId: null, alumnoId: null };
+  render();
+});
 
-initApp();
+$('#btn-sync').addEventListener('click', () => {
+  loadData();
+});
+
+initTheme();
+loadData();
 </script>
 </body>
 </html>
