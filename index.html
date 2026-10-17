@@ -1,66 +1,70 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" translate="no">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Registro de Producción Escénica</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{--bg:#f6f7f9;--card:#fff;--ink:#1c2430;--muted:#6b7785;--line:#e3e7ec;--brand:#2b5c8a;--brand2:#3d7ab5;--green:#0b6b2a;--yellow:#8a6100;--red:#9b1c1c}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
-.topbar{position:sticky;top:0;z-index:10;display:flex;gap:10px;align-items:center;padding:10px 14px;background:var(--brand);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15)}
-.topbar button,.topbar .btn{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer}
-.topbar button:hover,.topbar .btn:hover{background:rgba(255,255,255,.28)}
-#topbar-title{font-weight:600;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-main{max-width:1050px;margin:0 auto;padding:18px 14px 70px}
-h1{font-size:22px;margin:6px 0 14px}
-h2{font-size:16px;margin:22px 0 10px;color:var(--brand)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
-.pcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
-.pcard h3{margin:0;font-size:16px}
-.muted{color:var(--muted);font-size:13px}
-.btn{display:inline-flex;align-items:center;gap:6px;background:var(--brand);color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;text-decoration:none}
-.btn:hover{background:var(--brand2)}
-.btn.sec{background:#eef2f6;color:var(--ink);border:1px solid var(--line)}
-.btn.sec:hover{background:#e3e9ef}
-.btn.danger{background:#fbe4e4;color:var(--red);border:1px solid #f3c9c9}
-.btn.sm{padding:5px 9px;font-size:12px}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-details{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-bottom:12px}
-details summary{cursor:pointer;font-weight:600;color:var(--brand)}
-form{display:grid;gap:10px;margin-top:10px}
-.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
-input,select,textarea{font:inherit;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);width:100%}
-textarea{min-height:70px;resize:vertical}
-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;font-size:14px;margin-bottom:10px}
-th,td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-th{background:#f1f4f8;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
-tr:last-child td{border-bottom:none}
-.chip{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600}
-.c-green{background:#d7f5dd;color:var(--green)}
-.c-yellow{background:#fff3cd;color:var(--yellow)}
-.c-red{background:#fbdada;color:var(--red)}
-.pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#eef2f6;font-size:12px}
-a{color:var(--brand)}
-@media(max-width:600px){th,td{padding:6px;font-size:13px}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Producción Escénica</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root{--bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#4f46e5;--brand2:#4338ca;--green:#10b981;--yellow:#f59e0b;--red:#ef4444}
+        *{box-sizing:border-box}
+        body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+        .topbar{position:sticky;top:0;z-index:10;display:flex;gap:10px;align-items:center;padding:12px 18px;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+        .topbar button,.topbar .btn{background:#f1f5f9;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:13px;font-weight:600;cursor:pointer;transition:0.2s}
+        .topbar button:hover,.topbar .btn:hover{background:#e2e8f0}
+        #topbar-title{font-weight:800;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--brand)}
+        main{max-width:1050px;margin:0 auto;padding:24px 18px 80px}
+        h1{font-size:24px;margin:6px 0 18px;font-weight:800}
+        h2{font-size:16px;margin:24px 0 12px;color:var(--brand);font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+        .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.02)}
+        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+        .pcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,.02)}
+        .pcard h3{margin:0;font-size:18px;font-weight:700}
+        .muted{color:var(--muted);font-size:13px}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--brand);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:0.2s}
+        .btn:hover{background:var(--brand2)}
+        .btn.sec{background:#f1f5f9;color:var(--ink);border:1px solid var(--line)}
+        .btn.sec:hover{background:#e2e8f0}
+        .btn.danger{background:#fee2e2;color:var(--red);border:1px solid #fecaca}
+        .btn.danger:hover{background:#fecaca}
+        .btn.sm{padding:6px 12px;font-size:12px}
+        .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+        details{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:12px 16px;margin-bottom:16px}
+        details summary{cursor:pointer;font-weight:700;color:var(--brand);outline:none}
+        form{display:grid;gap:12px;margin-top:12px}
+        .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+        label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);font-weight:600}
+        input,select,textarea{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#f8fafc;color:var(--ink);width:100%;outline:none;transition:0.2s}
+        input:focus,select:focus,textarea:focus{border-color:var(--brand);background:#fff;box-shadow:0 0 0 3px rgba(79,70,229,0.1)}
+        textarea{min-height:80px;resize:vertical}
+        table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;font-size:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.02)}
+        th,td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+        th{background:#f8fafc;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+        tr:last-child td{border-bottom:none}
+        tr:hover{background:#f8fafc}
+        .chip{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700}
+        .c-green{background:#d1fae5;color:#065f46}
+        .c-yellow{background:#fef3c7;color:#92400e}
+        .c-red{background:#fee2e2;color:#991b1b}
+        .pill{display:inline-block;padding:4px 10px;border-radius:6px;background:#f1f5f9;font-size:12px;font-weight:600;color:var(--muted)}
+        a{color:var(--brand);text-decoration:none;font-weight:600}
+        a:hover{text-decoration:underline}
+        @media(max-width:600px){th,td{padding:8px 10px;font-size:13px}}
+    </style>
 </head>
 <body>
 
 <header class="topbar" id="topbar" style="display:none">
   <button id="btn-home">⌂ Proyectos</button>
   <span id="topbar-title">Registro de Producción Escénica</span>
-  <button id="btn-logout">Salir</button>
+  <button id="btn-logout" class="danger">Salir</button>
 </header>
 <main id="app"></main>
 
 <script>
 const SUPABASE_URL = 'https://uaqktciswfjzcorrevrh.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_JoSi5-B_NIAD12NDtpaSQw_Yxp6HMbj';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const $ = s => document.querySelector(s);
 const uid = () => crypto.randomUUID();
@@ -70,6 +74,7 @@ const colorClass = n => n >= 8 ? 'c-green' : n >= 5 ? 'c-yellow' : 'c-red';
 
 let DB = { proyectos:[], alumnos:[], roles:[], asignaciones:[], eventos:[], faltas:[], ajustes:[], colaboraciones:[] };
 let view = { name:'proyectos', proyectoId:null, alumnoId:null };
+let sessionEmail = localStorage.getItem('prod_session_email');
 
 const ROLES_DEFECTO = [
   ['Actor principal',3],['Coreógrafo',3],['Actor secundario',2],['Bailarín',2],
@@ -79,16 +84,16 @@ const ROLES_DEFECTO = [
 const TIPO_EVENTO = {solidario:'Solidario',presentacion:'Presentación',preestreno:'Preestreno',estreno:'Estreno',bolo:'Bolo',otro:'Otro'};
 
 async function loadData() {
-  $('#app').innerHTML = '<div class="card">Cargando datos...</div>';
+  $('#app').innerHTML = '<div class="card" style="text-align:center;padding:40px;">Cargando datos...</div>';
   try {
-    const p = await supabase.from('proyectos').select('*').order('created_at');
-    const a = await supabase.from('alumnos').select('*');
-    const r = await supabase.from('roles').select('*');
-    const asg = await supabase.from('asignaciones').select('*');
-    const e = await supabase.from('eventos').select('*');
-    const f = await supabase.from('faltas').select('*');
-    const aj = await supabase.from('ajustes').select('*');
-    const c = await supabase.from('colaboraciones').select('*');
+    const p = await supabaseClient.from('proyectos').select('*').order('created_at');
+    const a = await supabaseClient.from('alumnos').select('*');
+    const r = await supabaseClient.from('roles').select('*');
+    const asg = await supabaseClient.from('asignaciones').select('*');
+    const e = await supabaseClient.from('eventos').select('*');
+    const f = await supabaseClient.from('faltas').select('*');
+    const aj = await supabaseClient.from('ajustes').select('*');
+    const c = await supabaseClient.from('colaboraciones').select('*');
 
     DB.proyectos = p.data || [];
     DB.alumnos = a.data || [];
@@ -104,31 +109,34 @@ async function loadData() {
   }
 }
 
-async function checkAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
-    $('#topbar').style.display = 'none';
-    $('#app').innerHTML = `
-      <div class="card" style="max-width:400px;margin:40px auto">
-        <h2>Acceso al sistema</h2>
-        <p class="muted">Introduce tu correo para recibir un enlace de acceso.</p>
-        <form id="login-form">
-          <input type="email" id="login-email" placeholder="tu@correo.com" required>
-          <button class="btn" type="submit">Enviar enlace</button>
-        </form>
-        <div id="login-msg" style="margin-top:10px;color:var(--brand)"></div>
-      </div>`;
-    $('#login-form').onsubmit = async (e) => {
-      e.preventDefault();
-      const email = $('#login-email').value;
-      const { error } = await supabase.auth.signInWithOtp({ email });
-      if (error) alert(error.message);
-      else $('#login-msg').textContent = 'Revisa tu correo y haz clic en el enlace mágico.';
-    };
-    return;
+function renderLogin() {
+  $('#topbar').style.display = 'none';
+  $('#app').innerHTML = `
+    <div class="card" style="max-width:400px;margin:60px auto;text-align:center;padding:40px 30px;">
+      <div style="font-size:40px;margin-bottom:15px;">🎭</div>
+      <h2 style="margin-top:0;color:var(--ink);text-transform:none;">Acceso Profesorado</h2>
+      <p class="muted" style="margin-bottom:25px;">Introduce tu correo para acceder a tus proyectos.</p>
+      <form id="login-form">
+        <input type="email" id="login-email" placeholder="tu@correo.com" required style="text-align:center;">
+        <button class="btn" type="submit" style="width:100%;margin-top:10px;">Entrar</button>
+      </form>
+    </div>`;
+  $('#login-form').onsubmit = (e) => {
+    e.preventDefault();
+    const email = $('#login-email').value;
+    localStorage.setItem('prod_session_email', email);
+    sessionEmail = email;
+    initApp();
+  };
+}
+
+function initApp() {
+  if (!sessionEmail) {
+    renderLogin();
+  } else {
+    $('#topbar').style.display = 'flex';
+    loadData();
   }
-  $('#topbar').style.display = 'flex';
-  loadData();
 }
 
 function calcAlumno(p, a){
@@ -260,7 +268,7 @@ function renderProyectos(){
         <h3>${esc(p.nombre)}</h3>
         <div class="muted">${esc(p.curso)} · ${esc(p.optativa||'—')}</div>
         <div><span class="pill">${p.estado==='activo'?'Activo':'Archivado'}</span></div>
-        <div class="row">
+        <div class="row" style="margin-top:auto;">
           <button class="btn sm" data-action="abrir-proyecto" data-id="${p.id}">Abrir</button>
           <button class="btn sm sec" data-action="archivar-proyecto" data-id="${p.id}">${p.estado==='activo'?'Archivar':'Reactivar'}</button>
           <button class="btn sm danger" data-action="borrar-proyecto" data-id="${p.id}">Borrar</button>
@@ -275,9 +283,9 @@ function renderProyecto(p){
   const roles = DB.roles.filter(r=>r.proyecto_id===p.id);
   const nAl = DB.alumnos.filter(a=>a.proyecto_id===p.id).length;
   return `<h1>${esc(p.nombre)}</h1>
-  <div class="row" style="margin-bottom:14px">
-    <button class="btn" data-action="ver-alumnos">Alumnos (${nAl})</button>
-    <button class="btn" data-action="ver-comparativa">Comparativa</button>
+  <div class="row" style="margin-bottom:20px">
+    <button class="btn" data-action="ver-alumnos" style="background:var(--ink);">Alumnos (${nAl})</button>
+    <button class="btn" data-action="ver-comparativa" style="background:var(--ink);">Comparativa</button>
   </div>
 
   <h2>Datos del proyecto</h2>
@@ -332,14 +340,14 @@ function renderProyecto(p){
 
   <h2>Roles y pesos</h2>
   ${renderTablaRoles(roles)}
-  <div class="row" style="margin-top:8px"><button class="btn sec sm" data-action="add-rol-libre">+ Añadir rol libre</button></div>`;
+  <div class="row" style="margin-top:12px"><button class="btn sec sm" data-action="add-rol-libre">+ Añadir rol libre</button></div>`;
 }
 
 function renderTablaEventos(eventos){
   if(!eventos.length) return '<div class="card muted">Sin eventos todavía.</div>';
   return `<table><thead><tr><th>Evento</th><th>Tipo</th><th>T</th><th>Fecha</th><th>Sede</th><th>Formato</th><th>Estado</th><th></th></tr></thead><tbody>
   ${eventos.map(e=>`<tr>
-    <td>${esc(e.nombre)}</td>
+    <td><strong>${esc(e.nombre)}</strong></td>
     <td>${esc(TIPO_EVENTO[e.tipo]||e.tipo)}</td>
     <td>${esc(e.trimestre)}</td>
     <td>${esc(e.fecha)}</td>
@@ -354,8 +362,8 @@ function renderTablaRoles(roles){
   if(!roles.length) return '<div class="card muted">Sin roles.</div>';
   return `<table><thead><tr><th>Rol</th><th>Peso base</th><th>Tipo</th><th></th></tr></thead><tbody>
   ${roles.map(r=>`<tr>
-    <td>${r.es_libre?`<input data-rol-id="${r.id}" data-rol-field="nombre" value="${esc(r.nombre)}">`:esc(r.nombre)}</td>
-    <td><input type="number" step="0.5" min="0" style="max-width:90px" data-rol-id="${r.id}" data-rol-field="peso_base" value="${Number(r.peso_base)}"></td>
+    <td>${r.es_libre?`<input data-rol-id="${r.id}" data-rol-field="nombre" value="${esc(r.nombre)}" style="padding:6px;">`:esc(r.nombre)}</td>
+    <td><input type="number" step="0.5" min="0" style="max-width:90px;padding:6px;" data-rol-id="${r.id}" data-rol-field="peso_base" value="${Number(r.peso_base)}"></td>
     <td>${r.es_libre?'<span class="pill">Libre</span>':'<span class="muted">Fijo</span>'}</td>
     <td>${r.es_libre?`<button class="btn sm danger" type="button" data-action="del-rol" data-id="${r.id}">Borrar</button>`:''}</td>
   </tr>`).join('')}</tbody></table>`;
@@ -371,16 +379,16 @@ function renderAlumnos(p){
       <td><a href="#" data-action="abrir-alumno" data-id="${a.id}">${esc(a.nombre)}</a></td>
       <td>${esc(a.curso||'')}</td>
       <td>${esc(a.grupo||'')}</td>
-      <td>${r.asg.length}</td>
+      <td><span class="pill">${r.asg.length}</span></td>
       <td>${r.pts.toFixed(1)}</td>
       <td><span class="chip ${colorClass(final)}">${final.toFixed(1)}</span></td>
       <td><button class="btn sm danger" type="button" data-action="del-alumno" data-id="${a.id}">×</button></td>
     </tr>`;
   }).join('');
   return `<h1>Alumnos · ${esc(p.nombre)}</h1>
-  <div class="row" style="margin-bottom:14px">
-    <button class="btn sec" data-action="abrir-proyecto" data-id="${p.id}">← Proyecto</button>
-    <button class="btn" data-action="ver-comparativa">Comparativa</button>
+  <div class="row" style="margin-bottom:20px">
+    <button class="btn sec" data-action="abrir-proyecto" data-id="${p.id}">← Volver al proyecto</button>
+    <button class="btn" data-action="ver-comparativa" style="background:var(--ink);">Comparativa</button>
   </div>
   <details><summary>+ Añadir alumno</summary>
     <form data-action="add-alumno">
@@ -389,7 +397,7 @@ function renderAlumnos(p){
         <label>Curso<input name="curso" placeholder="4º ESO"></label>
         <label>Grupo<input name="grupo" placeholder="A"></label>
       </div>
-      <div class="row"><button class="btn" type="submit">Añadir</button></div>
+      <div class="row"><button class="btn" type="submit">Añadir alumno</button></div>
     </form>
   </details>
   ${als.length ? `<table><thead><tr><th>Alumno</th><th>Curso</th><th>Grupo</th><th>Roles</th><th>Puntos</th><th>Nota</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="card muted">Sin alumnos todavía.</div>'}`;
@@ -406,7 +414,7 @@ function renderAlumno(p, a){
   const colab = DB.colaboraciones.find(x=>x.alumno_id===a.id);
 
   const filasAsg = c.asg.map(x=>`<tr>
-    <td>${esc(x.rolNombre)}</td>
+    <td><strong>${esc(x.rolNombre)}</strong></td>
     <td>${esc(x.intensidad)}</td>
     <td><span class="chip ${x.valoracion==='bien'?'c-green':x.valoracion==='aceptable'?'c-yellow':'c-red'}">${esc(x.valoracion)}</span></td>
     <td>T${esc(x.trimestre)}</td>
@@ -425,17 +433,17 @@ function renderAlumno(p, a){
   const final = p.metodo_nota==='normalizada' ? g.finalNorm : g.finalTecho;
 
   return `<h1>${esc(a.nombre)}</h1>
-  <div class="row" style="margin-bottom:14px">
-    <button class="btn sec" data-action="ver-alumnos">← Alumnos</button>
-    <button class="btn" data-action="imprimir-ficha" data-id="${a.id}">🖨 Imprimir ficha</button>
+  <div class="row" style="margin-bottom:20px">
+    <button class="btn sec" data-action="ver-alumnos">← Volver a alumnos</button>
+    <button class="btn" data-action="imprimir-ficha" data-id="${a.id}" style="background:var(--ink);">🖨 Imprimir ficha</button>
   </div>
 
-  <div class="card">
+  <div class="card" style="background:#f8fafc; border-left:4px solid var(--brand);">
     <div class="row" style="justify-content:space-between">
-      <div><strong>${esc(a.curso||'')} ${esc(a.grupo||'')}</strong></div>
-      <div>Puntos: <strong>${c.pts.toFixed(1)}</strong> · Nota roles: <strong>${g.notaTecho.toFixed(1)}</strong> · Final: <span class="chip ${colorClass(final)}">${final.toFixed(1)}</span></div>
+      <div><strong style="font-size:16px;">${esc(a.curso||'')} ${esc(a.grupo||'')}</strong></div>
+      <div>Puntos: <strong style="font-size:16px;">${c.pts.toFixed(1)}</strong> &nbsp;·&nbsp; Nota roles: <strong style="font-size:16px;">${g.notaTecho.toFixed(1)}</strong> &nbsp;·&nbsp; Final: <span class="chip ${colorClass(final)}" style="font-size:14px;">${final.toFixed(1)}</span></div>
     </div>
-    <div class="muted" style="margin-top:6px">Faltas no justificadas: ${c.faltasNJ} (−${c.penal.toFixed(1)} pts)</div>
+    <div class="muted" style="margin-top:10px;">Faltas no justificadas: <strong>${c.faltasNJ}</strong> (Penalización: −${c.penal.toFixed(1)} pts)</div>
   </div>
 
   <h2>Roles asignados</h2>
@@ -462,7 +470,7 @@ function renderAlumno(p, a){
         </select></label>
       </div>
       <label>Observaciones<input name="notas" placeholder="Aprendió el papel, faltó a dos ensayos..."></label>
-      <div class="row"><button class="btn" type="submit">Asignar</button></div>
+      <div class="row"><button class="btn" type="submit">Asignar rol</button></div>
     </form>
   </details>
 
@@ -475,7 +483,7 @@ function renderAlumno(p, a){
         <label>Tipo<select name="tipo"><option value="ensayo">Ensayo importante</option><option value="actuacion">Actuación</option></select></label>
         <label>Justificada<select name="justificada"><option value="no">No</option><option value="si">Sí</option></select></label>
       </div>
-      <div class="row"><button class="btn" type="submit">Añadir</button></div>
+      <div class="row"><button class="btn" type="submit">Añadir falta</button></div>
     </form>
   </details>
 
@@ -506,7 +514,7 @@ function renderAlumno(p, a){
       </select></label>
     </div>
     <label>Notas<input name="notas" value="${esc(colab?colab.notas:'')}" placeholder="Ensayo general + función de fin de curso"></label>
-    <div class="row"><button class="btn" type="submit">Guardar</button></div>
+    <div class="row"><button class="btn" type="submit">Guardar colaboración</button></div>
   </form>` : ''}`;
 }
 
@@ -524,14 +532,14 @@ function renderComparativa(p){
     <td><span class="chip ${colorClass(r.finalNorm)}">${r.finalNorm.toFixed(1)} ${metodo==='normalizada'?'★':''}</span></td>
   </tr>`).join('');
   return `<h1>Comparativa · ${esc(p.nombre)}</h1>
-  <div class="row" style="margin-bottom:14px">
-    <button class="btn sec" data-action="abrir-proyecto" data-id="${p.id}">← Proyecto</button>
+  <div class="row" style="margin-bottom:20px">
+    <button class="btn sec" data-action="abrir-proyecto" data-id="${p.id}">← Volver al proyecto</button>
     <button class="btn sec" data-action="ver-alumnos">Alumnos</button>
-    <button class="btn" data-action="imprimir-comparativa">🖨 Imprimir comparativa</button>
+    <button class="btn" data-action="imprimir-comparativa" style="background:var(--ink);">🖨 Imprimir comparativa</button>
   </div>
-  <div class="card muted">Método activo: <strong>${metodo}</strong> · Techo: ${p.techo_referencia} · Pesos: ${p.peso_roles} / ${p.peso_ajuste} · Penalización falta: ${p.penalizacion_falta}</div>
+  <div class="card muted" style="background:#f8fafc;">Método activo: <strong>${metodo}</strong> · Techo: ${p.techo_referencia} · Pesos: ${p.peso_roles} / ${p.peso_ajuste} · Penalización falta: ${p.penalizacion_falta}</div>
   ${g.length ? `<table><thead><tr><th>Alumno</th><th>Puntos</th><th>Nota roles (techo)</th><th>Nota roles (norm.)</th><th>Ajuste</th><th>Final (techo)</th><th>Final (norm.)</th></tr></thead><tbody>${filas}</tbody></table>` : '<div class="card muted">Sin alumnos.</div>'}
-  <p class="muted">Uso interno del profesorado. La ficha que se enseña al alumno es la individual, sin puntos ni comparativa.</p>`;
+  <p class="muted" style="text-align:center;margin-top:20px;">Uso interno del profesorado. La ficha que se enseña al alumno es la individual, sin puntos ni comparativa.</p>`;
 }
 
 document.addEventListener('click', async e=>{
@@ -550,24 +558,24 @@ document.addEventListener('click', async e=>{
     case 'imprimir-comparativa': imprimirComparativa(DB.proyectos.find(x=>x.id===view.proyectoId)); break;
     
     case 'borrar-proyecto': 
-      if(confirm('¿Borrar el proyecto y todos sus datos?')) { await supabase.from('proyectos').delete().eq('id', id); view={name:'proyectos',proyectoId:null,alumnoId:null}; loadData(); } 
+      if(confirm('¿Borrar el proyecto y todos sus datos?')) { await supabaseClient.from('proyectos').delete().eq('id', id); view={name:'proyectos',proyectoId:null,alumnoId:null}; loadData(); } 
       break;
     case 'archivar-proyecto': {
       const p = DB.proyectos.find(x=>x.id===id);
       const nuevoEstado = p.estado==='activo'?'archivado':'activo';
-      await supabase.from('proyectos').update({estado: nuevoEstado}).eq('id', id); loadData(); break;
+      await supabaseClient.from('proyectos').update({estado: nuevoEstado}).eq('id', id); loadData(); break;
     }
-    case 'del-alumno': if(confirm('¿Borrar alumno y todos sus datos?')) { await supabase.from('alumnos').delete().eq('id', id); loadData(); } break;
-    case 'del-asignacion': await supabase.from('asignaciones').delete().eq('id', id); loadData(); break;
-    case 'del-falta': await supabase.from('faltas').delete().eq('id', id); loadData(); break;
-    case 'del-evento': if(confirm('¿Borrar evento?')) { await supabase.from('eventos').delete().eq('id', id); loadData(); } break;
+    case 'del-alumno': if(confirm('¿Borrar alumno y todos sus datos?')) { await supabaseClient.from('alumnos').delete().eq('id', id); loadData(); } break;
+    case 'del-asignacion': await supabaseClient.from('asignaciones').delete().eq('id', id); loadData(); break;
+    case 'del-falta': await supabaseClient.from('faltas').delete().eq('id', id); loadData(); break;
+    case 'del-evento': if(confirm('¿Borrar evento?')) { await supabaseClient.from('eventos').delete().eq('id', id); loadData(); } break;
     case 'del-rol': {
       if(DB.asignaciones.some(x=>x.rol_id===id)) { alert('No se puede borrar: hay asignaciones con este rol.'); break; }
-      await supabase.from('roles').delete().eq('id', id); loadData(); break;
+      await supabaseClient.from('roles').delete().eq('id', id); loadData(); break;
     }
     case 'add-rol-libre': {
       const n = DB.roles.filter(r=>r.proyecto_id===view.proyectoId && r.es_libre).length + 1;
-      await supabase.from('roles').insert([{id: uid(), proyecto_id:view.proyectoId, nombre:'Rol libre '+n, peso_base:1, es_libre:true}]);
+      await supabaseClient.from('roles').insert([{id: uid(), proyecto_id:view.proyectoId, nombre:'Rol libre '+n, peso_base:1, es_libre:true}]);
       loadData(); break;
     }
   }
@@ -577,7 +585,7 @@ document.addEventListener('change', async e=>{
   const el = e.target.closest('[data-rol-field]');
   if(!el) return;
   const val = el.dataset.rolField === 'peso_base' ? Number(el.value) : el.value;
-  await supabase.from('roles').update({[el.dataset.rolField]: val}).eq('id', el.dataset.rolId);
+  await supabaseClient.from('roles').update({[el.dataset.rolField]: val}).eq('id', el.dataset.rolId);
   loadData();
 });
 
@@ -592,7 +600,7 @@ document.addEventListener('submit', async e=>{
   switch(act){
     case 'crear-proyecto': {
       const pid = uid();
-      await supabase.from('proyectos').insert([{
+      await supabaseClient.from('proyectos').insert([{
         id:pid, nombre:fd.nombre, curso:fd.curso, optativa:fd.optativa,
         fecha_inicio:fd.fecha_inicio, fecha_fin:fd.fecha_fin, estado:'activo',
         techo_referencia:12, metodo_nota:'techo', peso_roles:0.7, peso_ajuste:0.3, penalizacion_falta:0.5
@@ -600,55 +608,55 @@ document.addEventListener('submit', async e=>{
       const roles = ROLES_DEFECTO.map(r => ({id:uid(), proyecto_id:pid, nombre:r[0], peso_base:r[1], es_libre:false}));
       roles.push({id:uid(), proyecto_id:pid, nombre:'Rol libre 1', peso_base:1, es_libre:true});
       roles.push({id:uid(), proyecto_id:pid, nombre:'Rol libre 2', peso_base:1, es_libre:true});
-      await supabase.from('roles').insert(roles);
+      await supabaseClient.from('roles').insert(roles);
       view = {name:'proyecto', proyectoId:pid, alumnoId:null}; loadData(); break;
     }
     case 'guardar-proyecto':
-      await supabase.from('proyectos').update({
+      await supabaseClient.from('proyectos').update({
         nombre:fd.nombre, curso:fd.curso, optativa:fd.optativa, fecha_inicio:fd.fecha_inicio, fecha_fin:fd.fecha_fin, notas:fd.notas
       }).eq('id', p.id); loadData(); break;
     case 'guardar-ajustes':
-      await supabase.from('proyectos').update({
+      await supabaseClient.from('proyectos').update({
         techo_referencia:Number(fd.techo_referencia), metodo_nota:fd.metodo_nota, peso_roles:Number(fd.peso_roles), peso_ajuste:Number(fd.peso_ajuste), penalizacion_falta:Number(fd.penalizacion_falta)
       }).eq('id', p.id); loadData(); break;
     case 'add-evento':
-      await supabase.from('eventos').insert([{
+      await supabaseClient.from('eventos').insert([{
         id:uid(), proyecto_id:p.id, nombre:fd.nombre, tipo:fd.tipo, trimestre:fd.trimestre, fecha:fd.fecha, sede:fd.sede, formato:fd.formato, estado:fd.estado, notas:fd.notas
       }]); loadData(); break;
     case 'add-alumno':
-      await supabase.from('alumnos').insert([{
+      await supabaseClient.from('alumnos').insert([{
         id:uid(), proyecto_id:p.id, nombre:fd.nombre, curso:fd.curso, grupo:fd.grupo
       }]); loadData(); break;
     case 'add-asignacion':
-      await supabase.from('asignaciones').insert([{
+      await supabaseClient.from('asignaciones').insert([{
         id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, rol_id:fd.rol_id, intensidad:fd.intensidad, valoracion:fd.valoracion, trimestre:fd.trimestre, evento_id:fd.evento_id||null, notas:fd.notas
       }]); loadData(); break;
     case 'add-falta':
-      await supabase.from('faltas').insert([{
+      await supabaseClient.from('faltas').insert([{
         id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, fecha:fd.fecha, tipo:fd.tipo, justificada:(fd.justificada==='si')
       }]); loadData(); break;
     case 'guardar-notas':
-      await supabase.from('alumnos').update({notas_privadas:fd.notas_privadas, notas_ficha:fd.notas_ficha}).eq('id', view.alumnoId);
+      await supabaseClient.from('alumnos').update({notas_privadas:fd.notas_privadas, notas_ficha:fd.notas_ficha}).eq('id', view.alumnoId);
       alert('Notas guardadas'); loadData(); break;
     case 'guardar-ajuste': {
       let aj = DB.ajustes.find(x=>x.alumno_id===view.alumnoId);
-      if(!aj) await supabase.from('ajustes').insert([{id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, nota:Number(fd.nota), comentario:fd.comentario}]);
-      else await supabase.from('ajustes').update({nota:Number(fd.nota), comentario:fd.comentario}).eq('id', aj.id);
+      if(!aj) await supabaseClient.from('ajustes').insert([{id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, nota:Number(fd.nota), comentario:fd.comentario}]);
+      else await supabaseClient.from('ajustes').update({nota:Number(fd.nota), comentario:fd.comentario}).eq('id', aj.id);
       loadData(); break;
     }
     case 'guardar-colab': {
       let c = DB.colaboraciones.find(x=>x.alumno_id===view.alumnoId);
-      if(!c) await supabase.from('colaboraciones').insert([{id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, estado:fd.estado, notas:fd.notas}]);
-      else await supabase.from('colaboraciones').update({estado:fd.estado, notas:fd.notas}).eq('id', c.id);
+      if(!c) await supabaseClient.from('colaboraciones').insert([{id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, estado:fd.estado, notas:fd.notas}]);
+      else await supabaseClient.from('colaboraciones').update({estado:fd.estado, notas:fd.notas}).eq('id', c.id);
       alert('Guardado'); loadData(); break;
     }
   }
 });
 
 $('#btn-home').addEventListener('click', ()=>{ view={name:'proyectos',proyectoId:null,alumnoId:null}; render(); });
-$('#btn-logout').addEventListener('click', async ()=>{ await supabase.auth.signOut(); checkAuth(); });
-$('#app').innerHTML = '<div class="card">Iniciando sistema...</div>';
-checkAuth();
+$('#btn-logout').addEventListener('click', ()=>{ localStorage.removeItem('prod_session_email'); sessionEmail = null; initApp(); });
+
+initApp();
 </script>
 </body>
 </html>
