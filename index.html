@@ -647,7 +647,7 @@ document.addEventListener('submit', async e=>{
 
 $('#btn-home').addEventListener('click', ()=>{ view={name:'proyectos',proyectoId:null,alumnoId:null}; render(); });
 $('#btn-logout').addEventListener('click', async ()=>{ await supabase.auth.signOut(); checkAuth(); });
-
+$('#app').innerHTML = '<div class="card">Iniciando sistema...</div>';
 checkAuth();
 </script>
 </body>
