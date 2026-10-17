@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registro de Producción Escénica</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#1c2430;--muted:#6b7785;--line:#e3e7ec;--brand:#2b5c8a;--brand2:#3d7ab5;--green:#0b6b2a;--yellow:#8a6100;--red:#9b1c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+.topbar{position:sticky;top:0;z-index:10;display:flex;gap:10px;align-items:center;padding:10px 14px;background:var(--brand);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.topbar button,.topbar .btn{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:7px 11px;font-size:13px;cursor:pointer}
+.topbar button:hover,.topbar .btn:hover{background:rgba(255,255,255,.28)}
+#topbar-title{font-weight:600;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+main{max-width:1050px;margin:0 auto;padding:18px 14px 70px}
+h1{font-size:22px;margin:6px 0 14px}
+h2{font-size:16px;margin:22px 0 10px;color:var(--brand)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.pcard h3{margin:0;font-size:16px}
+.muted{color:var(--muted);font-size:13px}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--brand);color:#fff;border:none;border-radius:8px;padding:8px 12px;font-size:13px;cursor:pointer;text-decoration:none}
+.btn:hover{background:var(--brand2)}
+.btn.sec{background:#eef2f6;color:var(--ink);border:1px solid var(--line)}
+.btn.sec:hover{background:#e3e9ef}
+.btn.danger{background:#fbe4e4;color:var(--red);border:1px solid #f3c9c9}
+.btn.sm{padding:5px 9px;font-size:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+details{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-bottom:12px}
+details summary{cursor:pointer;font-weight:600;color:var(--brand)}
+form{display:grid;gap:10px;margin-top:10px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input,select,textarea{font:inherit;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);width:100%}
+textarea{min-height:70px;resize:vertical}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;font-size:14px;margin-bottom:10px}
+th,td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:#f1f4f8;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+tr:last-child td{border-bottom:none}
+.chip{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600}
+.c-green{background:#d7f5dd;color:var(--green)}
+.c-yellow{background:#fff3cd;color:var(--yellow)}
+.c-red{background:#fbdada;color:var(--red)}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#eef2f6;font-size:12px}
+a{color:var(--brand)}
+@media(max-width:600px){th,td{padding:6px;font-size:13px}}
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar" style="display:none">
+  <button id="btn-home">⌂ Proyectos</button>
+  <span id="topbar-title">Registro de Producción Escénica</span>
+  <button id="btn-logout">Salir</button>
+</header>
+<main id="app"></main>
+
+<script>
+const SUPABASE_URL = 'https://uaqktciswfjzcorrevrh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_JoSi5-B_NIAD12NDtpaSQw_Yxp6HMbj';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = s => document.querySelector(s);
+const uid = () => crypto.randomUUID();
+const hoy = () => new Date().toISOString().slice(0,10);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const colorClass = n => n >= 8 ? 'c-green' : n >= 5 ? 'c-yellow' : 'c-red';
+
+let DB = { proyectos:[], alumnos:[], roles:[], asignaciones:[], eventos:[], faltas:[], ajustes:[], colaboraciones:[] };
+let view = { name:'proyectos', proyectoId:null, alumnoId:null };
+
+const ROLES_DEFECTO = [
+  ['Actor principal',3],['Coreógrafo',3],['Actor secundario',2],['Bailarín',2],
+  ['Escenógrafo',1.5],['Vestuario',1.5],['Regidor',1.5],['Guionista',1.5],
+  ['Prensa y cartelería',1.5],['Técnico',1],['Extra',1],['Tramoya (día de función)',2]
+];
+const TIPO_EVENTO = {solidario:'Solidario',presentacion:'Presentación',preestreno:'Preestreno',estreno:'Estreno',bolo:'Bolo',otro:'Otro'};
+
+async function loadData() {
+  $('#app').innerHTML = '<div class="card">Cargando datos...</div>';
+  try {
+    const p = await supabase.from('proyectos').select('*').order('created_at');
+    const a = await supabase.from('alumnos').select('*');
+    const r = await supabase.from('roles').select('*');
+    const asg = await supabase.from('asignaciones').select('*');
+    const e = await supabase.from('eventos').select('*');
+    const f = await supabase.from('faltas').select('*');
+    const aj = await supabase.from('ajustes').select('*');
+    const c = await supabase.from('colaboraciones').select('*');
+
+    DB.proyectos = p.data || [];
+    DB.alumnos = a.data || [];
+    DB.roles = r.data || [];
+    DB.asignaciones = asg.data || [];
+    DB.eventos = e.data || [];
+    DB.faltas = f.data || [];
+    DB.ajustes = aj.data || [];
+    DB.colaboraciones = c.data || [];
+    render();
+  } catch (err) {
+    $('#app').innerHTML = `<div class="card" style="color:red">Error de conexión: ${esc(err.message)}</div>`;
+  }
+}
+
+async function checkAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    $('#topbar').style.display = 'none';
+    $('#app').innerHTML = `
+      <div class="card" style="max-width:400px;margin:40px auto">
+        <h2>Acceso al sistema</h2>
+        <p class="muted">Introduce tu correo para recibir un enlace de acceso.</p>
+        <form id="login-form">
+          <input type="email" id="login-email" placeholder="tu@correo.com" required>
+          <button class="btn" type="submit">Enviar enlace</button>
+        </form>
+        <div id="login-msg" style="margin-top:10px;color:var(--brand)"></div>
+      </div>`;
+    $('#login-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const email = $('#login-email').value;
+      const { error } = await supabase.auth.signInWithOtp({ email });
+      if (error) alert(error.message);
+      else $('#login-msg').textContent = 'Revisa tu correo y haz clic en el enlace mágico.';
+    };
+    return;
+  }
+  $('#topbar').style.display = 'flex';
+  loadData();
+}
+
+function calcAlumno(p, a){
+  const asg = DB.asignaciones.filter(x=>x.alumno_id===a.id);
+  let pts = 0;
+  const detalle = asg.map(x=>{
+    const rol = DB.roles.find(r=>r.id===x.rol_id);
+    const peso = rol ? Number(rol.peso_base)||0 : 0;
+    const fi = x.intensidad==='principal' ? 1 : x.intensidad==='secundario' ? 0.6 : 0.3;
+    const fv = x.valoracion==='bien' ? 1 : x.valoracion==='aceptable' ? 0.5 : 0;
+    const pto = peso*fi*fv;
+    pts += pto;
+    return {...x, rolNombre: rol ? rol.nombre : '(rol borrado)', peso, pto};
+  });
+  const faltasNJ = DB.faltas.filter(f=>f.alumno_id===a.id && !f.justificada).length;
+  const penal = faltasNJ * (Number(p.penalizacion_falta)||0);
+  return {asg:detalle, pts:Math.max(0, pts-penal), faltasNJ, penal};
+}
+
+function calcGrupo(p){
+  const als = DB.alumnos.filter(a=>a.proyecto_id===p.id);
+  const base = als.map(a=>({alumno:a, ...calcAlumno(p,a)}));
+  const maxPts = base.length ? Math.max(...base.map(b=>b.pts)) : 0;
+  const techo = Number(p.techo_referencia)||12;
+  const pr = Number(p.peso_roles)||0.7, pa = Number(p.peso_ajuste)||0.3;
+  return base.map(b=>{
+    const notaTecho = Math.min(10, (b.pts/techo)*10);
+    const notaNorm = maxPts>0 ? (b.pts/maxPts)*10 : 0;
+    const aj = DB.ajustes.find(x=>x.alumno_id===b.alumno.id);
+    const ajN = aj ? Number(aj.nota) : null;
+    const finalTecho = ajN===null ? notaTecho : pr*notaTecho + pa*ajN;
+    const finalNorm  = ajN===null ? notaNorm  : pr*notaNorm  + pa*ajN;
+    return {...b, notaTecho, notaNorm, ajuste:ajN, finalTecho, finalNorm};
+  });
+}
+
+function eventoNombre(p, id){
+  if(!id) return '—';
+  const e = DB.eventos.find(x=>x.id===id);
+  return e ? e.nombre : '—';
+}
+
+function printHTML(titulo, cuerpo){
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>${esc(titulo)}</title><style>
+    @page{size:A4;margin:15mm}
+    body{font-family:system-ui,Arial,sans-serif;color:#111;font-size:12px}
+    h1{font-size:20px;margin:0 0 4px}
+    h2{font-size:14px;margin:16px 0 6px;border-bottom:1px solid #ccc;padding-bottom:3px}
+    table{width:100%;border-collapse:collapse;margin:6px 0}
+    th,td{border:1px solid #bbb;padding:5px 6px;text-align:left;vertical-align:top}
+    th{background:#f0f0f0;font-size:11px;text-transform:uppercase}
+    .chip{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:600}
+    .c-green{background:#d7f5dd;color:#0b6b2a}
+    .c-yellow{background:#fff3cd;color:#8a6100}
+    .c-red{background:#fbdada;color:#9b1c1c}
+    .muted{color:#666}.small{font-size:10px;color:#666}
+  </style></head><body>${cuerpo}</body></html>`);
+  w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
+}
+
+function imprimirFicha(p, a){
+  const c = calcAlumno(p, a);
+  const filas = c.asg.map(x=>`<tr>
+    <td>${esc(x.rolNombre)}</td>
+    <td>${esc(x.intensidad)}</td>
+    <td><span class="chip ${x.valoracion==='bien'?'c-green':x.valoracion==='aceptable'?'c-yellow':'c-red'}">${esc(x.valoracion)}</span></td>
+    <td>${esc(x.notas||'')}</td></tr>`).join('');
+  const html = `
+    <h1>${esc(a.nombre)}</h1>
+    <div class="muted">${esc(p.nombre)} · ${esc(a.curso||'')} ${esc(a.grupo||'')} · ${hoy()}</div>
+    <h2>Roles</h2>
+    <table><thead><tr><th>Rol</th><th>Intensidad</th><th>Valoración</th><th>Observaciones</th></tr></thead>
+    <tbody>${filas || '<tr><td colspan="4">Sin roles asignados</td></tr>'}</tbody></table>
+    ${c.faltasNJ>0 ? `<p><strong>Faltas no justificadas:</strong> ${c.faltasNJ}</p>` : ''}
+    ${a.notas_ficha ? `<h2>Observaciones</h2><p>${esc(a.notas_ficha).replace(/\n/g,'<br>')}</p>` : ''}`;
+  printHTML('Ficha de '+a.nombre, html);
+}
+
+function imprimirComparativa(p){
+  const g = calcGrupo(p);
+  const metodo = p.metodo_nota||'techo';
+  const filas = g.sort((x,y)=> (metodo==='techo'? y.finalTecho-x.finalTecho : y.finalNorm-x.finalNorm)).map(r=>`
+    <tr><td>${esc(r.alumno.nombre)}</td><td>${r.pts.toFixed(1)}</td>
+    <td><span class="chip ${colorClass(r.notaTecho)}">${r.notaTecho.toFixed(1)}</span></td>
+    <td><span class="chip ${colorClass(r.notaNorm)}">${r.notaNorm.toFixed(1)}</span></td>
+    <td>${r.ajuste===null?'—':r.ajuste}</td>
+    <td><span class="chip ${colorClass(r.finalTecho)}">${r.finalTecho.toFixed(1)}</span></td>
+    <td><span class="chip ${colorClass(r.finalNorm)}">${r.finalNorm.toFixed(1)}</span></td></tr>`).join('');
+  const html = `<h1>Comparativa · ${esc(p.nombre)}</h1>
+    <div class="muted">Método activo: ${metodo} · Techo: ${p.techo_referencia} · Pesos: ${p.peso_roles}/${p.peso_ajuste} · ${hoy()}</div>
+    <table><thead><tr><th>Alumno</th><th>Puntos</th><th>Nota roles (techo)</th><th>Nota roles (norm.)</th><th>Ajuste</th><th>Final (techo)</th><th>Final (norm.)</th></tr></thead>
+    <tbody>${filas||'<tr><td colspan="7">Sin alumnos</td></tr>'}</tbody></table>
+    <p class="small">Uso interno del profesorado. No distribuir al alumnado.</p>`;
+  printHTML('Comparativa '+p.nombre, html);
+}
+
+function render(){
+  const p = view.proyectoId ? DB.proyectos.find(x=>x.id===view.proyectoId) : null;
+  $('#topbar-title').textContent = p ? p.nombre : 'Registro de Producción Escénica';
+  const app = $('#app');
+  if(view.name==='proyectos') app.innerHTML = renderProyectos();
+  else if(view.name==='proyecto') app.innerHTML = renderProyecto(p);
+  else if(view.name==='alumnos') app.innerHTML = renderAlumnos(p);
+  else if(view.name==='alumno') app.innerHTML = renderAlumno(p, DB.alumnos.find(a=>a.id===view.alumnoId));
+  else if(view.name==='comparativa') app.innerHTML = renderComparativa(p);
+  window.scrollTo(0,0);
+}
+
+function renderProyectos(){
+  return `<h1>Proyectos</h1>
+  <details><summary>+ Nuevo proyecto</summary>
+    <form data-action="crear-proyecto">
+      <div class="grid2">
+        <label>Nombre<input name="nombre" required placeholder="Burlesque 2026-27"></label>
+        <label>Curso<select name="curso">
+          <option value="4ESO">4º ESO</option><option value="1BACH">1º Bachillerato</option><option value="otro">Otro</option>
+        </select></label>
+        <label>Optativa<input name="optativa" placeholder="Creaciones escénico-musicales"></label>
+        <label>Inicio<input type="date" name="fecha_inicio" value="${hoy()}"></label>
+        <label>Fin<input type="date" name="fecha_fin"></label>
+      </div>
+      <div class="row"><button class="btn" type="submit">Crear proyecto</button></div>
+    </form>
+  </details>
+  <div class="grid">
+    ${DB.proyectos.length ? DB.proyectos.map(p=>`
+      <div class="pcard">
+        <h3>${esc(p.nombre)}</h3>
+        <div class="muted">${esc(p.curso)} · ${esc(p.optativa||'—')}</div>
+        <div><span class="pill">${p.estado==='activo'?'Activo':'Archivado'}</span></div>
+        <div class="row">
+          <button class="btn sm" data-action="abrir-proyecto" data-id="${p.id}">Abrir</button>
+          <button class="btn sm sec" data-action="archivar-proyecto" data-id="${p.id}">${p.estado==='activo'?'Archivar':'Reactivar'}</button>
+          <button class="btn sm danger" data-action="borrar-proyecto" data-id="${p.id}">Borrar</button>
+        </div>
+      </div>`).join('') : '<div class="card muted">Todavía no hay proyectos. Crea el primero arriba.</div>'}
+  </div>`;
+}
+
+function renderProyecto(p){
+  if(!p) return '<div class="card">Proyecto no encontrado.</div>';
+  const eventos = DB.eventos.filter(e=>e.proyecto_id===p.id);
+  const roles = DB.roles.filter(r=>r.proyecto_id===p.id);
+  const nAl = DB.alumnos.filter(a=>a.proyecto_id===p.id).length;
+  return `<h1>${esc(p.nombre)}</h1>
+  <div class="row" style="margin-bottom:14px">
+    <button class="btn" data-action="ver-alumnos">Alumnos (${nAl})</button>
+    <button class="btn" data-action="ver-comparativa">Comparativa</button>
+  </div>
+
+  <h2>Datos del proyecto</h2>
+  <form class="card" data-action="guardar-proyecto">
+    <div class="grid2">
+      <label>Nombre<input name="nombre" value="${esc(p.nombre)}" required></label>
+      <label>Curso<select name="curso">
+        ${['4ESO','1BACH','otro'].map(c=>`<option value="${c}" ${p.curso===c?'selected':''}>${c}</option>`).join('')}
+      </select></label>
+      <label>Optativa<input name="optativa" value="${esc(p.optativa||'')}"></label>
+      <label>Inicio<input type="date" name="fecha_inicio" value="${esc(p.fecha_inicio||'')}"></label>
+      <label>Fin<input type="date" name="fecha_fin" value="${esc(p.fecha_fin||'')}"></label>
+    </div>
+    <label>Notas<textarea name="notas">${esc(p.notas||'')}</textarea></label>
+    <div class="row"><button class="btn" type="submit">Guardar datos</button></div>
+  </form>
+
+  <h2>Ajustes de valoración</h2>
+  <form class="card" data-action="guardar-ajustes">
+    <div class="grid2">
+      <label>Techo de referencia (puntos = 10)<input type="number" step="0.5" min="1" name="techo_referencia" value="${Number(p.techo_referencia)||12}"></label>
+      <label>Método de nota<select name="metodo_nota">
+        <option value="techo" ${p.metodo_nota==='techo'?'selected':''}>Techo de referencia</option>
+        <option value="normalizada" ${p.metodo_nota==='normalizada'?'selected':''}>Normalizada al máximo</option>
+      </select></label>
+      <label>Peso nota de roles (0-1)<input type="number" step="0.05" min="0" max="1" name="peso_roles" value="${Number(p.peso_roles)||0.7}"></label>
+      <label>Peso ajuste del profesor (0-1)<input type="number" step="0.05" min="0" max="1" name="peso_ajuste" value="${Number(p.peso_ajuste)||0.3}"></label>
+      <label>Penalización por falta no justificada<input type="number" step="0.1" min="0" name="penalizacion_falta" value="${Number(p.penalizacion_falta)||0.5}"></label>
+    </div>
+    <div class="row"><button class="btn" type="submit">Guardar ajustes</button></div>
+  </form>
+
+  <h2>Eventos</h2>
+  ${renderTablaEventos(eventos)}
+  <details><summary>+ Añadir evento</summary>
+    <form data-action="add-evento">
+      <div class="grid2">
+        <label>Nombre<input name="nombre" required placeholder="Concierto solidario Aspajunide"></label>
+        <label>Tipo<select name="tipo">
+          ${Object.entries(TIPO_EVENTO).map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}
+        </select></label>
+        <label>Trimestre<select name="trimestre"><option>1</option><option>2</option><option>3</option></select></label>
+        <label>Fecha<input type="date" name="fecha" value="${hoy()}"></label>
+        <label>Sede<input name="sede"></label>
+        <label>Formato<select name="formato"><option value="fragmento">Fragmento</option><option value="completo">Musical completo</option><option value="otro">Otro</option></select></label>
+        <label>Estado<select name="estado"><option value="planificado">Planificado</option><option value="en_preparacion">En preparación</option><option value="listo">Listo</option><option value="realizado">Realizado</option></select></label>
+      </div>
+      <label>Notas<textarea name="notas"></textarea></label>
+      <div class="row"><button class="btn" type="submit">Añadir evento</button></div>
+    </form>
+  </details>
+
+  <h2>Roles y pesos</h2>
+  ${renderTablaRoles(roles)}
+  <div class="row" style="margin-top:8px"><button class="btn sec sm" data-action="add-rol-libre">+ Añadir rol libre</button></div>`;
+}
+
+function renderTablaEventos(eventos){
+  if(!eventos.length) return '<div class="card muted">Sin eventos todavía.</div>';
+  return `<table><thead><tr><th>Evento</th><th>Tipo</th><th>T</th><th>Fecha</th><th>Sede</th><th>Formato</th><th>Estado</th><th></th></tr></thead><tbody>
+  ${eventos.map(e=>`<tr>
+    <td>${esc(e.nombre)}</td>
+    <td>${esc(TIPO_EVENTO[e.tipo]||e.tipo)}</td>
+    <td>${esc(e.trimestre)}</td>
+    <td>${esc(e.fecha)}</td>
+    <td>${esc(e.sede||'—')}</td>
+    <td>${e.formato==='completo'?'Completo':'Fragmento'}</td>
+    <td><span class="pill">${esc(e.estado)}</span></td>
+    <td><button class="btn sm danger" type="button" data-action="del-evento" data-id="${e.id}">×</button></td>
+  </tr>`).join('')}</tbody></table>`;
+}
+
+function renderTablaRoles(roles){
+  if(!roles.length) return '<div class="card muted">Sin roles.</div>';
+  return `<table><thead><tr><th>Rol</th><th>Peso base</th><th>Tipo</th><th></th></tr></thead><tbody>
+  ${roles.map(r=>`<tr>
+    <td>${r.es_libre?`<input data-rol-id="${r.id}" data-rol-field="nombre" value="${esc(r.nombre)}">`:esc(r.nombre)}</td>
+    <td><input type="number" step="0.5" min="0" style="max-width:90px" data-rol-id="${r.id}" data-rol-field="peso_base" value="${Number(r.peso_base)}"></td>
+    <td>${r.es_libre?'<span class="pill">Libre</span>':'<span class="muted">Fijo</span>'}</td>
+    <td>${r.es_libre?`<button class="btn sm danger" type="button" data-action="del-rol" data-id="${r.id}">Borrar</button>`:''}</td>
+  </tr>`).join('')}</tbody></table>`;
+}
+
+function renderAlumnos(p){
+  const als = DB.alumnos.filter(a=>a.proyecto_id===p.id);
+  const g = calcGrupo(p);
+  const rows = als.map(a=>{
+    const r = g.find(x=>x.alumno.id===a.id);
+    const final = p.metodo_nota==='normalizada' ? r.finalNorm : r.finalTecho;
+    return `<tr>
+      <td><a href="#" data-action="abrir-alumno" data-id="${a.id}">${esc(a.nombre)}</a></td>
+      <td>${esc(a.curso||'')}</td>
+      <td>${esc(a.grupo||'')}</td>
+      <td>${r.asg.length}</td>
+      <td>${r.pts.toFixed(1)}</td>
+      <td><span class="chip ${colorClass(final)}">${final.toFixed(1)}</span></td>
+      <td><button class="btn sm danger" type="button" data-action="del-alumno" data-id="${a.id}">×</button></td>
+    </tr>`;
+  }).join('');
+  return `<h1>Alumnos · ${esc(p.nombre)}</h1>
+  <div class="row" style="margin-bottom:14px">
+    <button class="btn sec" data-action="abrir-proyecto" data-id="${p.id}">← Proyecto</button>
+    <button class="btn" data-action="ver-comparativa">Comparativa</button>
+  </div>
+  <details><summary>+ Añadir alumno</summary>
+    <form data-action="add-alumno">
+      <div class="grid2">
+        <label>Nombre<input name="nombre" required></label>
+        <label>Curso<input name="curso" placeholder="4º ESO"></label>
+        <label>Grupo<input name="grupo" placeholder="A"></label>
+      </div>
+      <div class="row"><button class="btn" type="submit">Añadir</button></div>
+    </form>
+  </details>
+  ${als.length ? `<table><thead><tr><th>Alumno</th><th>Curso</th><th>Grupo</th><th>Roles</th><th>Puntos</th><th>Nota</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="card muted">Sin alumnos todavía.</div>'}`;
+}
+
+function renderAlumno(p, a){
+  if(!a) return '<div class="card">Alumno no encontrado.</div>';
+  const c = calcAlumno(p, a);
+  const g = calcGrupo(p).find(x=>x.alumno.id===a.id);
+  const aj = DB.ajustes.find(x=>x.alumno_id===a.id);
+  const roles = DB.roles.filter(r=>r.proyecto_id===p.id);
+  const eventos = DB.eventos.filter(e=>e.proyecto_id===p.id);
+  const es4 = p.curso === '4ESO';
+  const colab = DB.colaboraciones.find(x=>x.alumno_id===a.id);
+
+  const filasAsg = c.asg.map(x=>`<tr>
+    <td>${esc(x.rolNombre)}</td>
+    <td>${esc(x.intensidad)}</td>
+    <td><span class="chip ${x.valoracion==='bien'?'c-green':x.valoracion==='aceptable'?'c-yellow':'c-red'}">${esc(x.valoracion)}</span></td>
+    <td>T${esc(x.trimestre)}</td>
+    <td>${esc(eventoNombre(p, x.evento_id))}</td>
+    <td>${x.pto.toFixed(2)}</td>
+    <td><button class="btn sm danger" type="button" data-action="del-asignacion" data-id="${x.id}">×</button></td>
+  </tr>`).join('');
+
+  const filasFaltas = DB.faltas.filter(f=>f.alumno_id===a.id).map(f=>`<tr>
+    <td>${esc(f.fecha)}</td>
+    <td>${f.tipo==='actuacion'?'Actuación':'Ensayo'}</td>
+    <td>${f.justificada?'Sí':'No'}</td>
+    <td><button class="btn sm danger" type="button" data-action="del-falta" data-id="${f.id}">×</button></td>
+  </tr>`).join('');
+
+  const final = p.metodo_nota==='normalizada' ? g.finalNorm : g.finalTecho;
+
+  return `<h1>${esc(a.nombre)}</h1>
+  <div class="row" style="margin-bottom:14px">
+    <button class="btn sec" data-action="ver-alumnos">← Alumnos</button>
+    <button class="btn" data-action="imprimir-ficha" data-id="${a.id}">🖨 Imprimir ficha</button>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <div><strong>${esc(a.curso||'')} ${esc(a.grupo||'')}</strong></div>
+      <div>Puntos: <strong>${c.pts.toFixed(1)}</strong> · Nota roles: <strong>${g.notaTecho.toFixed(1)}</strong> · Final: <span class="chip ${colorClass(final)}">${final.toFixed(1)}</span></div>
+    </div>
+    <div class="muted" style="margin-top:6px">Faltas no justificadas: ${c.faltasNJ} (−${c.penal.toFixed(1)} pts)</div>
+  </div>
+
+  <h2>Roles asignados</h2>
+  ${c.asg.length ? `<table><thead><tr><th>Rol</th><th>Intensidad</th><th>Valoración</th><th>T</th><th>Evento</th><th>Pts</th><th></th></tr></thead><tbody>${filasAsg}</tbody></table>` : '<div class="card muted">Sin roles asignados.</div>'}
+  <details><summary>+ Asignar rol</summary>
+    <form data-action="add-asignacion">
+      <div class="grid2">
+        <label>Rol<select name="rol_id" required>
+          ${roles.map(r=>`<option value="${r.id}">${esc(r.nombre)} (${Number(r.peso_base)})</option>`).join('')}
+        </select></label>
+        <label>Intensidad<select name="intensidad">
+          <option value="principal">Principal (×1.0)</option>
+          <option value="secundario">Secundario (×0.6)</option>
+          <option value="puntual">Puntual (×0.3)</option>
+        </select></label>
+        <label>Valoración<select name="valoracion">
+          <option value="bien">Bien 🟢</option>
+          <option value="aceptable">Aceptable 🟡</option>
+          <option value="mal">Mal 🔴</option>
+        </select></label>
+        <label>Trimestre<select name="trimestre"><option>1</option><option>2</option><option>3</option></select></label>
+        <label>Evento (opcional)<select name="evento_id"><option value="">—</option>
+          ${eventos.map(e=>`<option value="${e.id}">${esc(e.nombre)}</option>`).join('')}
+        </select></label>
+      </div>
+      <label>Observaciones<input name="notas" placeholder="Aprendió el papel, faltó a dos ensayos..."></label>
+      <div class="row"><button class="btn" type="submit">Asignar</button></div>
+    </form>
+  </details>
+
+  <h2>Faltas</h2>
+  ${filasFaltas ? `<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Justificada</th><th></th></tr></thead><tbody>${filasFaltas}</tbody></table>` : '<div class="card muted">Sin faltas registradas.</div>'}
+  <details><summary>+ Añadir falta</summary>
+    <form data-action="add-falta">
+      <div class="grid2">
+        <label>Fecha<input type="date" name="fecha" value="${hoy()}"></label>
+        <label>Tipo<select name="tipo"><option value="ensayo">Ensayo importante</option><option value="actuacion">Actuación</option></select></label>
+        <label>Justificada<select name="justificada"><option value="no">No</option><option value="si">Sí</option></select></label>
+      </div>
+      <div class="row"><button class="btn" type="submit">Añadir</button></div>
+    </form>
+  </details>
+
+  <h2>Ajuste del profesor</h2>
+  <form class="card" data-action="guardar-ajuste">
+    <div class="grid2">
+      <label>Nota (0-10)<input type="number" min="0" max="10" step="0.1" name="nota" value="${aj?Number(aj.nota):''}" placeholder="Ej. 8"></label>
+    </div>
+    <label>Comentario<input name="comentario" value="${esc(aj?aj.comentario:'')}" placeholder="Actitud, implicación, comportamiento..."></label>
+    <div class="row"><button class="btn" type="submit">Guardar ajuste</button></div>
+  </form>
+
+  <h2>Notas</h2>
+  <form class="card" data-action="guardar-notas">
+    <label>Notas privadas (no salen en la ficha del alumno)<textarea name="notas_privadas">${esc(a.notas_privadas||'')}</textarea></label>
+    <label>Notas para la ficha (sí salen en el PDF)<textarea name="notas_ficha">${esc(a.notas_ficha||'')}</textarea></label>
+    <div class="row"><button class="btn" type="submit">Guardar notas</button></div>
+  </form>
+
+  ${es4 ? `<h2>Colaboración en montaje de Bachillerato</h2>
+  <form class="card" data-action="guardar-colab">
+    <div class="grid2">
+      <label>Estado<select name="estado">
+        <option value="">—</option>
+        <option value="hecho" ${colab&&colab.estado==='hecho'?'selected':''}>Ha hecho</option>
+        <option value="no_hecho" ${colab&&colab.estado==='no_hecho'?'selected':''}>No ha hecho</option>
+        <option value="no_vino" ${colab&&colab.estado==='no_vino'?'selected':''}>No ha venido</option>
+      </select></label>
+    </div>
+    <label>Notas<input name="notas" value="${esc(colab?colab.notas:'')}" placeholder="Ensayo general + función de fin de curso"></label>
+    <div class="row"><button class="btn" type="submit">Guardar</button></div>
+  </form>` : ''}`;
+}
+
+function renderComparativa(p){
+  const g = calcGrupo(p);
+  const metodo = p.metodo_nota || 'techo';
+  const orden = [...g].sort((x,y)=> metodo==='techo' ? y.finalTecho-x.finalTecho : y.finalNorm-x.finalNorm);
+  const filas = orden.map(r=>`<tr>
+    <td><a href="#" data-action="abrir-alumno" data-id="${r.alumno.id}">${esc(r.alumno.nombre)}</a></td>
+    <td>${r.pts.toFixed(1)}</td>
+    <td><span class="chip ${colorClass(r.notaTecho)}">${r.notaTecho.toFixed(1)}</span></td>
+    <td><span class="chip ${colorClass(r.notaNorm)}">${r.notaNorm.toFixed(1)}</span></td>
+    <td>${r.ajuste===null?'—':r.ajuste}</td>
+    <td><span class="chip ${colorClass(r.finalTecho)}">${r.finalTecho.toFixed(1)} ${metodo==='techo'?'★':''}</span></td>
+    <td><span class="chip ${colorClass(r.finalNorm)}">${r.finalNorm.toFixed(1)} ${metodo==='normalizada'?'★':''}</span></td>
+  </tr>`).join('');
+  return `<h1>Comparativa · ${esc(p.nombre)}</h1>
+  <div class="row" style="margin-bottom:14px">
+    <button class="btn sec" data-action="abrir-proyecto" data-id="${p.id}">← Proyecto</button>
+    <button class="btn sec" data-action="ver-alumnos">Alumnos</button>
+    <button class="btn" data-action="imprimir-comparativa">🖨 Imprimir comparativa</button>
+  </div>
+  <div class="card muted">Método activo: <strong>${metodo}</strong> · Techo: ${p.techo_referencia} · Pesos: ${p.peso_roles} / ${p.peso_ajuste} · Penalización falta: ${p.penalizacion_falta}</div>
+  ${g.length ? `<table><thead><tr><th>Alumno</th><th>Puntos</th><th>Nota roles (techo)</th><th>Nota roles (norm.)</th><th>Ajuste</th><th>Final (techo)</th><th>Final (norm.)</th></tr></thead><tbody>${filas}</tbody></table>` : '<div class="card muted">Sin alumnos.</div>'}
+  <p class="muted">Uso interno del profesorado. La ficha que se enseña al alumno es la individual, sin puntos ni comparativa.</p>`;
+}
+
+document.addEventListener('click', async e=>{
+  const el = e.target.closest('[data-action]');
+  if(!el) return;
+  const act = el.dataset.action, id = el.dataset.id;
+  if(el.tagName === 'A') e.preventDefault();
+  
+  switch(act){
+    case 'home': view={name:'proyectos',proyectoId:null,alumnoId:null}; render(); break;
+    case 'abrir-proyecto': view={name:'proyecto',proyectoId:id,alumnoId:null}; render(); break;
+    case 'ver-alumnos': view={name:'alumnos',proyectoId:view.proyectoId,alumnoId:null}; render(); break;
+    case 'ver-comparativa': view={name:'comparativa',proyectoId:view.proyectoId,alumnoId:null}; render(); break;
+    case 'abrir-alumno': view={name:'alumno',proyectoId:view.proyectoId,alumnoId:id}; render(); break;
+    case 'imprimir-ficha': imprimirFicha(DB.proyectos.find(x=>x.id===view.proyectoId), DB.alumnos.find(x=>x.id===id)); break;
+    case 'imprimir-comparativa': imprimirComparativa(DB.proyectos.find(x=>x.id===view.proyectoId)); break;
+    
+    case 'borrar-proyecto': 
+      if(confirm('¿Borrar el proyecto y todos sus datos?')) { await supabase.from('proyectos').delete().eq('id', id); view={name:'proyectos',proyectoId:null,alumnoId:null}; loadData(); } 
+      break;
+    case 'archivar-proyecto': {
+      const p = DB.proyectos.find(x=>x.id===id);
+      const nuevoEstado = p.estado==='activo'?'archivado':'activo';
+      await supabase.from('proyectos').update({estado: nuevoEstado}).eq('id', id); loadData(); break;
+    }
+    case 'del-alumno': if(confirm('¿Borrar alumno y todos sus datos?')) { await supabase.from('alumnos').delete().eq('id', id); loadData(); } break;
+    case 'del-asignacion': await supabase.from('asignaciones').delete().eq('id', id); loadData(); break;
+    case 'del-falta': await supabase.from('faltas').delete().eq('id', id); loadData(); break;
+    case 'del-evento': if(confirm('¿Borrar evento?')) { await supabase.from('eventos').delete().eq('id', id); loadData(); } break;
+    case 'del-rol': {
+      if(DB.asignaciones.some(x=>x.rol_id===id)) { alert('No se puede borrar: hay asignaciones con este rol.'); break; }
+      await supabase.from('roles').delete().eq('id', id); loadData(); break;
+    }
+    case 'add-rol-libre': {
+      const n = DB.roles.filter(r=>r.proyecto_id===view.proyectoId && r.es_libre).length + 1;
+      await supabase.from('roles').insert([{id: uid(), proyecto_id:view.proyectoId, nombre:'Rol libre '+n, peso_base:1, es_libre:true}]);
+      loadData(); break;
+    }
+  }
+});
+
+document.addEventListener('change', async e=>{
+  const el = e.target.closest('[data-rol-field]');
+  if(!el) return;
+  const val = el.dataset.rolField === 'peso_base' ? Number(el.value) : el.value;
+  await supabase.from('roles').update({[el.dataset.rolField]: val}).eq('id', el.dataset.rolId);
+  loadData();
+});
+
+document.addEventListener('submit', async e=>{
+  const f = e.target.closest('form[data-action]');
+  if(!f) return;
+  e.preventDefault();
+  const act = f.dataset.action;
+  const fd = Object.fromEntries(new FormData(f).entries());
+  const p = DB.proyectos.find(x=>x.id===view.proyectoId);
+
+  switch(act){
+    case 'crear-proyecto': {
+      const pid = uid();
+      await supabase.from('proyectos').insert([{
+        id:pid, nombre:fd.nombre, curso:fd.curso, optativa:fd.optativa,
+        fecha_inicio:fd.fecha_inicio, fecha_fin:fd.fecha_fin, estado:'activo',
+        techo_referencia:12, metodo_nota:'techo', peso_roles:0.7, peso_ajuste:0.3, penalizacion_falta:0.5
+      }]);
+      const roles = ROLES_DEFECTO.map(r => ({id:uid(), proyecto_id:pid, nombre:r[0], peso_base:r[1], es_libre:false}));
+      roles.push({id:uid(), proyecto_id:pid, nombre:'Rol libre 1', peso_base:1, es_libre:true});
+      roles.push({id:uid(), proyecto_id:pid, nombre:'Rol libre 2', peso_base:1, es_libre:true});
+      await supabase.from('roles').insert(roles);
+      view = {name:'proyecto', proyectoId:pid, alumnoId:null}; loadData(); break;
+    }
+    case 'guardar-proyecto':
+      await supabase.from('proyectos').update({
+        nombre:fd.nombre, curso:fd.curso, optativa:fd.optativa, fecha_inicio:fd.fecha_inicio, fecha_fin:fd.fecha_fin, notas:fd.notas
+      }).eq('id', p.id); loadData(); break;
+    case 'guardar-ajustes':
+      await supabase.from('proyectos').update({
+        techo_referencia:Number(fd.techo_referencia), metodo_nota:fd.metodo_nota, peso_roles:Number(fd.peso_roles), peso_ajuste:Number(fd.peso_ajuste), penalizacion_falta:Number(fd.penalizacion_falta)
+      }).eq('id', p.id); loadData(); break;
+    case 'add-evento':
+      await supabase.from('eventos').insert([{
+        id:uid(), proyecto_id:p.id, nombre:fd.nombre, tipo:fd.tipo, trimestre:fd.trimestre, fecha:fd.fecha, sede:fd.sede, formato:fd.formato, estado:fd.estado, notas:fd.notas
+      }]); loadData(); break;
+    case 'add-alumno':
+      await supabase.from('alumnos').insert([{
+        id:uid(), proyecto_id:p.id, nombre:fd.nombre, curso:fd.curso, grupo:fd.grupo
+      }]); loadData(); break;
+    case 'add-asignacion':
+      await supabase.from('asignaciones').insert([{
+        id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, rol_id:fd.rol_id, intensidad:fd.intensidad, valoracion:fd.valoracion, trimestre:fd.trimestre, evento_id:fd.evento_id||null, notas:fd.notas
+      }]); loadData(); break;
+    case 'add-falta':
+      await supabase.from('faltas').insert([{
+        id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, fecha:fd.fecha, tipo:fd.tipo, justificada:(fd.justificada==='si')
+      }]); loadData(); break;
+    case 'guardar-notas':
+      await supabase.from('alumnos').update({notas_privadas:fd.notas_privadas, notas_ficha:fd.notas_ficha}).eq('id', view.alumnoId);
+      alert('Notas guardadas'); loadData(); break;
+    case 'guardar-ajuste': {
+      let aj = DB.ajustes.find(x=>x.alumno_id===view.alumnoId);
+      if(!aj) await supabase.from('ajustes').insert([{id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, nota:Number(fd.nota), comentario:fd.comentario}]);
+      else await supabase.from('ajustes').update({nota:Number(fd.nota), comentario:fd.comentario}).eq('id', aj.id);
+      loadData(); break;
+    }
+    case 'guardar-colab': {
+      let c = DB.colaboraciones.find(x=>x.alumno_id===view.alumnoId);
+      if(!c) await supabase.from('colaboraciones').insert([{id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, estado:fd.estado, notas:fd.notas}]);
+      else await supabase.from('colaboraciones').update({estado:fd.estado, notas:fd.notas}).eq('id', c.id);
+      alert('Guardado'); loadData(); break;
+    }
+  }
+});
+
+$('#btn-home').addEventListener('click', ()=>{ view={name:'proyectos',proyectoId:null,alumnoId:null}; render(); });
+$('#btn-logout').addEventListener('click', async ()=>{ await supabase.auth.signOut(); checkAuth(); });
+
+checkAuth();
+</script>
+</body>
+</html>
