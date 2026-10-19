@@ -130,7 +130,7 @@ function renderLogin(message = '') {
       <p class="muted" style="margin-bottom:25px;">${description}</p>
       ${message ? `<div class="card" role="status" style="padding:10px;margin-bottom:14px;color:var(--brand);">${esc(message)}</div>` : ''}
       <form id="login-form">
-        ${!reset ? `<label style="text-align:left">Correo electrónico<input type="email" id="login-email" autocomplete="email" placeholder="tu@correo.com" value="${esc(sessionEmail||'')}" required></label>` : ''}
+        ${!reset ? `<label style="text-align:left">Correo electrónico<input type="email" id="login-email" autocomplete="email" placeholder="profesor@murciaeduca.es" value="${esc(sessionEmail||'')}" required></label>` : ''}
         ${passwordFields}
         <button class="btn" type="submit" style="width:100%;margin-top:10px;">${buttonText}</button>
       </form>
