@@ -1,729 +1,403 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es" translate="no">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Producción Escénica</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root{--bg:#f8fafc;--card:#ffffff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#4f46e5;--brand2:#4338ca;--green:#10b981;--yellow:#f59e0b;--red:#ef4444}
-        *{box-sizing:border-box}
-        body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
-        .topbar{position:sticky;top:0;z-index:10;display:flex;gap:10px;align-items:center;padding:12px 18px;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 1px 3px rgba(0,0,0,.05)}
-        .topbar button,.topbar .btn{background:#f1f5f9;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:13px;font-weight:600;cursor:pointer;transition:0.2s}
-        .topbar button:hover,.topbar .btn:hover{background:#e2e8f0}
-        #topbar-title{font-weight:800;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--brand)}
-        main{max-width:1050px;margin:0 auto;padding:24px 18px 80px}
-        h1{font-size:24px;margin:6px 0 18px;font-weight:800}
-        h2{font-size:16px;margin:24px 0 12px;color:var(--brand);font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
-        .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.02)}
-        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-        .pcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,.02)}
-        .pcard h3{margin:0;font-size:18px;font-weight:700}
-        .muted{color:var(--muted);font-size:13px}
-        .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--brand);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:0.2s}
-        .btn:hover{background:var(--brand2)}
-        .btn.sec{background:#f1f5f9;color:var(--ink);border:1px solid var(--line)}
-        .btn.sec:hover{background:#e2e8f0}
-        .btn.danger{background:#fee2e2;color:var(--red);border:1px solid #fecaca}
-        .btn.danger:hover{background:#fecaca}
-        .btn.sm{padding:6px 12px;font-size:12px}
-        .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-        details{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:12px 16px;margin-bottom:16px}
-        details summary{cursor:pointer;font-weight:700;color:var(--brand);outline:none}
-        form{display:grid;gap:12px;margin-top:12px}
-        .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-        label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);font-weight:600}
-        input,select,textarea{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#f8fafc;color:var(--ink);width:100%;outline:none;transition:0.2s}
-        input:focus,select:focus,textarea:focus{border-color:var(--brand);background:#fff;box-shadow:0 0 0 3px rgba(79,70,229,0.1)}
-        textarea{min-height:80px;resize:vertical}
-        table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;font-size:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.02)}
-        th,td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
-        th{background:#f8fafc;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
-        tr:last-child td{border-bottom:none}
-        tr:hover{background:#f8fafc}
-        .chip{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700}
-        .c-green{background:#d1fae5;color:#065f46}
-        .c-yellow{background:#fef3c7;color:#92400e}
-        .c-red{background:#fee2e2;color:#991b1b}
-        .pill{display:inline-block;padding:4px 10px;border-radius:6px;background:#f1f5f9;font-size:12px;font-weight:600;color:var(--muted)}
-        a{color:var(--brand);text-decoration:none;font-weight:600}
-        a:hover{text-decoration:underline}
-        @media(max-width:600px){th,td{padding:8px 10px;font-size:13px}}
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Producciones Escénico-Musicales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#171016;--card:#241a22;--line:#46364a;--ink:#f6eee3;--mut:#bfb0c2;--gold:#dcb45f;--wine:#6e1d3a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;line-height:1.15}
+.curtain{background:linear-gradient(180deg,var(--wine),#4a1228);border-bottom:3px solid var(--gold);padding:10px 20px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;gap:12px;align-items:center;margin-right:auto}
+.brand b{font-family:Fraunces,serif;font-size:19px;display:block;line-height:1.1}
+.brand small{color:#e8c9d3;font-size:12px}
+.nav{display:flex;gap:6px;overflow-x:auto;max-width:100%}
+.nav button{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid #9b5870;background:transparent;font-weight:600;white-space:nowrap}
+.nav button.on{background:var(--gold);color:#241a22;border-color:var(--gold)}
+.nav .sp{flex:1}
+main{max-width:1100px;margin:0 auto;padding:24px 18px 90px}
+.muted{color:var(--mut)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{min-height:44px;padding:0 18px;border-radius:10px;border:1px solid var(--line);background:transparent;font-weight:600}
+.btn.gold{background:var(--gold);color:#241a22;border:none;font-weight:700}
+.btn.red{border-color:#ef6f6f;color:#ef9a9a}
+.btn.sm{min-height:36px;padding:0 12px;font-size:13px}
+input,select,textarea{background:#1b1220;border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-height:44px}
+textarea{min-height:90px}
+label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mut);font-weight:600}
+form{display:grid;gap:12px}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+th{font-size:12px;color:var(--mut);font-weight:600}
+.scroll{overflow-x:auto}
+.seg{display:flex;gap:8px;margin:12px 0}
+.seg button{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--mut)}
+.seg button.on{background:var(--gold);color:#241a22;font-weight:700;border-color:var(--gold)}
+.sub{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.sub button{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--mut)}
+.sub button.on{border-color:var(--gold);color:var(--gold);font-weight:600}
+.phone{max-width:560px;margin:0 auto}
+.al{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.al .t{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:10px}
+.al .t span{font-size:13px;color:var(--mut)}
+.mk{display:grid;grid-template-columns:repeat(5,1fr) 1.5fr;gap:6px}
+.sh{display:inline-block;width:22px;height:22px;border-radius:50%;border:2px solid var(--s,var(--c));background:conic-gradient(var(--s,var(--c)) var(--p),transparent 0);flex:none}
+.c-verde{--c:#63d08f;--p:100%}.c-lima{--c:#b9e35c;--p:75%}.c-amarillo{--c:#f2bb43;--p:50%}.c-naranja{--c:#f08a3c;--p:25%}.c-rojo{--c:#ef6f6f;--p:0%}
+.cb{min-height:46px;border-radius:10px;border:2px solid var(--c);background:transparent;display:flex;align-items:center;justify-content:center;gap:4px;padding:0}
+.cb.on{background:var(--c)}.cb.on .sh{--s:#1b1220}
+.cb small{font-weight:700;color:var(--c)}.cb.on small{color:#1b1220}
+.fb{min-height:46px;border-radius:10px;border:2px solid #9a8aa6;background:transparent;font-size:13px;font-weight:600;color:#d3c6da;padding:0 4px}
+.fb.on{background:#f6eee3;color:#171016}.fb.on.j{background:#9a8aa6}
+.chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:#30263a;color:var(--mut)}
+.chip.y{background:#f2bb43;color:#2b2006}.chip.r{background:#ef6f6f;color:#2e0d0d}.chip.g{background:#63d08f;color:#10261a}
+.nota{font-family:Fraunces,serif;font-weight:700;font-size:20px}
+.weeks{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.weeks div{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#30263a;font-size:12px;font-weight:700}
+.big{font-family:Fraunces,serif;font-size:44px;font-weight:700;line-height:1}
+.warn{padding:10px 14px;border-radius:10px;background:#f2bb43;color:#2b2006;font-weight:600;margin:10px 0}
+.warn.r{background:#ef6f6f;color:#2e0d0d}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#f6eee3;color:#171016;padding:12px 18px;border-radius:10px;font-weight:600;z-index:9;display:none;max-width:90%}
+.login{max-width:430px;margin:50px auto;text-align:center}.login form{text-align:left}
+@media print{body{background:#fff;color:#000}.curtain,.noprint{display:none!important}.card{background:#fff;border-color:#999}.muted,th{color:#444}}
+</style>
 </head>
 <body>
-
-<header class="topbar" id="topbar" style="display:none">
-  <button id="btn-home">⌂ Proyectos</button>
-  <span id="topbar-title">Registro de Producción Escénica</span>
-  <button id="btn-logout" class="danger">Salir</button>
-</header>
+<div id="top"></div>
 <main id="app"></main>
-
+<div id="toast" role="status"></div>
 <script>
-const SUPABASE_URL = 'https://uaqktciswfjzcorrevrh.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_JoSi5-B_NIAD12NDtpaSQw_Yxp6HMbj';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const $ = s => document.querySelector(s);
-const uid = () => crypto.randomUUID();
-const hoy = () => new Date().toISOString().slice(0,10);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const colorClass = n => n >= 8 ? 'c-green' : n >= 5 ? 'c-yellow' : 'c-red';
-
-let DB = { proyectos:[], alumnos:[], roles:[], asignaciones:[], eventos:[], faltas:[], ajustes:[], colaboraciones:[] };
-let view = { name:'proyectos', proyectoId:null, alumnoId:null };
-let authSession = null;
-let sessionEmail = null;
-let authMode = 'login';
-
-const ROLES_DEFECTO = [
-  ['Actor principal',3],['Coreógrafo',3],['Actor secundario',2],['Bailarín',2],
-  ['Escenógrafo',1.5],['Vestuario',1.5],['Regidor',1.5],['Guionista',1.5],
-  ['Prensa y cartelería',1.5],['Técnico',1],['Extra',1],['Tramoya (día de función)',2]
-];
-const TIPO_EVENTO = {solidario:'Solidario',presentacion:'Presentación',preestreno:'Preestreno',estreno:'Estreno',bolo:'Bolo',otro:'Otro'};
-
-async function loadData() {
-  if (!authSession?.user?.id) { renderLogin(); return; }
-  $('#app').innerHTML = '<div class="card" style="text-align:center;padding:40px;">Cargando datos...</div>';
-  try {
-    const p = await supabaseClient.from('proyectos').select('*').order('created_at');
-    const a = await supabaseClient.from('alumnos').select('*');
-    const r = await supabaseClient.from('roles').select('*');
-    const asg = await supabaseClient.from('asignaciones').select('*');
-    const e = await supabaseClient.from('eventos').select('*');
-    const f = await supabaseClient.from('faltas').select('*');
-    const aj = await supabaseClient.from('ajustes').select('*');
-    const c = await supabaseClient.from('colaboraciones').select('*');
-
-    const failed = [p,a,r,asg,e,f,aj,c].find(x => x.error);
-    if (failed) throw failed.error;
-    DB.proyectos = p.data || [];
-    DB.alumnos = a.data || [];
-    DB.roles = r.data || [];
-    DB.asignaciones = asg.data || [];
-    DB.eventos = e.data || [];
-    DB.faltas = f.data || [];
-    DB.ajustes = aj.data || [];
-    DB.colaboraciones = c.data || [];
-    render();
-  } catch (err) {
-    $('#app').innerHTML = `<div class="card" style="color:red">Error al cargar datos: ${esc(err.message)}<p>Comprueba que has ejecutado el SQL de configuración de propietarios y políticas RLS en Supabase.</p><button class="btn" onclick="location.reload()">Reintentar</button></div>`;
-  }
+/*<calc>*/
+const COLORES=['verde','lima','amarillo','naranja','rojo'];
+const REGLAS_DEF={
+  rubrica:{verde:10,lima:8,amarillo:6,naranja:4,rojo:2},
+  bonus:{verde:2,lima:1.5,amarillo:1,naranja:0.5,rojo:0},
+  pesos_eval:[30,30,40],
+  falta_sj_resta:0.5, falta_sj_cuenta_cero:true,
+  escala_just:[0,0,0,0.5,0.7,1,1.5,2], mas_just_resta:0.5,
+  aviso_amarillo:3, aviso_rojo:5,
+  vico_peso:30, vico_tope:4, vico_tope_activo:true
+};
+let DB={proyectos:[],alumnos:[],roles:[],asignaciones:[],sesiones:[],marcas:[],eventos:[],vico:[]};
+function reglas(p){const r=(p&&p.reglas)||{};return {...REGLAS_DEF,...r,rubrica:{...REGLAS_DEF.rubrica,...(r.rubrica||{})},bonus:{...REGLAS_DEF.bonus,...(r.bonus||{})}}}
+function penalJust(n,r){if(n<=2)return 0;const e=r.escala_just;return n<e.length?e[n]:e[e.length-1]+r.mas_just_resta*(n-(e.length-1))}
+function calcEval(p,a,ev){
+  const r=reglas(p);
+  const ses=DB.sesiones.filter(s=>s.proyecto_id===p.id&&s.evaluacion===ev&&s.cerrada);
+  let sum=0,n=0,fsj=0,fj=0;
+  ses.forEach(s=>{
+    const m=DB.marcas.find(x=>x.sesion_id===s.id&&x.alumno_id===a.id);const c=m?m.color:'verde';
+    if(c==='falta_j'){fj++;return}
+    if(c==='falta'){fsj++;if(r.falta_sj_cuenta_cero)n++;return}
+    sum+=Number(r.rubrica[c]);n++;
+  });
+  const media=n?sum/n:10;
+  const roles=DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{};return {nombre:ro.nombre||'(rol borrado)',valor:Number(ro['v'+ev]||0)*Number(x.factor??1)}});
+  const base=roles.reduce((t,x)=>t+x.valor,0);
+  const bruto=base*media/10;
+  const pen=fsj*r.falta_sj_resta+penalJust(fj,r);
+  const real=Math.max(0,bruto-pen);
+  return {ses:ses.length,media,base,bruto,pen,real,nota:ses.length?Math.min(10,real):null,fsj,fj,roles};
 }
+function calcVico(p,a){
+  const r=reglas(p);let vals=[],pend=false,sinJust=false,bon=[0,0];
+  [1,2].forEach(f=>{
+    const x=DB.vico.find(v=>v.alumno_id===a.id&&v.funcion===f);if(!x)return;
+    if(x.color==='falta'){vals.push(0);sinJust=true;return}
+    if(x.color==='falta_j'){if(x.valor_manual===null||x.valor_manual===undefined||x.valor_manual==='')pend=true;else vals.push(Number(x.valor_manual));return}
+    vals.push(Number(r.rubrica[x.color]));bon[f-1]=Number(r.bonus[x.color]);
+  });
+  return {nota:vals.length?vals.reduce((t,v)=>t+v,0)/vals.length:null,pend,sinJust,bonus:(bon[0]+bon[1])/2,entradas:DB.vico.filter(v=>v.alumno_id===a.id).length};
+}
+function calcFinal(p,a){
+  const r=reglas(p);
+  const vico=calcVico(p,a);
+  const ev=[1,2,3].map(e=>calcEval(p,a,e));
+  let s=0,ws=0;
+  ev.forEach((x,i)=>{if(x.ses>0){let n=x.nota;if(p.curso==='4ESO'&&i===2)n=Math.min(10,n+vico.bonus);x.notaFinalEv=n;s+=n*r.pesos_eval[i];ws+=r.pesos_eval[i]}});
+  const clase=ws?s/ws:null;
+  let final=clase,tope=false,vicoPend=false;
+  if(p.curso==='1BACH'&&clase!==null){
+    if(vico.nota!==null){final=(1-r.vico_peso/100)*clase+r.vico_peso/100*vico.nota}
+    if(vico.pend)vicoPend=true;
+    if(vico.sinJust&&r.vico_tope_activo&&final>r.vico_tope){final=r.vico_tope;tope=true}
+  }
+  return {ev,clase,final,vico,tope,vicoPend};
+}
+/*</calc>*/
 
-function renderLogin(message = '') {
-  $('#topbar').style.display = 'none';
-  const recovery = authMode === 'recover';
-  const reset = authMode === 'reset';
-  const signup = authMode === 'signup';
-  const title = reset ? 'Crear nueva contraseña' : recovery ? 'Recuperar contraseña' : signup ? 'Crear cuenta de profesor' : 'Acceso Profesorado';
-  const description = reset ? 'Introduce una contraseña nueva para tu cuenta.' : recovery ? 'Te enviaremos un enlace al correo para restablecer tu contraseña.' : signup ? 'Registra tu correo y crea una contraseña para tus proyectos.' : 'Accede a tus proyectos de producción escénica.';
-  const passwordFields = (!recovery) ? `<label style="text-align:left">${reset ? 'Nueva contraseña' : 'Contraseña'}<input type="password" id="login-password" minlength="10" autocomplete="${signup || reset ? 'new-password' : 'current-password'}" required placeholder="Mínimo 10 caracteres"></label>${signup ? `<label style="text-align:left">Repite la contraseña<input type="password" id="login-password2" minlength="10" autocomplete="new-password" required></label>` : ''}` : '';
-  const buttonText = reset ? 'Guardar contraseña' : recovery ? 'Enviar enlace de recuperación' : signup ? 'Crear cuenta' : 'Entrar';
-  $('#app').innerHTML = `
-    <div class="card" style="max-width:430px;margin:60px auto;text-align:center;padding:40px 30px;">
-      <div style="font-size:40px;margin-bottom:15px;">🎭</div>
-      <h2 style="margin-top:0;color:var(--ink);text-transform:none;">${title}</h2>
-      <p class="muted" style="margin-bottom:25px;">${description}</p>
-      ${message ? `<div class="card" role="status" style="padding:10px;margin-bottom:14px;color:var(--brand);">${esc(message)}</div>` : ''}
-      <form id="login-form">
-        ${!reset ? `<label style="text-align:left">Correo electrónico<input type="email" id="login-email" autocomplete="email" placeholder="profesor@murciaeduca.es" value="${esc(sessionEmail||'')}" required></label>` : ''}
-        ${passwordFields}
-        <button class="btn" type="submit" style="width:100%;margin-top:10px;">${buttonText}</button>
-      </form>
-      <div class="row" style="justify-content:center;margin-top:18px;">
-        ${reset ? '' : recovery ? `<button class="btn sec sm" type="button" data-auth-mode="login">Volver al acceso</button>` : signup ? `<button class="btn sec sm" type="button" data-auth-mode="login">Ya tengo cuenta</button>` : `<button class="btn sec sm" type="button" data-auth-mode="signup">Crear cuenta</button><button class="btn sec sm" type="button" data-auth-mode="recover">He olvidado mi contraseña</button>`}
-      </div>
-    </div>`;
-  $('#login-form').onsubmit = async (e) => {
-    e.preventDefault();
-    const email = $('#login-email')?.value.trim().toLowerCase();
-    const password = $('#login-password')?.value;
-    const submit = $('#login-form').querySelector('button[type="submit"]');
-    submit.disabled = true; submit.textContent = 'Procesando…';
-    try {
-      let result;
-      if (authMode === 'signup') {
-        if (password !== $('#login-password2').value) throw new Error('Las contraseñas no coinciden.');
-        if (password.length < 10) throw new Error('La contraseña debe tener al menos 10 caracteres.');
-        result = await supabaseClient.auth.signUp({ email, password, options: { emailRedirectTo: window.location.href.split('#')[0] } });
-        if (result.error) throw result.error;
-        if (!result.data.session) { authMode = 'login'; renderLogin('Cuenta creada. Revisa tu correo y confirma la dirección antes de iniciar sesión.'); return; }
-      } else if (authMode === 'login') {
-        result = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (result.error) throw result.error;
-      } else if (authMode === 'recover') {
-        result = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.href.split('#')[0] });
-        if (result.error) throw result.error;
-        authMode = 'login'; renderLogin('Si la dirección está registrada, recibirás un correo con el enlace para cambiar la contraseña.'); return;
-      } else if (authMode === 'reset') {
-        if (password.length < 10) throw new Error('La contraseña debe tener al menos 10 caracteres.');
-        result = await supabaseClient.auth.updateUser({ password });
-        if (result.error) throw result.error;
-        authMode = 'login';
-        renderLogin('Contraseña actualizada. Ya puedes entrar con tu nueva contraseña.'); return;
-      }
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      authSession = session; sessionEmail = session?.user?.email || null;
-      if (session) { await initApp(); }
-    } catch (err) {
-      renderLogin(err.message || 'No se ha podido completar la operación.');
-    }
+const SB_URL='https://uaqktciswfjzcorrevrh.supabase.co',SB_KEY='sb_publishable_JoSi5-B_NIAD12NDtpaSQw_Yxp6HMbj';
+const sb=window.supabase.createClient(SB_URL,SB_KEY);
+const TBL={proyectos:'pe_proyectos',alumnos:'pe_alumnos',roles:'pe_roles',asignaciones:'pe_asignaciones',sesiones:'pe_sesiones',marcas:'pe_marcas',eventos:'pe_eventos',vico:'pe_vico'};
+const $=s=>document.querySelector(s),uid=()=>crypto.randomUUID(),hoy=()=>new Date().toISOString().slice(0,10);
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const num=v=>{const n=Number(String(v).replace(',','.'));return isNaN(n)?0:n};
+const fmt=n=>n===null||n===undefined?'—':(Math.round(n*10)/10).toString().replace('.',',');
+const evDeFecha=f=>{const m=+f.slice(5,7);return m>=9?1:m<=3?2:3};
+let auth={mode:'login',user:null},view={tab:'home',sub:'hoy',pid:null,aid:null,conf:'datos'};
+let fecha=hoy(),evalSel=evDeFecha(hoy()),verVal=localStorage.getItem('pe_ver')==='1',modoAlumno=false;
+const P=()=>DB.proyectos.find(p=>p.id===view.pid);
+const alumnosDe=p=>DB.alumnos.filter(a=>a.proyecto_id===p.id).sort((x,y)=>x.nombre.localeCompare(y.nombre,'es'));
+const rolesDe=p=>DB.roles.filter(r=>r.proyecto_id===p.id).sort((x,y)=>x.orden-y.orden);
+function toast(m,ms=3500){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',ms)}
+function fail(e){console.warn(e);toast('No se pudo guardar: '+(e.message||e)+'. Recarga la página para ver el estado real.',7000)}
+async function ins(k,rows){const arr=Array.isArray(rows)?rows:[rows];arr.forEach(x=>x.id=x.id||uid());const {error}=await sb.from(TBL[k]).insert(arr);if(error){fail(error);return null}DB[k].push(...arr);return arr}
+async function upd(k,id,patch){const {error}=await sb.from(TBL[k]).update(patch).eq('id',id);if(error){fail(error);return false}Object.assign(DB[k].find(x=>x.id===id),patch);return true}
+async function del(k,id){const {error}=await sb.from(TBL[k]).delete().eq('id',id);if(error){fail(error);return false}DB[k]=DB[k].filter(x=>x.id!==id);return true}
+async function loadData(){
+  $('#app').innerHTML='<div class="card muted" style="text-align:center">Cargando…</div>';
+  const keys=Object.keys(TBL);
+  const res=await Promise.all(keys.map(k=>sb.from(TBL[k]).select('*')));
+  const bad=res.find(r=>r.error);
+  if(bad){$('#app').innerHTML=`<div class="card"><b>No se pudieron cargar los datos.</b><p class="muted">${esc(bad.error.message)}</p><p class="muted">¿Has ejecutado el archivo SQL en Supabase?</p></div>`;return}
+  keys.forEach((k,i)=>DB[k]=res[i].data||[]);
+  DB.proyectos.sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||''));
+  render();
+}
+/* ---------- acceso ---------- */
+function renderLogin(msg=''){
+  $('#top').innerHTML='';
+  const m=auth.mode,t={login:'Acceso del profesorado',signup:'Crear cuenta',recover:'Recuperar contraseña',reset:'Nueva contraseña'}[m];
+  $('#app').innerHTML=`<div class="card login"><h1 style="font-size:28px">Producciones Escénico-Musicales</h1><div class="muted" style="margin:4px 0 18px">by Manuel Esteve</div><h3 style="margin-bottom:12px">${t}</h3>
+  ${msg?`<div class="warn">${esc(msg)}</div>`:''}
+  <form id="fl">${m!=='reset'?'<label>Correo<input type="email" id="le" required autocomplete="email"></label>':''}
+  ${m!=='recover'?`<label>${m==='reset'?'Nueva contraseña':'Contraseña'}<input type="password" id="lp" minlength="10" required autocomplete="${m==='login'?'current-password':'new-password'}"></label>`:''}
+  <button class="btn gold" type="submit">${{login:'Entrar',signup:'Crear cuenta',recover:'Enviar enlace',reset:'Guardar contraseña'}[m]}</button></form>
+  <div class="row" style="justify-content:center;margin-top:14px">${m==='login'?'<button class="btn sm" data-act="amode" data-v="signup">Crear cuenta</button><button class="btn sm" data-act="amode" data-v="recover">He olvidado la contraseña</button>':m==='reset'?'':'<button class="btn sm" data-act="amode" data-v="login">Volver</button>'}</div></div>`;
+  $('#fl').onsubmit=async e=>{
+    e.preventDefault();const em=$('#le')?.value.trim().toLowerCase(),pw=$('#lp')?.value;let r;
+    try{
+      if(m==='signup'){r=await sb.auth.signUp({email:em,password:pw,options:{emailRedirectTo:location.href.split('#')[0]}});if(r.error)throw r.error;if(!r.data.session){auth.mode='login';return renderLogin('Cuenta creada. Confirma tu correo y entra.')}}
+      else if(m==='login'){r=await sb.auth.signInWithPassword({email:em,password:pw});if(r.error)throw r.error}
+      else if(m==='recover'){r=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.href.split('#')[0]});if(r.error)throw r.error;auth.mode='login';return renderLogin('Si el correo existe, recibirás un enlace.')}
+      else{r=await sb.auth.updateUser({password:pw});if(r.error)throw r.error;auth.mode='login';return renderLogin('Contraseña cambiada. Ya puedes entrar.')}
+      await init();
+    }catch(err){renderLogin(err.message||'No se pudo completar.')}
   };
 }
-
-document.addEventListener('click', (e) => {
-  const b = e.target.closest('[data-auth-mode]');
-  if (!b) return;
-  authMode = b.dataset.authMode;
-  renderLogin();
-});
-
-async function initApp() {
-  const { data, error } = await supabaseClient.auth.getSession();
-  if (error || !data.session) {
-    authSession = null; sessionEmail = null; renderLogin(); return;
-  }
-  authSession = data.session;
-  sessionEmail = data.session.user.email || null;
-  $('#topbar').style.display = 'flex';
-  await loadData();
+async function init(){
+  const {data}=await sb.auth.getSession();
+  if(!data.session){auth.user=null;return renderLogin()}
+  auth.user=data.session.user;await loadData();
 }
-
-supabaseClient.auth.onAuthStateChange((event, session) => {
-  authSession = session;
-  sessionEmail = session?.user?.email || null;
-  if (event === 'PASSWORD_RECOVERY') {
-    authMode = 'reset';
-    renderLogin();
-  } else if (!session) {
-    authMode = 'login';
-    renderLogin();
-  }
-});
-
-function calcAlumno(p, a){
-  const asg = DB.asignaciones.filter(x=>x.alumno_id===a.id);
-  let pts = 0;
-  const detalle = asg.map(x=>{
-    const rol = DB.roles.find(r=>r.id===x.rol_id);
-    const peso = rol ? Number(rol.peso_base)||0 : 0;
-    const fi = x.intensidad==='principal' ? 1 : x.intensidad==='secundario' ? 0.6 : 0.3;
-    const fv = x.valoracion==='bien' ? 1 : x.valoracion==='aceptable' ? 0.5 : 0;
-    const pto = peso*fi*fv;
-    pts += pto;
-    return {...x, rolNombre: rol ? rol.nombre : '(rol borrado)', peso, pto};
-  });
-  const faltasNJ = DB.faltas.filter(f=>f.alumno_id===a.id && !f.justificada).length;
-  const penal = faltasNJ * (Number(p.penalizacion_falta)||0);
-  return {asg:detalle, pts:Math.max(0, pts-penal), faltasNJ, penal};
+sb.auth.onAuthStateChange((ev,s)=>{if(ev==='PASSWORD_RECOVERY'){auth.mode='reset';renderLogin()}else if(!s){auth.user=null;auth.mode='login';renderLogin()}});
+/* ---------- estructura ---------- */
+function top(){
+  const p=P();let t='';
+  const tabs=p?[['dia','Día a día'],['archivo','Archivo'],...(p.curso==='1BACH'?[['prod','Producción']]:[]),['eval','Evaluar']]:[];
+  t=`<div class="curtain noprint"><div class="brand"><svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="none" stroke="#dcb45f" stroke-width="2"/><path d="M12 15q8-6 16 0v6q-8 8-16 0z" fill="#dcb45f"/><circle cx="16.5" cy="18" r="1.6" fill="#4a1228"/><circle cx="23.5" cy="18" r="1.6" fill="#4a1228"/></svg><div><b>Producciones Escénico-Musicales</b><small>by Manuel Esteve</small></div></div>
+  <nav class="nav" aria-label="Secciones">${tabs.map(([k,l])=>`<button class="${view.tab===k?'on':''}" data-act="tab" data-v="${k}">${l}</button>`).join('')}
+  <button class="${view.tab==='home'?'on':''}" data-act="tab" data-v="home">Mis musicales</button>
+  ${p?`<button class="${view.tab==='conf'?'on':''}" data-act="tab" data-v="conf">Configuración</button>`:''}
+  <button data-act="logout">Salir</button></nav></div>`;
+  $('#top').innerHTML=t;
 }
-
-function calcGrupo(p){
-  const als = DB.alumnos.filter(a=>a.proyecto_id===p.id);
-  const base = als.map(a=>({alumno:a, ...calcAlumno(p,a)}));
-  const maxPts = base.length ? Math.max(...base.map(b=>b.pts)) : 0;
-  const techo = Number(p.techo_referencia)||12;
-  const pr = Number(p.peso_roles)||0.7, pa = Number(p.peso_ajuste)||0.3;
-  return base.map(b=>{
-    const notaTecho = Math.min(10, (b.pts/techo)*10);
-    const notaNorm = maxPts>0 ? (b.pts/maxPts)*10 : 0;
-    const aj = DB.ajustes.find(x=>x.alumno_id===b.alumno.id);
-    const ajN = aj ? Number(aj.nota) : null;
-    const finalTecho = ajN===null ? notaTecho : pr*notaTecho + pa*ajN;
-    const finalNorm  = ajN===null ? notaNorm  : pr*notaNorm  + pa*ajN;
-    return {...b, notaTecho, notaNorm, ajuste:ajN, finalTecho, finalNorm};
-  });
-}
-
-function eventoNombre(p, id){
-  if(!id) return '—';
-  const e = DB.eventos.find(x=>x.id===id);
-  return e ? e.nombre : '—';
-}
-
-function printHTML(titulo, cuerpo){
-  const w = window.open('', '_blank');
-  w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>${esc(titulo)}</title><style>
-    @page{size:A4;margin:15mm}
-    body{font-family:system-ui,Arial,sans-serif;color:#111;font-size:12px}
-    h1{font-size:20px;margin:0 0 4px}
-    h2{font-size:14px;margin:16px 0 6px;border-bottom:1px solid #ccc;padding-bottom:3px}
-    table{width:100%;border-collapse:collapse;margin:6px 0}
-    th,td{border:1px solid #bbb;padding:5px 6px;text-align:left;vertical-align:top}
-    th{background:#f0f0f0;font-size:11px;text-transform:uppercase}
-    .chip{display:inline-block;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:600}
-    .c-green{background:#d7f5dd;color:#0b6b2a}
-    .c-yellow{background:#fff3cd;color:#8a6100}
-    .c-red{background:#fbdada;color:#9b1c1c}
-    .muted{color:#666}.small{font-size:10px;color:#666}
-  </style></head><body>${cuerpo}</body></html>`);
-  w.document.close(); w.focus(); setTimeout(()=>w.print(), 300);
-}
-
-function imprimirFicha(p, a){
-  const c = calcAlumno(p, a);
-  const filas = c.asg.map(x=>`<tr>
-    <td>${esc(x.rolNombre)}</td>
-    <td>${esc(x.intensidad)}</td>
-    <td><span class="chip ${x.valoracion==='bien'?'c-green':x.valoracion==='aceptable'?'c-yellow':'c-red'}">${esc(x.valoracion)}</span></td>
-    <td>${esc(x.notas||'')}</td></tr>`).join('');
-  const html = `
-    <h1>${esc(a.nombre)}</h1>
-    <div class="muted">${esc(p.nombre)} · ${esc(a.curso||'')} ${esc(a.grupo||'')} · ${hoy()}</div>
-    <h2>Roles</h2>
-    <table><thead><tr><th>Rol</th><th>Intensidad</th><th>Valoración</th><th>Observaciones</th></tr></thead>
-    <tbody>${filas || '<tr><td colspan="4">Sin roles asignados</td></tr>'}</tbody></table>
-    ${c.faltasNJ>0 ? `<p><strong>Faltas no justificadas:</strong> ${c.faltasNJ}</p>` : ''}
-    ${a.notas_ficha ? `<h2>Observaciones</h2><p>${esc(a.notas_ficha).replace(/\n/g,'<br>')}</p>` : ''}`;
-  printHTML('Ficha de '+a.nombre, html);
-}
-
-function imprimirComparativa(p){
-  const g = calcGrupo(p);
-  const metodo = p.metodo_nota||'techo';
-  const filas = g.sort((x,y)=> (metodo==='techo'? y.finalTecho-x.finalTecho : y.finalNorm-x.finalNorm)).map(r=>`
-    <tr><td>${esc(r.alumno.nombre)}</td><td>${r.pts.toFixed(1)}</td>
-    <td><span class="chip ${colorClass(r.notaTecho)}">${r.notaTecho.toFixed(1)}</span></td>
-    <td><span class="chip ${colorClass(r.notaNorm)}">${r.notaNorm.toFixed(1)}</span></td>
-    <td>${r.ajuste===null?'—':r.ajuste}</td>
-    <td><span class="chip ${colorClass(r.finalTecho)}">${r.finalTecho.toFixed(1)}</span></td>
-    <td><span class="chip ${colorClass(r.finalNorm)}">${r.finalNorm.toFixed(1)}</span></td></tr>`).join('');
-  const html = `<h1>Comparativa · ${esc(p.nombre)}</h1>
-    <div class="muted">Método activo: ${metodo} · Techo: ${p.techo_referencia} · Pesos: ${p.peso_roles}/${p.peso_ajuste} · ${hoy()}</div>
-    <table><thead><tr><th>Alumno</th><th>Puntos</th><th>Nota roles (techo)</th><th>Nota roles (norm.)</th><th>Ajuste</th><th>Final (techo)</th><th>Final (norm.)</th></tr></thead>
-    <tbody>${filas||'<tr><td colspan="7">Sin alumnos</td></tr>'}</tbody></table>
-    <p class="small">Uso interno del profesorado. No distribuir al alumnado.</p>`;
-  printHTML('Comparativa '+p.nombre, html);
-}
-
 function render(){
-  const p = view.proyectoId ? DB.proyectos.find(x=>x.id===view.proyectoId) : null;
-  $('#topbar-title').textContent = p ? p.nombre : 'Registro de Producción Escénica';
-  const app = $('#app');
-  if(view.name==='proyectos') app.innerHTML = renderProyectos();
-  else if(view.name==='proyecto') app.innerHTML = renderProyecto(p);
-  else if(view.name==='alumnos') app.innerHTML = renderAlumnos(p);
-  else if(view.name==='alumno') app.innerHTML = renderAlumno(p, DB.alumnos.find(a=>a.id===view.alumnoId));
-  else if(view.name==='comparativa') app.innerHTML = renderComparativa(p);
-  window.scrollTo(0,0);
+  if(!auth.user)return renderLogin();
+  const y=window.scrollY;top();const p=P();let h='';
+  if(view.tab!=='home'&&!p)view.tab='home';
+  if(view.tab==='home')h=vHome();
+  else if(view.tab==='dia')h=vDia(p);
+  else if(view.tab==='archivo')h=vArchivo(p);
+  else if(view.tab==='prod')h=vProd(p);
+  else if(view.tab==='eval')h=view.aid?vFicha(p):vEval(p);
+  else if(view.tab==='conf')h=vConf(p);
+  $('#app').innerHTML=h;window.scrollTo(0,y);
 }
-
-function renderProyectos(){
-  return `<h1>Proyectos</h1>
-  <details><summary>+ Nuevo proyecto</summary>
-    <form data-action="crear-proyecto">
-      <div class="grid2">
-        <label>Nombre<input name="nombre" required placeholder="Burlesque 2026-27"></label>
-        <label>Curso<select name="curso">
-          <option value="4ESO">4º ESO</option><option value="1BACH">1º Bachillerato</option><option value="otro">Otro</option>
-        </select></label>
-        <label>Optativa<input name="optativa" placeholder="Creaciones escénico-musicales"></label>
-        <label>Inicio<input type="date" name="fecha_inicio" value="${hoy()}"></label>
-        <label>Fin<input type="date" name="fecha_fin"></label>
-      </div>
-      <div class="row"><button class="btn" type="submit">Crear proyecto</button></div>
-    </form>
-  </details>
-  <div class="grid">
-    ${DB.proyectos.length ? DB.proyectos.map(p=>`
-      <div class="pcard">
-        <h3>${esc(p.nombre)}</h3>
-        <div class="muted">${esc(p.curso)} · ${esc(p.optativa||'—')}</div>
-        <div><span class="pill">${p.estado==='activo'?'Activo':'Archivado'}</span></div>
-        <div class="row" style="margin-top:auto;">
-          <button class="btn sm" data-action="abrir-proyecto" data-id="${p.id}">Abrir</button>
-          <button class="btn sm sec" data-action="archivar-proyecto" data-id="${p.id}">${p.estado==='activo'?'Archivar':'Reactivar'}</button>
-          <button class="btn sm danger" data-action="borrar-proyecto" data-id="${p.id}">Borrar</button>
-        </div>
-      </div>`).join('') : '<div class="card muted">Todavía no hay proyectos. Crea el primero arriba.</div>'}
-  </div>`;
+function head(p,extra=''){return `<div style="margin-bottom:18px" class="noprint"><div class="muted">${p.curso==='4ESO'?'4º ESO':'1º Bachillerato'} · ${esc(p.optativa||'')}${p.estado==='archivado'?' · archivado':''}</div><h1 style="font-size:32px">${esc(p.nombre)}</h1>${extra}</div>`}
+function vHome(){
+  const act=DB.proyectos.filter(p=>p.estado==='activo');
+  return `<div class="row" style="justify-content:space-between;margin-bottom:20px"><div><div class="muted">Tus proyectos</div><h1 style="font-size:36px">Mis musicales</h1></div></div>
+  <div class="grid2">${act.length?act.map(p=>`<div class="card"><div style="color:var(--gold);font-weight:600">${p.curso==='4ESO'?'4º ESO':'1º Bachillerato'}</div><h2 style="font-size:26px;margin:4px 0">${esc(p.nombre)}</h2><div class="muted">${esc(p.optativa||'')} · ${DB.alumnos.filter(a=>a.proyecto_id===p.id).length} alumnos</div><div class="row" style="margin-top:14px"><button class="btn gold" data-act="open" data-id="${p.id}">Abrir</button></div></div>`).join(''):'<div class="card muted">Todavía no hay musicales. Crea el primero aquí abajo.</div>'}</div>
+  <details class="card" ${act.length?'':'open'}><summary style="cursor:pointer;font-weight:600;color:var(--gold)">Nuevo musical</summary>
+  <form data-form="nuevo" style="margin-top:14px"><div class="fg"><label>Nombre del musical<input name="nombre" required></label>
+  <label>Grupo<select name="curso"><option value="4ESO">4º ESO · Creaciones escénico-musicales</option><option value="1BACH">1º Bachillerato · Música, espectáculo y comunicación</option></select></label>
+  <label>Inicio<input type="date" name="fecha_inicio" value="${hoy()}"></label><label>Fin<input type="date" name="fecha_fin"></label></div>
+  <div><button class="btn gold" type="submit">Crear musical</button></div></form></details>`;
 }
-
-function renderProyecto(p){
-  if(!p) return '<div class="card">Proyecto no encontrado.</div>';
-  const eventos = DB.eventos.filter(e=>e.proyecto_id===p.id);
-  const roles = DB.roles.filter(r=>r.proyecto_id===p.id);
-  const nAl = DB.alumnos.filter(a=>a.proyecto_id===p.id).length;
-  return `<h1>${esc(p.nombre)}</h1>
-  <div class="row" style="margin-bottom:20px">
-    <button class="btn" data-action="ver-alumnos" style="background:var(--ink);">Alumnos (${nAl})</button>
-    <button class="btn" data-action="ver-comparativa" style="background:var(--ink);">Comparativa</button>
-  </div>
-
-  <h2>Datos del proyecto</h2>
-  <form class="card" data-action="guardar-proyecto">
-    <div class="grid2">
-      <label>Nombre<input name="nombre" value="${esc(p.nombre)}" required></label>
-      <label>Curso<select name="curso">
-        ${['4ESO','1BACH','otro'].map(c=>`<option value="${c}" ${p.curso===c?'selected':''}>${c}</option>`).join('')}
-      </select></label>
-      <label>Optativa<input name="optativa" value="${esc(p.optativa||'')}"></label>
-      <label>Inicio<input type="date" name="fecha_inicio" value="${esc(p.fecha_inicio||'')}"></label>
-      <label>Fin<input type="date" name="fecha_fin" value="${esc(p.fecha_fin||'')}"></label>
-    </div>
-    <label>Notas<textarea name="notas">${esc(p.notas||'')}</textarea></label>
-    <div class="row"><button class="btn" type="submit">Guardar datos</button></div>
-  </form>
-
-  <h2>Ajustes de valoración</h2>
-  <form class="card" data-action="guardar-ajustes">
-    <div class="grid2">
-      <label>Techo de referencia (puntos = 10)<input type="number" step="0.5" min="1" name="techo_referencia" value="${Number(p.techo_referencia)||12}"></label>
-      <label>Método de nota<select name="metodo_nota">
-        <option value="techo" ${p.metodo_nota==='techo'?'selected':''}>Techo de referencia</option>
-        <option value="normalizada" ${p.metodo_nota==='normalizada'?'selected':''}>Normalizada al máximo</option>
-      </select></label>
-      <label>Peso nota de roles (0-1)<input type="number" step="0.05" min="0" max="1" name="peso_roles" value="${Number(p.peso_roles)||0.7}"></label>
-      <label>Peso ajuste del profesor (0-1)<input type="number" step="0.05" min="0" max="1" name="peso_ajuste" value="${Number(p.peso_ajuste)||0.3}"></label>
-      <label>Penalización por falta no justificada<input type="number" step="0.1" min="0" name="penalizacion_falta" value="${Number(p.penalizacion_falta)||0.5}"></label>
-    </div>
-    <div class="row"><button class="btn" type="submit">Guardar ajustes</button></div>
-  </form>
-
-  <h2>Eventos</h2>
-  ${renderTablaEventos(eventos)}
-  <details><summary>+ Añadir evento</summary>
-    <form data-action="add-evento">
-      <div class="grid2">
-        <label>Nombre<input name="nombre" required placeholder="Concierto solidario Aspajunide"></label>
-        <label>Tipo<select name="tipo">
-          ${Object.entries(TIPO_EVENTO).map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}
-        </select></label>
-        <label>Trimestre<select name="trimestre"><option>1</option><option>2</option><option>3</option></select></label>
-        <label>Fecha<input type="date" name="fecha" value="${hoy()}"></label>
-        <label>Sede<input name="sede"></label>
-        <label>Formato<select name="formato"><option value="fragmento">Fragmento</option><option value="completo">Musical completo</option><option value="otro">Otro</option></select></label>
-        <label>Estado<select name="estado"><option value="planificado">Planificado</option><option value="en_preparacion">En preparación</option><option value="listo">Listo</option><option value="realizado">Realizado</option></select></label>
-      </div>
-      <label>Notas<textarea name="notas"></textarea></label>
-      <div class="row"><button class="btn" type="submit">Añadir evento</button></div>
-    </form>
-  </details>
-
-  <h2>Roles y pesos</h2>
-  ${renderTablaRoles(roles)}
-  <div class="row" style="margin-top:12px"><button class="btn sec sm" data-action="add-rol-libre">+ Añadir rol libre</button></div>`;
+function subtabs(list,cur,act){return `<div class="sub noprint">${list.map(([k,l])=>`<button class="${cur===k?'on':''}" data-act="${act}" data-v="${k}">${l}</button>`).join('')}</div>`}
+function vDia(p){
+  return head(p)+subtabs([['hoy','Hoy en clase'],['eventos','Eventos'],['vico','Teatro Vico']],view.sub,'sub')+(view.sub==='eventos'?vEventos(p):view.sub==='vico'?vVico(p):vHoy(p));
 }
-
-function renderTablaEventos(eventos){
-  if(!eventos.length) return '<div class="card muted">Sin eventos todavía.</div>';
-  return `<table><thead><tr><th>Evento</th><th>Tipo</th><th>T</th><th>Fecha</th><th>Sede</th><th>Formato</th><th>Estado</th><th></th></tr></thead><tbody>
-  ${eventos.map(e=>`<tr>
-    <td><strong>${esc(e.nombre)}</strong></td>
-    <td>${esc(TIPO_EVENTO[e.tipo]||e.tipo)}</td>
-    <td>${esc(e.trimestre)}</td>
-    <td>${esc(e.fecha)}</td>
-    <td>${esc(e.sede||'—')}</td>
-    <td>${e.formato==='completo'?'Completo':'Fragmento'}</td>
-    <td><span class="pill">${esc(e.estado)}</span></td>
-    <td><button class="btn sm danger" type="button" data-action="del-evento" data-id="${e.id}">×</button></td>
-  </tr>`).join('')}</tbody></table>`;
+function colorBtns(cur,act,extra){
+  const r=reglas(P()).rubrica;
+  return `<div class="mk">${COLORES.map(c=>`<button class="cb c-${c} ${cur===c?'on':''}" data-act="${act}" data-c="${c}" ${extra} aria-label="${c}"><i class="sh"></i>${verVal?`<small>${r[c]}</small>`:''}</button>`).join('')}<button class="fb ${cur==='falta'?'on':''} ${cur==='falta_j'?'on j':''}" data-act="${act}" data-c="falta" ${extra}>${cur==='falta_j'?'Justif.':cur==='falta'?'Falta':'Falta'}</button></div>`;
 }
-
-function renderTablaRoles(roles){
-  if(!roles.length) return '<div class="card muted">Sin roles.</div>';
-  return `<table><thead><tr><th>Rol</th><th>Peso base</th><th>Tipo</th><th></th></tr></thead><tbody>
-  ${roles.map(r=>`<tr>
-    <td>${r.es_libre?`<input data-rol-id="${r.id}" data-rol-field="nombre" value="${esc(r.nombre)}" style="padding:6px;">`:esc(r.nombre)}</td>
-    <td><input type="number" step="0.5" min="0" style="max-width:90px;padding:6px;" data-rol-id="${r.id}" data-rol-field="peso_base" value="${Number(r.peso_base)}"></td>
-    <td>${r.es_libre?'<span class="pill">Libre</span>':'<span class="muted">Fijo</span>'}</td>
-    <td>${r.es_libre?`<button class="btn sm danger" type="button" data-action="del-rol" data-id="${r.id}">Borrar</button>`:''}</td>
-  </tr>`).join('')}</tbody></table>`;
+function vHoy(p){
+  const als=alumnosDe(p),ses=DB.sesiones.find(s=>s.proyecto_id===p.id&&s.fecha===fecha),ev=ses?ses.evaluacion:evalSel;
+  const marks=ses?DB.marcas.filter(m=>m.sesion_id===ses.id):[];
+  const sinCerrar=DB.sesiones.filter(s=>s.proyecto_id===p.id&&!s.cerrada&&s.fecha!==fecha).length;
+  return `<div class="phone"><div class="row" style="justify-content:space-between"><label style="flex:1">Fecha<input type="date" value="${fecha}" data-chg="fecha"></label></div>
+  <div class="seg">${[1,2,3].map(e=>`<button class="${ev===e?'on':''}" data-act="evsel" data-v="${e}">${e}ª eval.</button>`).join('')}</div>
+  <div class="muted row" style="justify-content:space-between;margin-bottom:10px"><span>Sin marca = verde</span><b style="color:var(--gold)">${marks.length} marcas</b></div>
+  ${sinCerrar?`<div class="warn">Tienes ${sinCerrar} día(s) anteriores sin cerrar. No cuentan para la nota hasta cerrarlos.</div>`:''}
+  ${ses&&ses.cerrada?'<div class="warn">Día cerrado. <button class="btn sm" data-act="reabrir">Reabrir</button></div>':''}
+  ${als.length?als.map(a=>{const m=marks.find(x=>x.alumno_id===a.id),c=calcEval(p,a,ev),rl=DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>(DB.roles.find(q=>q.id===x.rol_id)||{}).nombre).filter(Boolean).join(' + '),r=reglas(p);
+    const av=c.fj>=r.aviso_rojo?'<span class="chip r">'+c.fj+' justif.</span>':c.fj>=r.aviso_amarillo?'<span class="chip y">'+c.fj+' justif.</span>':'';
+    return `<div class="al"><div class="t"><b>${esc(a.nombre)} ${av}</b><span>${esc(rl||'sin rol')}</span></div>${colorBtns(m?m.color:null,'mark',`data-a="${a.id}"`)}</div>`}).join(''):'<div class="card muted">Añade alumnos en Configuración.</div>'}
+  ${als.length?'<button class="btn gold" style="width:100%;margin-top:8px" data-act="cerrar">Cerrar el día</button>':''}</div>`;
 }
-
-function renderAlumnos(p){
-  const als = DB.alumnos.filter(a=>a.proyecto_id===p.id);
-  const g = calcGrupo(p);
-  const rows = als.map(a=>{
-    const r = g.find(x=>x.alumno.id===a.id);
-    const final = p.metodo_nota==='normalizada' ? r.finalNorm : r.finalTecho;
-    return `<tr>
-      <td><a href="#" data-action="abrir-alumno" data-id="${a.id}">${esc(a.nombre)}</a></td>
-      <td>${esc(a.curso||'')}</td>
-      <td>${esc(a.grupo||'')}</td>
-      <td><span class="pill">${r.asg.length}</span></td>
-      <td>${r.pts.toFixed(1)}</td>
-      <td><span class="chip ${colorClass(final)}">${final.toFixed(1)}</span></td>
-      <td><button class="btn sm danger" type="button" data-action="del-alumno" data-id="${a.id}">×</button></td>
-    </tr>`;
-  }).join('');
-  return `<h1>Alumnos · ${esc(p.nombre)}</h1>
-  <div class="row" style="margin-bottom:20px">
-    <button class="btn sec" data-action="abrir-proyecto" data-id="${p.id}">← Volver al proyecto</button>
-    <button class="btn" data-action="ver-comparativa" style="background:var(--ink);">Comparativa</button>
-  </div>
-  <details><summary>+ Añadir alumno</summary>
-    <form data-action="add-alumno">
-      <div class="grid2">
-        <label>Nombre<input name="nombre" required></label>
-        <label>Curso<input name="curso" placeholder="4º ESO"></label>
-        <label>Grupo<input name="grupo" placeholder="A"></label>
-      </div>
-      <div class="row"><button class="btn" type="submit">Añadir alumno</button></div>
-    </form>
-  </details>
-  ${als.length ? `<table><thead><tr><th>Alumno</th><th>Curso</th><th>Grupo</th><th>Roles</th><th>Puntos</th><th>Nota</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : '<div class="card muted">Sin alumnos todavía.</div>'}`;
+function vEventos(p){
+  const evs=DB.eventos.filter(e=>e.proyecto_id===p.id).sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
+  return `<div class="card scroll">${evs.length?`<table><tr><th>Evento</th><th>Tipo</th><th>Eval.</th><th>Fecha</th><th>Sede</th><th></th></tr>${evs.map(e=>`<tr><td><b>${esc(e.nombre)}</b></td><td>${esc(e.tipo)}</td><td>${e.evaluacion||''}</td><td>${esc(e.fecha||'')}</td><td>${esc(e.sede||'')}</td><td><button class="btn sm red" data-act="delev" data-id="${e.id}">Borrar</button></td></tr>`).join('')}</table>`:'<span class="muted">Sin eventos todavía.</span>'}</div>
+  <details class="card"><summary style="cursor:pointer;font-weight:600;color:var(--gold)">Añadir evento</summary><form data-form="evento" style="margin-top:12px"><div class="fg"><label>Nombre<input name="nombre" required placeholder="Concierto solidario en Aspajunide"></label><label>Tipo<select name="tipo"><option value="solidario">Solidario</option><option value="colegios">Colegios</option><option value="audicion">Audición</option><option value="vico">Teatro Vico</option><option value="otro">Otro</option></select></label><label>Evaluación<select name="evaluacion"><option>1</option><option>2</option><option>3</option></select></label><label>Fecha<input type="date" name="fecha"></label><label>Sede<input name="sede"></label></div><div><button class="btn gold">Añadir</button></div></form></details>`;
 }
-
-function renderAlumno(p, a){
-  if(!a) return '<div class="card">Alumno no encontrado.</div>';
-  const c = calcAlumno(p, a);
-  const g = calcGrupo(p).find(x=>x.alumno.id===a.id);
-  const aj = DB.ajustes.find(x=>x.alumno_id===a.id);
-  const roles = DB.roles.filter(r=>r.proyecto_id===p.id);
-  const eventos = DB.eventos.filter(e=>e.proyecto_id===p.id);
-  const es4 = p.curso === '4ESO';
-  const colab = DB.colaboraciones.find(x=>x.alumno_id===a.id);
-
-  const filasAsg = c.asg.map(x=>`<tr>
-    <td><strong>${esc(x.rolNombre)}</strong></td>
-    <td>${esc(x.intensidad)}</td>
-    <td><span class="chip ${x.valoracion==='bien'?'c-green':x.valoracion==='aceptable'?'c-yellow':'c-red'}">${esc(x.valoracion)}</span></td>
-    <td>T${esc(x.trimestre)}</td>
-    <td>${esc(eventoNombre(p, x.evento_id))}</td>
-    <td>${x.pto.toFixed(2)}</td>
-    <td><button class="btn sm danger" type="button" data-action="del-asignacion" data-id="${x.id}">×</button></td>
-  </tr>`).join('');
-
-  const filasFaltas = DB.faltas.filter(f=>f.alumno_id===a.id).map(f=>`<tr>
-    <td>${esc(f.fecha)}</td>
-    <td>${f.tipo==='actuacion'?'Actuación':'Ensayo'}</td>
-    <td>${f.justificada?'Sí':'No'}</td>
-    <td><button class="btn sm danger" type="button" data-action="del-falta" data-id="${f.id}">×</button></td>
-  </tr>`).join('');
-
-  const final = p.metodo_nota==='normalizada' ? g.finalNorm : g.finalTecho;
-
-  return `<h1>${esc(a.nombre)}</h1>
-  <div class="row" style="margin-bottom:20px">
-    <button class="btn sec" data-action="ver-alumnos">← Volver a alumnos</button>
-    <button class="btn" data-action="imprimir-ficha" data-id="${a.id}" style="background:var(--ink);">🖨 Imprimir ficha</button>
-  </div>
-
-  <div class="card" style="background:#f8fafc; border-left:4px solid var(--brand);">
-    <div class="row" style="justify-content:space-between">
-      <div><strong style="font-size:16px;">${esc(a.curso||'')} ${esc(a.grupo||'')}</strong></div>
-      <div>Puntos: <strong style="font-size:16px;">${c.pts.toFixed(1)}</strong> &nbsp;·&nbsp; Nota roles: <strong style="font-size:16px;">${g.notaTecho.toFixed(1)}</strong> &nbsp;·&nbsp; Final: <span class="chip ${colorClass(final)}" style="font-size:14px;">${final.toFixed(1)}</span></div>
-    </div>
-    <div class="muted" style="margin-top:10px;">Faltas no justificadas: <strong>${c.faltasNJ}</strong> (Penalización: −${c.penal.toFixed(1)} pts)</div>
-  </div>
-
-  <h2>Roles asignados</h2>
-  ${c.asg.length ? `<table><thead><tr><th>Rol</th><th>Intensidad</th><th>Valoración</th><th>T</th><th>Evento</th><th>Pts</th><th></th></tr></thead><tbody>${filasAsg}</tbody></table>` : '<div class="card muted">Sin roles asignados.</div>'}
-  <details><summary>+ Asignar rol</summary>
-    <form data-action="add-asignacion">
-      <div class="grid2">
-        <label>Rol<select name="rol_id" required>
-          ${roles.map(r=>`<option value="${r.id}">${esc(r.nombre)} (${Number(r.peso_base)})</option>`).join('')}
-        </select></label>
-        <label>Intensidad<select name="intensidad">
-          <option value="principal">Principal (×1.0)</option>
-          <option value="secundario">Secundario (×0.6)</option>
-          <option value="puntual">Puntual (×0.3)</option>
-        </select></label>
-        <label>Valoración<select name="valoracion">
-          <option value="bien">Bien 🟢</option>
-          <option value="aceptable">Aceptable 🟡</option>
-          <option value="mal">Mal 🔴</option>
-        </select></label>
-        <label>Trimestre<select name="trimestre"><option>1</option><option>2</option><option>3</option></select></label>
-        <label>Evento (opcional)<select name="evento_id"><option value="">—</option>
-          ${eventos.map(e=>`<option value="${e.id}">${esc(e.nombre)}</option>`).join('')}
-        </select></label>
-      </div>
-      <label>Observaciones<input name="notas" placeholder="Aprendió el papel, faltó a dos ensayos..."></label>
-      <div class="row"><button class="btn" type="submit">Asignar rol</button></div>
-    </form>
-  </details>
-
-  <h2>Faltas</h2>
-  ${filasFaltas ? `<table><thead><tr><th>Fecha</th><th>Tipo</th><th>Justificada</th><th></th></tr></thead><tbody>${filasFaltas}</tbody></table>` : '<div class="card muted">Sin faltas registradas.</div>'}
-  <details><summary>+ Añadir falta</summary>
-    <form data-action="add-falta">
-      <div class="grid2">
-        <label>Fecha<input type="date" name="fecha" value="${hoy()}"></label>
-        <label>Tipo<select name="tipo"><option value="ensayo">Ensayo importante</option><option value="actuacion">Actuación</option></select></label>
-        <label>Justificada<select name="justificada"><option value="no">No</option><option value="si">Sí</option></select></label>
-      </div>
-      <div class="row"><button class="btn" type="submit">Añadir falta</button></div>
-    </form>
-  </details>
-
-  <h2>Ajuste del profesor</h2>
-  <form class="card" data-action="guardar-ajuste">
-    <div class="grid2">
-      <label>Nota (0-10)<input type="number" min="0" max="10" step="0.1" name="nota" value="${aj?Number(aj.nota):''}" placeholder="Ej. 8"></label>
-    </div>
-    <label>Comentario<input name="comentario" value="${esc(aj?aj.comentario:'')}" placeholder="Actitud, implicación, comportamiento..."></label>
-    <div class="row"><button class="btn" type="submit">Guardar ajuste</button></div>
-  </form>
-
-  <h2>Notas</h2>
-  <form class="card" data-action="guardar-notas">
-    <label>Notas privadas (no salen en la ficha del alumno)<textarea name="notas_privadas">${esc(a.notas_privadas||'')}</textarea></label>
-    <label>Notas para la ficha (sí salen en el PDF)<textarea name="notas_ficha">${esc(a.notas_ficha||'')}</textarea></label>
-    <div class="row"><button class="btn" type="submit">Guardar notas</button></div>
-  </form>
-
-  ${es4 ? `<h2>Colaboración en montaje de Bachillerato</h2>
-  <form class="card" data-action="guardar-colab">
-    <div class="grid2">
-      <label>Estado<select name="estado">
-        <option value="">—</option>
-        <option value="hecho" ${colab&&colab.estado==='hecho'?'selected':''}>Ha hecho</option>
-        <option value="no_hecho" ${colab&&colab.estado==='no_hecho'?'selected':''}>No ha hecho</option>
-        <option value="no_vino" ${colab&&colab.estado==='no_vino'?'selected':''}>No ha venido</option>
-      </select></label>
-    </div>
-    <label>Notas<input name="notas" value="${esc(colab?colab.notas:'')}" placeholder="Ensayo general + función de fin de curso"></label>
-    <div class="row"><button class="btn" type="submit">Guardar colaboración</button></div>
-  </form>` : ''}`;
+function vVico(p){
+  const als=alumnosDe(p),b4=p.curso==='4ESO',r=reglas(p);
+  return `<div class="card muted">${b4?'Montaje en el Teatro Vico: cada función da una bonificación en la 3ª evaluación (verde +'+r.bonus.verde+', lima +'+r.bonus.lima+', amarillo +'+r.bonus.amarillo+', naranja +'+r.bonus.naranja+', rojo +'+r.bonus.rojo+'). La media de las dos funciones se suma a la nota.':'Actuación en el Teatro Vico: pesa un '+r.vico_peso+' % de la nota final. Falta sin justificar = 0 y tope de '+r.vico_tope+(r.vico_tope_activo?'':' (desactivado)')+'. Falta justificada: pones tú el valor.'}</div>
+  ${als.map(a=>{const c=calcVico(p,a);return `<div class="al"><div class="t"><b>${esc(a.nombre)}</b><span>${b4?'bonificación '+fmt(c.bonus):'nota Vico '+fmt(c.nota)}${c.sinJust?' · <span class="chip r">sin justificar</span>':''}${c.pend?' · <span class="chip y">falta valor manual</span>':''}</span></div>
+  ${[1,2].map(f=>{const x=DB.vico.find(v=>v.alumno_id===a.id&&v.funcion===f);return `<div style="margin-bottom:8px"><div class="muted" style="font-size:12px;margin-bottom:4px">Función ${f}</div>${colorBtns(x?x.color:null,'vmark',`data-a="${a.id}" data-f="${f}"`)}${x&&x.color==='falta_j'&&!b4?`<label style="margin-top:6px">Valor manual (0-10) por falta justificada<input type="number" min="0" max="10" step="0.1" value="${x.valor_manual??''}" data-chg="vman" data-id="${x.id}"></label>`:''}</div>`}).join('')}</div>`}).join('')||'<div class="card muted">Sin alumnos.</div>'}`;
 }
-
-function renderComparativa(p){
-  const g = calcGrupo(p);
-  const metodo = p.metodo_nota || 'techo';
-  const orden = [...g].sort((x,y)=> metodo==='techo' ? y.finalTecho-x.finalTecho : y.finalNorm-x.finalNorm);
-  const filas = orden.map(r=>`<tr>
-    <td><a href="#" data-action="abrir-alumno" data-id="${r.alumno.id}">${esc(r.alumno.nombre)}</a></td>
-    <td>${r.pts.toFixed(1)}</td>
-    <td><span class="chip ${colorClass(r.notaTecho)}">${r.notaTecho.toFixed(1)}</span></td>
-    <td><span class="chip ${colorClass(r.notaNorm)}">${r.notaNorm.toFixed(1)}</span></td>
-    <td>${r.ajuste===null?'—':r.ajuste}</td>
-    <td><span class="chip ${colorClass(r.finalTecho)}">${r.finalTecho.toFixed(1)} ${metodo==='techo'?'★':''}</span></td>
-    <td><span class="chip ${colorClass(r.finalNorm)}">${r.finalNorm.toFixed(1)} ${metodo==='normalizada'?'★':''}</span></td>
-  </tr>`).join('');
-  return `<h1>Comparativa · ${esc(p.nombre)}</h1>
-  <div class="row" style="margin-bottom:20px">
-    <button class="btn sec" data-action="abrir-proyecto" data-id="${p.id}">← Volver al proyecto</button>
-    <button class="btn sec" data-action="ver-alumnos">Alumnos</button>
-    <button class="btn" data-action="imprimir-comparativa" style="background:var(--ink);">🖨 Imprimir comparativa</button>
-  </div>
-  <div class="card muted" style="background:#f8fafc;">Método activo: <strong>${metodo}</strong> · Techo: ${p.techo_referencia} · Pesos: ${p.peso_roles} / ${p.peso_ajuste} · Penalización falta: ${p.penalizacion_falta}</div>
-  ${g.length ? `<table><thead><tr><th>Alumno</th><th>Puntos</th><th>Nota roles (techo)</th><th>Nota roles (norm.)</th><th>Ajuste</th><th>Final (techo)</th><th>Final (norm.)</th></tr></thead><tbody>${filas}</tbody></table>` : '<div class="card muted">Sin alumnos.</div>'}
-  <p class="muted" style="text-align:center;margin-top:20px;">Uso interno del profesorado. La ficha que se enseña al alumno es la individual, sin puntos ni comparativa.</p>`;
+function vEval(p){
+  const als=alumnosDe(p),b=p.curso==='1BACH',r=reglas(p);
+  const rows=als.map(a=>{const f=calcFinal(p,a);const man=a.nota_manual;
+    const chip=x=>x.nota===null?'<span class="muted">—</span>':`<span class="nota" style="color:${x.nota>=8?'#63d08f':x.nota>=5?'#f2bb43':'#ef6f6f'}">${fmt(x.notaFinalEv??x.nota)}</span>${x.real>10.04?` <span class="chip g">real ${fmt(x.real)}</span>`:''}`;
+    const maxJ=Math.max(...f.ev.map(x=>x.fj)),fsj=f.ev.reduce((t,x)=>t+x.fsj,0);
+    return `<tr><td><a href="#" data-act="ficha" data-id="${a.id}" style="color:var(--gold);font-weight:600">${esc(a.nombre)}</a></td>${f.ev.map(x=>`<td>${chip(x)}</td>`).join('')}${b?`<td>${fmt(f.vico.nota)}${f.vico.sinJust?' <span class="chip r">sin just.</span>':''}${f.vicoPend?' <span class="chip y">manual</span>':''}</td>`:''}
+    <td>${fsj?`<span class="chip r">${fsj} sin just.</span> `:''}${maxJ>=r.aviso_rojo?`<span class="chip r">${maxJ} just.</span>`:maxJ>=r.aviso_amarillo?`<span class="chip y">${maxJ} just.</span>`:maxJ?`<span class="chip">${maxJ} just.</span>`:''}</td>
+    <td><span class="nota">${fmt(f.final)}</span>${f.tope?' <span class="chip r">tope</span>':''}</td><td>${f.final===null?'—':Math.round(f.final)+' / '+Math.floor(f.final)}</td><td>${man!==null&&man!==undefined?`<b style="color:var(--gold)">${fmt(man)}</b>`:'—'}</td></tr>`}).join('');
+  return head(p)+`<div class="card scroll"><table><tr><th>Alumno/a</th><th>1ª</th><th>2ª</th><th>3ª</th>${b?'<th>Vico</th>':''}<th>Faltas</th><th>Final calculada</th><th>Redond. / trunc.</th><th>Nota manual</th></tr>${rows||'<tr><td colspan="9" class="muted">Sin alumnos.</td></tr>'}</table></div>
+  <p class="muted">La nota por evaluación se corta en 10; el trabajo real aparece aparte cuando lo supera. La 3ª evaluación no se publica: se pone la nota final. Solo cuentan los días cerrados.</p>`;
 }
-
-document.addEventListener('click', async e=>{
-  const el = e.target.closest('[data-action]');
-  if(!el) return;
-  const act = el.dataset.action, id = el.dataset.id;
-  if(el.tagName === 'A') e.preventDefault();
-  
-  switch(act){
-    case 'home': view={name:'proyectos',proyectoId:null,alumnoId:null}; render(); break;
-    case 'abrir-proyecto': view={name:'proyecto',proyectoId:id,alumnoId:null}; render(); break;
-    case 'ver-alumnos': view={name:'alumnos',proyectoId:view.proyectoId,alumnoId:null}; render(); break;
-    case 'ver-comparativa': view={name:'comparativa',proyectoId:view.proyectoId,alumnoId:null}; render(); break;
-    case 'abrir-alumno': view={name:'alumno',proyectoId:view.proyectoId,alumnoId:id}; render(); break;
-    case 'imprimir-ficha': imprimirFicha(DB.proyectos.find(x=>x.id===view.proyectoId), DB.alumnos.find(x=>x.id===id)); break;
-    case 'imprimir-comparativa': imprimirComparativa(DB.proyectos.find(x=>x.id===view.proyectoId)); break;
-    
-    case 'borrar-proyecto': 
-      if(confirm('¿Borrar el proyecto y todos sus datos?')) { await supabaseClient.from('proyectos').delete().eq('id', id); view={name:'proyectos',proyectoId:null,alumnoId:null}; loadData(); } 
-      break;
-    case 'archivar-proyecto': {
-      const p = DB.proyectos.find(x=>x.id===id);
-      const nuevoEstado = p.estado==='activo'?'archivado':'activo';
-      await supabaseClient.from('proyectos').update({estado: nuevoEstado}).eq('id', id); loadData(); break;
-    }
-    case 'del-alumno': if(confirm('¿Borrar alumno y todos sus datos?')) { await supabaseClient.from('alumnos').delete().eq('id', id); loadData(); } break;
-    case 'del-asignacion': await supabaseClient.from('asignaciones').delete().eq('id', id); loadData(); break;
-    case 'del-falta': await supabaseClient.from('faltas').delete().eq('id', id); loadData(); break;
-    case 'del-evento': if(confirm('¿Borrar evento?')) { await supabaseClient.from('eventos').delete().eq('id', id); loadData(); } break;
-    case 'del-rol': {
-      if(DB.asignaciones.some(x=>x.rol_id===id)) { alert('No se puede borrar: hay asignaciones con este rol.'); break; }
-      await supabaseClient.from('roles').delete().eq('id', id); loadData(); break;
-    }
-    case 'add-rol-libre': {
-      const n = DB.roles.filter(r=>r.proyecto_id===view.proyectoId && r.es_libre).length + 1;
-      await supabaseClient.from('roles').insert([{id: uid(), proyecto_id:view.proyectoId, nombre:'Rol libre '+n, peso_base:1, es_libre:true}]);
-      loadData(); break;
-    }
-  }
-});
-
-document.addEventListener('change', async e=>{
-  const el = e.target.closest('[data-rol-field]');
-  if(!el) return;
-  const val = el.dataset.rolField === 'peso_base' ? Number(el.value) : el.value;
-  await supabaseClient.from('roles').update({[el.dataset.rolField]: val}).eq('id', el.dataset.rolId);
-  loadData();
-});
-
-document.addEventListener('submit', async e=>{
-  const f = e.target.closest('form[data-action]');
-  if(!f) return;
-  e.preventDefault();
-  const act = f.dataset.action;
-  const fd = Object.fromEntries(new FormData(f).entries());
-  const p = DB.proyectos.find(x=>x.id===view.proyectoId);
-
-  switch(act){
-    case 'crear-proyecto': {
-      const pid = uid();
-      const { error: projectError } = await supabaseClient.from('proyectos').insert([{
-        id:pid, owner_id:authSession.user.id, nombre:fd.nombre, curso:fd.curso, optativa:fd.optativa,
-        fecha_inicio:fd.fecha_inicio || null, fecha_fin:fd.fecha_fin || null, estado:'activo',
-        techo_referencia:12, metodo_nota:'techo', peso_roles:0.7, peso_ajuste:0.3, penalizacion_falta:0.5
-      }]);
-      if (projectError) { alert('No se pudo guardar el proyecto: ' + projectError.message); break; }
-      const roles = ROLES_DEFECTO.map(r => ({id:uid(), proyecto_id:pid, nombre:r[0], peso_base:r[1], es_libre:false}));
-      roles.push({id:uid(), proyecto_id:pid, nombre:'Rol libre 1', peso_base:1, es_libre:true});
-      roles.push({id:uid(), proyecto_id:pid, nombre:'Rol libre 2', peso_base:1, es_libre:true});
-      await supabaseClient.from('roles').insert(roles);
-      view = {name:'proyecto', proyectoId:pid, alumnoId:null}; loadData(); break;
-    }
-    case 'guardar-proyecto':
-      await supabaseClient.from('proyectos').update({
-        nombre:fd.nombre, curso:fd.curso, optativa:fd.optativa, fecha_inicio:fd.fecha_inicio, fecha_fin:fd.fecha_fin, notas:fd.notas
-      }).eq('id', p.id); loadData(); break;
-    case 'guardar-ajustes':
-      await supabaseClient.from('proyectos').update({
-        techo_referencia:Number(fd.techo_referencia), metodo_nota:fd.metodo_nota, peso_roles:Number(fd.peso_roles), peso_ajuste:Number(fd.peso_ajuste), penalizacion_falta:Number(fd.penalizacion_falta)
-      }).eq('id', p.id); loadData(); break;
-    case 'add-evento':
-      await supabaseClient.from('eventos').insert([{
-        id:uid(), proyecto_id:p.id, nombre:fd.nombre, tipo:fd.tipo, trimestre:fd.trimestre, fecha:fd.fecha, sede:fd.sede, formato:fd.formato, estado:fd.estado, notas:fd.notas
-      }]); loadData(); break;
-    case 'add-alumno':
-      await supabaseClient.from('alumnos').insert([{
-        id:uid(), proyecto_id:p.id, nombre:fd.nombre, curso:fd.curso, grupo:fd.grupo
-      }]); loadData(); break;
-    case 'add-asignacion':
-      await supabaseClient.from('asignaciones').insert([{
-        id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, rol_id:fd.rol_id, intensidad:fd.intensidad, valoracion:fd.valoracion, trimestre:fd.trimestre, evento_id:fd.evento_id||null, notas:fd.notas
-      }]); loadData(); break;
-    case 'add-falta':
-      await supabaseClient.from('faltas').insert([{
-        id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, fecha:fd.fecha, tipo:fd.tipo, justificada:(fd.justificada==='si')
-      }]); loadData(); break;
-    case 'guardar-notas':
-      await supabaseClient.from('alumnos').update({notas_privadas:fd.notas_privadas, notas_ficha:fd.notas_ficha}).eq('id', view.alumnoId);
-      alert('Notas guardadas'); loadData(); break;
-    case 'guardar-ajuste': {
-      let aj = DB.ajustes.find(x=>x.alumno_id===view.alumnoId);
-      if(!aj) await supabaseClient.from('ajustes').insert([{id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, nota:Number(fd.nota), comentario:fd.comentario}]);
-      else await supabaseClient.from('ajustes').update({nota:Number(fd.nota), comentario:fd.comentario}).eq('id', aj.id);
-      loadData(); break;
-    }
-    case 'guardar-colab': {
-      let c = DB.colaboraciones.find(x=>x.alumno_id===view.alumnoId);
-      if(!c) await supabaseClient.from('colaboraciones').insert([{id:uid(), proyecto_id:p.id, alumno_id:view.alumnoId, estado:fd.estado, notas:fd.notas}]);
-      else await supabaseClient.from('colaboraciones').update({estado:fd.estado, notas:fd.notas}).eq('id', c.id);
-      alert('Guardado'); loadData(); break;
-    }
-  }
-});
-
-$('#btn-home').addEventListener('click', ()=>{ view={name:'proyectos',proyectoId:null,alumnoId:null}; render(); });
-$('#btn-logout').addEventListener('click', async ()=>{ await supabaseClient.auth.signOut(); authSession = null; sessionEmail = null; authMode = 'login'; renderLogin(); });
-
-initApp();
+function vFicha(p){
+  const a=DB.alumnos.find(x=>x.id===view.aid);if(!a){view.aid=null;return vEval(p)}
+  const f=calcFinal(p,a),r=reglas(p),m=modoAlumno,b=p.curso==='1BACH';
+  const strip=ev=>{const ss=DB.sesiones.filter(s=>s.proyecto_id===p.id&&s.evaluacion===ev&&s.cerrada).sort((x,y)=>x.fecha.localeCompare(y.fecha));
+    return ss.length?ss.map(s=>{const k=DB.marcas.find(x=>x.sesion_id===s.id&&x.alumno_id===a.id),c=k?k.color:'verde';return `<div title="${s.fecha}">${c==='falta'?'F':c==='falta_j'?'J':`<i class="sh c-${c}"></i>`}</div>`}).join(''):'<span class="muted">Sin días cerrados</span>'};
+  const roles=DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>(DB.roles.find(q=>q.id===x.rol_id)||{}).nombre).filter(Boolean);
+  return `<div class="row noprint" style="margin-bottom:16px"><button class="btn" data-act="back">← Volver</button><button class="btn" data-act="modo">${m?'Salir del modo alumno':'Modo enseñar al alumno'}</button><button class="btn gold" data-act="print">Imprimir ficha</button></div>
+  <div class="muted">${p.curso==='4ESO'?'4º ESO':'1º Bachillerato'} · ${esc(p.nombre)}</div><h1 style="font-size:40px;margin:4px 0 6px">${esc(a.nombre)}</h1><div class="muted" style="margin-bottom:16px">${esc(roles.join(' · ')||'Sin roles asignados')}</div>
+  ${[1,2,3].map(e=>{const x=f.ev[e-1];return `<div class="card"><div class="row" style="justify-content:space-between"><h3 style="font-size:20px">${e}ª evaluación</h3>${m?'':`<span><span class="nota">${fmt(x.nota)}</span>${x.real>10.04?` <span class="chip g">trabajo real ${fmt(x.real)}</span>`:''}</span>`}</div><div class="weeks">${strip(e)}</div>${m?'':`<div class="muted" style="font-size:13px;margin-top:8px">${x.fsj?x.fsj+' falta(s) sin justificar. ':''}${x.fj?x.fj+' justificada(s).':''}${x.pen?' Resta '+fmt(x.pen)+' al trabajo real.':''}</div>${x.fj>=r.aviso_rojo?'<div class="warn r">Aviso rojo: muchas faltas justificadas</div>':x.fj>=r.aviso_amarillo?'<div class="warn">Aviso amarillo: faltas justificadas acumuladas</div>':''}`}</div>`}).join('')}
+  ${m?'':`<div class="grid2"><div class="card"><div class="muted">Nota final calculada</div><div class="big">${fmt(f.final)}</div><div class="muted" style="margin-top:6px">Redondeada ${f.final===null?'—':Math.round(f.final)} · truncada ${f.final===null?'—':Math.floor(f.final)}</div>${f.tope?`<div class="warn r">Tope de ${r.vico_tope} por no ir al Vico sin justificar. Sin tope sería ${fmt((1-r.vico_peso/100)*f.clase+r.vico_peso/100*f.vico.nota)}.</div>`:''}${f.vicoPend?'<div class="warn">Falta poner el valor manual del Vico (falta justificada).</div>':''}<div class="muted" style="font-size:13px;margin-top:6px">Media de clase ${fmt(f.clase)}${b?' · Vico '+fmt(f.vico.nota):' · bonificación Vico '+fmt(f.vico.bonus)}</div></div>
+  <form data-form="manual" class="card"><h3 style="font-size:18px">Nota final manual</h3><label>Nota (vacío = usar la calculada)<input type="number" step="0.1" min="0" max="10" name="nota_manual" value="${a.nota_manual??''}"></label><label>Comentario<textarea name="comentario_manual">${esc(a.comentario_manual||'')}</textarea></label><label>Notas privadas<textarea name="notas_privadas">${esc(a.notas_privadas||'')}</textarea></label><div><button class="btn gold">Guardar</button></div></form></div>`}`;
+}
+function vArchivo(p){
+  const arch=DB.proyectos.filter(x=>x.estado==='archivado');
+  return head(p)+`<div class="grid2"><div class="card"><h3>Plantillas PDF</h3><p class="muted">Escaleta y guion, hoja de asistencia, coreografía, hojas técnicas, ficha de personaje, vestuario y utilería, planning de montaje. Llegarán en la siguiente fase.</p></div>
+  <div class="card"><h3>Este musical</h3><p class="muted">Archivar lo deja en solo historial.</p><div class="row"><button class="btn" data-act="arch" data-id="${p.id}">${p.estado==='activo'?'Archivar':'Reactivar'}</button></div></div></div>
+  ${p.curso==='4ESO'?`<details class="card"><summary style="cursor:pointer;font-weight:600;color:var(--gold)">Crear Bachillerato a partir de este musical</summary><form data-form="derivar" style="margin-top:12px"><label>Nombre del nuevo proyecto<input name="nombre" value="${esc(p.nombre)} (1º Bachillerato)" required></label><div class="muted">Alumnos que continúan:</div>${alumnosDe(p).map(a=>`<label style="flex-direction:row;align-items:center;gap:10px;color:var(--ink)"><input type="checkbox" name="al" value="${a.id}" checked style="width:auto;min-height:0"> ${esc(a.nombre)}</label>`).join('')}<div><button class="btn gold">Crear proyecto de Bachillerato</button></div></form></details>`:''}
+  <div class="card"><h3 style="margin-bottom:8px">Historial de musicales archivados</h3>${arch.length?arch.map(x=>`<div class="row" style="justify-content:space-between;padding:6px 0"><span>${esc(x.nombre)} <span class="muted">· ${x.curso==='4ESO'?'4º ESO':'1º Bach.'}</span></span><button class="btn sm" data-act="open" data-id="${x.id}">Abrir</button></div>`).join(''):'<span class="muted">Ninguno todavía.</span>'}</div>`;
+}
+function vProd(p){
+  return head(p)+`<div class="grid3">${['Trámite SGAE y Ayuntamiento','Patrocinadores','Presupuestos y gastos'].map(t=>`<div class="card"><h3 style="font-size:18px">${t}</h3><p class="muted">Siguiente fase.</p></div>`).join('')}</div>`;
+}
+function vConf(p){
+  return head(p)+subtabs([['datos','Datos'],['alumnos','Alumnos'],['reparto','Reparto de roles'],['roles','Roles y valores'],['reglas','Reglas y rúbrica'],['sim','Simulador']],view.conf,'conf')+({datos:cDatos,alumnos:cAlumnos,reparto:cReparto,roles:cRoles,reglas:cReglas,sim:cSim}[view.conf]||cDatos)(p);
+}
+function cDatos(p){return `<form data-form="datos" class="card"><div class="fg"><label>Nombre del musical<input name="nombre" value="${esc(p.nombre)}" required></label><label>Optativa<input name="optativa" value="${esc(p.optativa||'')}"></label><label>Inicio<input type="date" name="fecha_inicio" value="${p.fecha_inicio||''}"></label><label>Fin<input type="date" name="fecha_fin" value="${p.fecha_fin||''}"></label></div><label>Notas<textarea name="notas">${esc(p.notas||'')}</textarea></label><div class="row"><button class="btn gold">Guardar</button><button type="button" class="btn red" data-act="delp" data-id="${p.id}">Borrar musical</button></div></form>`}
+function cAlumnos(p){
+  const als=alumnosDe(p);
+  return `<div class="grid2"><form data-form="alumno" class="card"><h3 style="font-size:18px">Añadir uno</h3><label>Nombre completo<input name="nombre" required></label><label>Grupo<input name="grupo"></label><div><button class="btn gold">Añadir</button></div></form>
+  <form data-form="importar" class="card"><h3 style="font-size:18px">Pegar una lista</h3><label>Un alumno por línea (Nombre; Grupo)<textarea name="lista" rows="5"></textarea></label><div><button class="btn gold">Importar</button></div></form></div>
+  <div class="card scroll"><table><tr><th>Alumno/a (${als.length})</th><th>Grupo</th><th></th></tr>${als.map(a=>`<tr><td>${esc(a.nombre)}</td><td>${esc(a.grupo||'')}</td><td><button class="btn sm red" data-act="delal" data-id="${a.id}">Borrar</button></td></tr>`).join('')}</table></div>`;
+}
+function cReparto(p){
+  const rs=rolesDe(p);
+  return `<div class="muted" style="margin-bottom:10px">Un alumno puede tener varios roles. La intensidad multiplica el valor del rol.</div>`+alumnosDe(p).map(a=>{const as=DB.asignaciones.filter(x=>x.alumno_id===a.id);
+    return `<div class="al"><div class="t"><b>${esc(a.nombre)}</b></div>${as.map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{};return `<div class="row" style="margin-bottom:6px"><span style="flex:1;min-width:140px">${esc(ro.nombre||'?')}</span><select style="width:170px" data-chg="factor" data-id="${x.id}">${[[1,'Principal ×1'],[0.6,'Secundario ×0,6'],[0.3,'Puntual ×0,3']].map(([v,l])=>`<option value="${v}" ${Number(x.factor)===v?'selected':''}>${l}</option>`).join('')}</select><button class="btn sm red" data-act="delasg" data-id="${x.id}">Quitar</button></div>`}).join('')}
+    <select data-chg="addrol" data-a="${a.id}"><option value="">+ Añadir rol…</option>${rs.filter(r=>!as.some(x=>x.rol_id===r.id)).map(r=>`<option value="${r.id}">${esc(r.nombre)} (${r.v1})</option>`).join('')}</select></div>`}).join('')||'<div class="card muted">Añade alumnos primero.</div>';
+}
+function cRoles(p){
+  const rs=rolesDe(p);
+  return `<div class="card muted">El valor es la nota que saca quien hace perfecto ese rol durante una evaluación. Cada evaluación tiene su propio valor, así que puedes cambiarlo en la siguiente sin tocar las anteriores.</div><div class="card scroll"><table><tr><th>Rol</th><th>Bloque</th><th>1ª</th><th>2ª</th><th>3ª</th><th></th></tr>${rs.map(r=>`<tr><td><input value="${esc(r.nombre)}" data-chg="rolf" data-id="${r.id}" data-f="nombre" style="min-width:160px"></td><td class="muted">${esc(r.bloque||'')}</td>${[1,2,3].map(e=>`<td><input type="number" step="0.5" min="0" value="${r['v'+e]}" data-chg="rolf" data-id="${r.id}" data-f="v${e}" style="width:76px"></td>`).join('')}<td><button class="btn sm red" data-act="delrol" data-id="${r.id}">Borrar</button></td></tr>`).join('')}</table></div>
+  <form data-form="rol" class="card"><h3 style="font-size:18px">Nuevo rol</h3><div class="fg"><label>Nombre<input name="nombre" required></label><label>Bloque<input name="bloque" placeholder="Escena, Danza…"></label><label>Valor inicial<input type="number" step="0.5" name="valor" value="5"></label></div><div><button class="btn gold">Añadir rol</button></div></form>`;
+}
+function cReglas(p){
+  const r=reglas(p),e=r.escala_just;
+  const n=(name,l,v,st='0.1')=>`<label>${l}<input type="number" step="${st}" name="${name}" value="${v}"></label>`;
+  return `<form data-form="reglas" class="card"><h3 style="margin-bottom:10px">Rúbrica de colores (solo la ves tú)</h3><div class="fg">${COLORES.map(c=>`<label><span class="row"><i class="sh c-${c}"></i> ${c}</span><input type="number" step="0.5" name="rub_${c}" value="${r.rubrica[c]}"></label>`).join('')}</div>
+  <h3 style="margin:16px 0 10px">Peso de cada evaluación (%)</h3><div class="fg">${n('pe0','1ª',r.pesos_eval[0],'1')}${n('pe1','2ª',r.pesos_eval[1],'1')}${n('pe2','3ª (final)',r.pesos_eval[2],'1')}</div>
+  <h3 style="margin:16px 0 10px">Faltas</h3><div class="fg">${n('sj_resta','Resta por falta sin justificar',r.falta_sj_resta)}<label style="flex-direction:row;align-items:center;gap:10px;color:var(--ink)"><input type="checkbox" name="sj_cero" ${r.falta_sj_cuenta_cero?'checked':''} style="width:auto;min-height:0"> La falta sin justificar cuenta como 0 en la media</label>${[3,4,5,6,7].map(i=>n('j'+i,'Resta con '+i+' justificadas',e[i])).join('')}${n('mas_j','Cada justificada más',r.mas_just_resta)}${n('av_a','Aviso amarillo desde',r.aviso_amarillo,'1')}${n('av_r','Aviso rojo desde',r.aviso_rojo,'1')}</div>
+  <h3 style="margin:16px 0 10px">Teatro Vico</h3><div class="fg">${n('v_peso','Peso en la nota final de Bachillerato (%)',r.vico_peso,'1')}${n('v_tope','Tope si no va sin justificar',r.vico_tope)}<label style="flex-direction:row;align-items:center;gap:10px;color:var(--ink)"><input type="checkbox" name="v_tope_on" ${r.vico_tope_activo?'checked':''} style="width:auto;min-height:0"> Tope activo</label></div>
+  <div class="muted" style="margin:10px 0 6px">Bonificación en 4º ESO por función</div><div class="fg">${COLORES.map(c=>`<label><span class="row"><i class="sh c-${c}"></i> ${c}</span><input type="number" step="0.5" name="bon_${c}" value="${r.bonus[c]}"></label>`).join('')}</div>
+  <label style="flex-direction:row;align-items:center;gap:10px;color:var(--ink);margin-top:14px"><input type="checkbox" name="ver" ${verVal?'checked':''} style="width:auto;min-height:0"> Ver los valores numéricos en los botones (solo en este dispositivo)</label>
+  <div style="margin-top:12px"><button class="btn gold">Guardar reglas</button></div></form>`;
+}
+function cSim(p){
+  const rs=rolesDe(p),r=reglas(p);
+  return `<form data-form="sim" class="card"><h3 style="margin-bottom:10px">Simulador de notas</h3><div class="muted" style="margin-bottom:8px">Elige roles y un caso para ver qué nota saldría.</div><div class="fg">${rs.map(x=>`<label style="flex-direction:row;align-items:center;gap:8px;color:var(--ink)"><input type="checkbox" name="rol" value="${x.id}" style="width:auto;min-height:0"> ${esc(x.nombre)}</label>`).join('')}</div>
+  <div class="fg" style="margin-top:12px"><label>Evaluación<select name="ev"><option>1</option><option>2</option><option>3</option></select></label><label>Color medio<select name="col">${COLORES.map(c=>`<option>${c}</option>`).join('')}</select></label><label>Faltas sin justificar<input type="number" name="sj" value="0" min="0"></label><label>Faltas justificadas<input type="number" name="j" value="0" min="0"></label></div>
+  <div style="margin-top:12px"><button class="btn gold">Calcular</button></div><div id="simres" style="margin-top:14px"></div></form>`;
+}
+/* ---------- acciones ---------- */
+const ROLES_INI=[['Escena','Actor principal',10],['Escena','Actor secundario',7],['Escena','Extra',4],['Escena','Presentador/a',6],['Danza','Coreógrafo/a',10],['Danza','Bailarín/a',7],['Música','Intérprete en directo',10],['Producción','Regidor',5],['Producción','Guionista',5],['Producción','Ayudante de dirección',5],['Diseño y construcción','Escenógrafo',5],['Diseño y construcción','Vestuario',5],['Diseño y construcción','Técnico de decorados',4],['Diseño y construcción','Utilería y maquillaje',4],['Función','Técnico de sonido y luces',5],['Comunicación','Prensa, cartelería y redes',6],['Libre','Rol libre 1',5,true],['Libre','Rol libre 2',5,true]];
+const rolesIni=pid=>ROLES_INI.map(([bl,n,v,l],i)=>({proyecto_id:pid,nombre:n,bloque:bl,v1:v,v2:v,v3:v,es_libre:!!l,orden:i}));
+async function sesionDe(p){let s=DB.sesiones.find(x=>x.proyecto_id===p.id&&x.fecha===fecha);if(!s){const r=await ins('sesiones',{proyecto_id:p.id,fecha,evaluacion:evalSel,cerrada:false});s=r&&r[0]}return s}
+const nextColor=(cur,c)=>c==='falta'?(cur==='falta'?'falta_j':cur==='falta_j'?null:'falta'):(cur===c?null:c);
+const A={
+  tab:el=>{view.tab=el.dataset.v;view.aid=null;render()},
+  sub:el=>{view.sub=el.dataset.v;render()},
+  conf:el=>{view.conf=el.dataset.v;render()},
+  open:el=>{view={...view,tab:'dia',sub:'hoy',pid:el.dataset.id,aid:null};render()},
+  logout:async()=>{await sb.auth.signOut()},
+  amode:el=>{auth.mode=el.dataset.v;renderLogin()},
+  evsel:async el=>{const e=+el.dataset.v,s=DB.sesiones.find(x=>x.proyecto_id===view.pid&&x.fecha===fecha);evalSel=e;if(s)await upd('sesiones',s.id,{evaluacion:e});render()},
+  mark:async el=>{const p=P(),s=await sesionDe(p);if(!s)return;const aid=el.dataset.a,m=DB.marcas.find(x=>x.sesion_id===s.id&&x.alumno_id===aid),nc=nextColor(m?m.color:null,el.dataset.c);
+    DB.marcas=DB.marcas.filter(x=>x!==m);
+    if(!nc){render();if(m){const {error}=await sb.from('pe_marcas').delete().eq('id',m.id);if(error)fail(error)}return}
+    const row={id:m?m.id:uid(),proyecto_id:p.id,sesion_id:s.id,alumno_id:aid,color:nc};DB.marcas.push(row);render();
+    const {error}=await sb.from('pe_marcas').upsert(row,{onConflict:'sesion_id,alumno_id'});if(error)fail(error)},
+  vmark:async el=>{const p=P(),aid=el.dataset.a,f=+el.dataset.f,x=DB.vico.find(v=>v.alumno_id===aid&&v.funcion===f),nc=nextColor(x?x.color:null,el.dataset.c);
+    DB.vico=DB.vico.filter(v=>v!==x);
+    if(!nc){render();if(x){const {error}=await sb.from('pe_vico').delete().eq('id',x.id);if(error)fail(error)}return}
+    const row={id:x?x.id:uid(),proyecto_id:p.id,alumno_id:aid,funcion:f,color:nc,valor_manual:nc==='falta_j'&&x?x.valor_manual:null};DB.vico.push(row);render();
+    const {error}=await sb.from('pe_vico').upsert(row,{onConflict:'alumno_id,funcion'});if(error)fail(error)},
+  cerrar:async()=>{const p=P(),als=alumnosDe(p),s=await sesionDe(p);if(!s)return;const n=als.length-DB.marcas.filter(m=>m.sesion_id===s.id).length;
+    if(confirm(`Se cierra el ${fecha}. ${n} alumno(s) sin marca contarán como verde. ¿Cerrar el día?`)){await upd('sesiones',s.id,{cerrada:true});toast('Día cerrado');render()}},
+  reabrir:async()=>{const s=DB.sesiones.find(x=>x.proyecto_id===view.pid&&x.fecha===fecha);if(s){await upd('sesiones',s.id,{cerrada:false});render()}},
+  delev:async el=>{if(confirm('¿Borrar el evento?')){await del('eventos',el.dataset.id);render()}},
+  ficha:(el,e)=>{e.preventDefault();view.aid=el.dataset.id;modoAlumno=false;window.scrollTo(0,0);render()},
+  back:()=>{view.aid=null;modoAlumno=false;render()},
+  modo:()=>{modoAlumno=!modoAlumno;render()},
+  print:()=>window.print(),
+  arch:async el=>{const p=DB.proyectos.find(x=>x.id===el.dataset.id);await upd('proyectos',p.id,{estado:p.estado==='activo'?'archivado':'activo'});toast(p.estado==='archivado'?'Musical archivado':'Musical reactivado');render()},
+  delp:async el=>{if(confirm('¿Borrar este musical y TODOS sus datos? No se puede deshacer.')){await del('proyectos',el.dataset.id);DB.alumnos=DB.alumnos.filter(x=>x.proyecto_id!==el.dataset.id);view={...view,tab:'home',pid:null};render()}},
+  delal:async el=>{if(confirm('¿Borrar al alumno y todos sus datos?')){const id=el.dataset.id;await del('alumnos',id);['asignaciones','marcas','vico'].forEach(k=>DB[k]=DB[k].filter(x=>x.alumno_id!==id));render()}},
+  delasg:async el=>{await del('asignaciones',el.dataset.id);render()},
+  delrol:async el=>{if(DB.asignaciones.some(x=>x.rol_id===el.dataset.id))return toast('Hay alumnos con este rol. Quítaselo primero.');await del('roles',el.dataset.id);render()}
+};
+const C={
+  fecha:el=>{fecha=el.value||hoy();const s=DB.sesiones.find(x=>x.proyecto_id===view.pid&&x.fecha===fecha);evalSel=s?s.evaluacion:evDeFecha(fecha);render()},
+  vman:async el=>{await upd('vico',el.dataset.id,{valor_manual:el.value===''?null:num(el.value)});render()},
+  rolf:async el=>{await upd('roles',el.dataset.id,{[el.dataset.f]:el.dataset.f==='nombre'?el.value:num(el.value)})},
+  factor:async el=>{await upd('asignaciones',el.dataset.id,{factor:num(el.value)});render()},
+  addrol:async el=>{if(!el.value)return;await ins('asignaciones',{proyecto_id:view.pid,alumno_id:el.dataset.a,rol_id:el.value,factor:1});render()}
+};
+const F={
+  nuevo:async d=>{const r=await ins('proyectos',{nombre:d.nombre,curso:d.curso,optativa:d.curso==='4ESO'?'Creaciones escénico-musicales':'Música, espectáculo y comunicación',fecha_inicio:d.fecha_inicio||null,fecha_fin:d.fecha_fin||null,estado:'activo',reglas:{}});if(!r)return;await ins('roles',rolesIni(r[0].id));view={...view,tab:'conf',conf:'alumnos',pid:r[0].id};toast('Musical creado. Añade ahora los alumnos.');render()},
+  datos:async d=>{if(await upd('proyectos',view.pid,{nombre:d.nombre,optativa:d.optativa,fecha_inicio:d.fecha_inicio||null,fecha_fin:d.fecha_fin||null,notas:d.notas})){toast('Guardado');render()}},
+  evento:async d=>{if(await ins('eventos',{proyecto_id:view.pid,nombre:d.nombre,tipo:d.tipo,evaluacion:+d.evaluacion,fecha:d.fecha||null,sede:d.sede})){render()}},
+  alumno:async d=>{if(await ins('alumnos',{proyecto_id:view.pid,nombre:d.nombre.trim(),grupo:d.grupo||''})){render()}},
+  importar:async d=>{const ya=new Set(DB.alumnos.filter(a=>a.proyecto_id===view.pid).map(a=>a.nombre.toLowerCase()));const rows=[];String(d.lista||'').split(/\r?\n/).forEach(l=>{const [n,g]=l.split(/[;\t]/).map(x=>x.trim());if(n&&!ya.has(n.toLowerCase())){ya.add(n.toLowerCase());rows.push({proyecto_id:view.pid,nombre:n,grupo:g||''})}});if(!rows.length)return toast('No hay alumnos nuevos.');if(await ins('alumnos',rows)){toast(rows.length+' alumno(s) importados');render()}},
+  rol:async d=>{const v=num(d.valor),rs=rolesDe(P());if(await ins('roles',{proyecto_id:view.pid,nombre:d.nombre,bloque:d.bloque||'',v1:v,v2:v,v3:v,es_libre:true,orden:rs.length})){render()}},
+  manual:async d=>{if(await upd('alumnos',view.aid,{nota_manual:d.nota_manual===''?null:num(d.nota_manual),comentario_manual:d.comentario_manual,notas_privadas:d.notas_privadas})){toast('Guardado');render()}},
+  reglas:async d=>{const p=P(),r=reglas(p);const rub={},bon={};COLORES.forEach(c=>{rub[c]=num(d['rub_'+c]);bon[c]=num(d['bon_'+c])});
+    const esc2=[...r.escala_just];[3,4,5,6,7].forEach(i=>esc2[i]=num(d['j'+i]));
+    const nr={rubrica:rub,bonus:bon,pesos_eval:[num(d.pe0),num(d.pe1),num(d.pe2)],falta_sj_resta:num(d.sj_resta),falta_sj_cuenta_cero:!!d.sj_cero,escala_just:esc2,mas_just_resta:num(d.mas_j),aviso_amarillo:num(d.av_a),aviso_rojo:num(d.av_r),vico_peso:num(d.v_peso),vico_tope:num(d.v_tope),vico_tope_activo:!!d.v_tope_on};
+    verVal=!!d.ver;localStorage.setItem('pe_ver',verVal?'1':'0');
+    if(await upd('proyectos',p.id,{reglas:nr})){toast('Reglas guardadas');render()}},
+  sim:(d,f)=>{const p=P(),r=reglas(p),ev=+d.ev,ids=[...f.querySelectorAll('input[name=rol]:checked')].map(x=>x.value);
+    const base=ids.reduce((t,id)=>t+Number((DB.roles.find(q=>q.id===id)||{})['v'+ev]||0),0),media=r.rubrica[d.col],pen=num(d.sj)*r.falta_sj_resta+penalJust(num(d.j),r),real=Math.max(0,base*media/10-pen);
+    $('#simres').innerHTML=`<div class="card"><div class="muted">Valor de los roles: ${fmt(base)} · color medio ${d.col} (${media}) · resta por faltas ${fmt(pen)}</div><div class="big">${fmt(Math.min(10,real))}</div><div class="muted">Trabajo real: ${fmt(real)}${real>10?' (matrícula)':''}</div></div>`},
+  derivar:async(d,f)=>{const p=P(),ids=[...f.querySelectorAll('input[name=al]:checked')].map(x=>x.value);const r=await ins('proyectos',{nombre:d.nombre,curso:'1BACH',optativa:'Música, espectáculo y comunicación',estado:'activo',reglas:p.reglas||{},origen_id:p.id});if(!r)return;const np=r[0];
+    await ins('roles',rolesDe(p).map(x=>({proyecto_id:np.id,nombre:x.nombre,bloque:x.bloque,v1:x.v1,v2:x.v2,v3:x.v3,es_libre:x.es_libre,orden:x.orden})));
+    await ins('alumnos',ids.map(id=>{const a=DB.alumnos.find(q=>q.id===id);return {proyecto_id:np.id,nombre:a.nombre,grupo:a.grupo||''}}));
+    view={...view,pid:np.id,tab:'conf',conf:'reparto'};toast('Proyecto de Bachillerato creado. Reparte los roles.');render()}
+};
+document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||!A[el.dataset.act])return;if(el.tagName==='A')e.preventDefault();A[el.dataset.act](el,e)});
+document.addEventListener('change',e=>{const el=e.target.closest('[data-chg]');if(el&&C[el.dataset.chg])C[el.dataset.chg](el)});
+document.addEventListener('submit',e=>{const f=e.target.closest('form[data-form]');if(!f)return;e.preventDefault();F[f.dataset.form](Object.fromEntries(new FormData(f)),f)});
+init();
 </script>
 </body>
 </html>
