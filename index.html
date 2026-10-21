@@ -192,7 +192,7 @@ async function init(){
 }
 sb.auth.onAuthStateChange((ev,s)=>{if(ev==='PASSWORD_RECOVERY'){auth.mode='reset';renderLogin()}else if(!s){auth.user=null;auth.mode='login';renderLogin()}});
 /* ---------- estructura ---------- */
-function top(){
+function pintaBarra(){
   const p=P();let t='';
   const tabs=p?[['dia','Día a día'],['archivo','Archivo'],...(p.curso==='1BACH'?[['prod','Producción']]:[]),['eval','Evaluar']]:[];
   t=`<div class="curtain noprint"><div class="brand"><svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="none" stroke="#dcb45f" stroke-width="2"/><path d="M12 15q8-6 16 0v6q-8 8-16 0z" fill="#dcb45f"/><circle cx="16.5" cy="18" r="1.6" fill="#4a1228"/><circle cx="23.5" cy="18" r="1.6" fill="#4a1228"/></svg><div><b>Producciones Escénico-Musicales</b><small>by Manuel Esteve</small></div></div>
@@ -204,7 +204,7 @@ function top(){
 }
 function render(){
   if(!auth.user)return renderLogin();
-  const y=window.scrollY;top();const p=P();let h='';
+  const y=window.scrollY;pintaBarra();const p=P();let h='';
   if(view.tab!=='home'&&!p)view.tab='home';
   if(view.tab==='home')h=vHome();
   else if(view.tab==='dia')h=vDia(p);
