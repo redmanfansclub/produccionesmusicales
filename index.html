@@ -8,19 +8,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#171016;--card:#241a22;--line:#46364a;--ink:#f6eee3;--mut:#bfb0c2;--gold:#dcb45f;--wine:#6e1d3a}
+:root{--bg:#171016;--card:#241a22;--line:#46364a;--ink:#f6eee3;--mut:#bfb0c2;--gold:#dcb45f;--goldbg:#dcb45f;--wine:#6e1d3a;--inp:#1b1220;--chip:#30263a;--ok:#63d08f;--mid:#f2bb43;--bad:#ef6f6f}
+body.light{--bg:#faf5ee;--card:#fffdf9;--line:#e0d3c2;--ink:#2a1b25;--mut:#6c5a66;--gold:#8a6410;--inp:#ffffff;--chip:#efe6da;--ok:#1f8f55;--mid:#a86f00;--bad:#c23b3b}
+body.light .c-verde{--c:#2fa968}body.light .c-lima{--c:#86ad1c}body.light .c-amarillo{--c:#d99a0b}body.light .c-naranja{--c:#e0701c}body.light .c-rojo{--c:#d9453f}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
 h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;line-height:1.15}
-.curtain{background:linear-gradient(180deg,var(--wine),#4a1228);border-bottom:3px solid var(--gold);padding:10px 20px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.curtain{color:#f6eee3;background:linear-gradient(180deg,var(--wine),#4a1228);border-bottom:3px solid var(--gold);padding:10px 20px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
 .brand{display:flex;gap:12px;align-items:center;margin-right:auto}
 .brand b{font-family:Fraunces,serif;font-size:19px;display:block;line-height:1.1}
 .brand small{color:#e8c9d3;font-size:12px}
 .nav{display:flex;gap:6px;overflow-x:auto;max-width:100%}
 .nav button{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid #9b5870;background:transparent;font-weight:600;white-space:nowrap}
-.nav button.on{background:var(--gold);color:#241a22;border-color:var(--gold)}
+.nav button.on{background:var(--goldbg);color:#241a22;border-color:var(--gold)}
 .nav .sp{flex:1}
 main{max-width:1100px;margin:0 auto;padding:24px 18px 90px}
 .muted{color:var(--mut)}
@@ -29,10 +31,10 @@ main{max-width:1100px;margin:0 auto;padding:24px 18px 90px}
 .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .btn{min-height:44px;padding:0 18px;border-radius:10px;border:1px solid var(--line);background:transparent;font-weight:600}
-.btn.gold{background:var(--gold);color:#241a22;border:none;font-weight:700}
+.btn.gold{background:var(--goldbg);color:#241a22;border:none;font-weight:700}
 .btn.red{border-color:#ef6f6f;color:#ef9a9a}
 .btn.sm{min-height:36px;padding:0 12px;font-size:13px}
-input,select,textarea{background:#1b1220;border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-height:44px}
+input,select,textarea{background:var(--inp);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;min-height:44px}
 textarea{min-height:90px}
 label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--mut);font-weight:600}
 form{display:grid;gap:12px}
@@ -43,7 +45,7 @@ th{font-size:12px;color:var(--mut);font-weight:600}
 .scroll{overflow-x:auto}
 .seg{display:flex;gap:8px;margin:12px 0}
 .seg button{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--mut)}
-.seg button.on{background:var(--gold);color:#241a22;font-weight:700;border-color:var(--gold)}
+.seg button.on{background:var(--goldbg);color:#241a22;font-weight:700;border-color:var(--gold)}
 .sub{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
 .sub button{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--mut)}
 .sub button.on{border-color:var(--gold);color:var(--gold);font-weight:600}
@@ -53,21 +55,24 @@ th{font-size:12px;color:var(--mut);font-weight:600}
 .al .t span{font-size:13px;color:var(--mut)}
 .mk{display:grid;grid-template-columns:repeat(5,1fr) 1.5fr;gap:6px}
 .sh{display:inline-block;width:22px;height:22px;border-radius:50%;border:2px solid var(--s,var(--c));background:conic-gradient(var(--s,var(--c)) var(--p),transparent 0);flex:none}
-.c-verde{--c:#63d08f;--p:100%}.c-lima{--c:#b9e35c;--p:75%}.c-amarillo{--c:#f2bb43;--p:50%}.c-naranja{--c:#f08a3c;--p:25%}.c-rojo{--c:#ef6f6f;--p:0%}
+.c-verde{--c:#63d08f;--p:100%}.c-lima{--c:#b9e35c;--p:75%}.c-amarillo{--c:#f2bb43;--p:50%}.c-naranja{--c:#f08a3c;--p:25%}.c-rojo{--c:#ef6f6f;--p:12.5%}
 .cb{min-height:46px;border-radius:10px;border:2px solid var(--c);background:transparent;display:flex;align-items:center;justify-content:center;gap:4px;padding:0}
 .cb.on{background:var(--c)}.cb.on .sh{--s:#1b1220}
 .cb small{font-weight:700;color:var(--c)}.cb.on small{color:#1b1220}
 .fb{min-height:46px;border-radius:10px;border:2px solid #9a8aa6;background:transparent;font-size:13px;font-weight:600;color:#d3c6da;padding:0 4px}
-.fb.on{background:#f6eee3;color:#171016}.fb.on.j{background:#9a8aa6}
-.chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:#30263a;color:var(--mut)}
+.fb.on{background:var(--ink);color:var(--bg)}.fb.on.j{background:#9a8aa6}
+.chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--chip);color:var(--mut)}
 .chip.y{background:#f2bb43;color:#2b2006}.chip.r{background:#ef6f6f;color:#2e0d0d}.chip.g{background:#63d08f;color:#10261a}
 .nota{font-family:Fraunces,serif;font-weight:700;font-size:20px}
 .weeks{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.weeks div{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#30263a;font-size:12px;font-weight:700}
+.weeks div{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--chip);font-size:12px;font-weight:700}
 .big{font-family:Fraunces,serif;font-size:44px;font-weight:700;line-height:1}
 .warn{padding:10px 14px;border-radius:10px;background:#f2bb43;color:#2b2006;font-weight:600;margin:10px 0}
 .warn.r{background:#ef6f6f;color:#2e0d0d}
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#f6eee3;color:#171016;padding:12px 18px;border-radius:10px;font-weight:600;z-index:9;display:none;max-width:90%}
+#toast{box-shadow:0 4px 20px rgba(0,0,0,.35);position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#f6eee3;color:#171016;padding:12px 18px;border-radius:10px;font-weight:600;z-index:9;display:none;max-width:90%}
+.titulo{display:inline-block;border:2px solid var(--gold);border-radius:14px;padding:8px 20px;background:linear-gradient(135deg,rgba(110,29,58,.28),transparent)}
+.rol{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--goldbg);color:#241a22;font-size:13px;font-weight:700;margin:2px 4px 2px 0}.rol small{opacity:.7;font-weight:600}
+.al-click{cursor:pointer}.al-click:hover{border-color:var(--gold)}.al.sinrol{border-color:var(--bad)}
 .login{max-width:430px;margin:50px auto;text-align:center}.login form{text-align:left}
 @media print{body{background:#fff;color:#000}.curtain,.noprint{display:none!important}.card{background:#fff;border-color:#999}.muted,th{color:#444}}
 </style>
@@ -77,6 +82,9 @@ th{font-size:12px;color:var(--mut);font-weight:600}
 <main id="app"></main>
 <div id="toast" role="status"></div>
 <script>
+addEventListener('error',e=>aviso(e.message));addEventListener('unhandledrejection',e=>aviso((e.reason&&e.reason.message)||String(e.reason)));
+function aviso(m){let b=document.getElementById('errb');if(!b){b=document.createElement('div');b.id='errb';b.className='warn r';b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99;margin:0;border-radius:0';document.body.prepend(b)}b.textContent='Error: '+m+'. Recarga la página; si persiste, avísame.'}
+document.body.classList.toggle('light',(localStorage.getItem('pe_theme')||(matchMedia('(prefers-color-scheme: light)').matches?'l':'d'))==='l');
 /*<calc>*/
 const COLORES=['verde','lima','amarillo','naranja','rojo'];
 const REGLAS_DEF={
@@ -88,7 +96,7 @@ const REGLAS_DEF={
   aviso_amarillo:3, aviso_rojo:5,
   vico_peso:30, vico_tope:4, vico_tope_activo:true
 };
-let DB={proyectos:[],alumnos:[],roles:[],asignaciones:[],sesiones:[],marcas:[],eventos:[],vico:[]};
+let DB={proyectos:[],alumnos:[],roles:[],asignaciones:[],sesiones:[],marcas:[],eventos:[],vico:[],notas:[]};
 function reglas(p){const r=(p&&p.reglas)||{};return {...REGLAS_DEF,...r,rubrica:{...REGLAS_DEF.rubrica,...(r.rubrica||{})},bonus:{...REGLAS_DEF.bonus,...(r.bonus||{})}}}
 function penalJust(n,r){if(n<=2)return 0;const e=r.escala_just;return n<e.length?e[n]:e[e.length-1]+r.mas_just_resta*(n-(e.length-1))}
 function calcEval(p,a,ev){
@@ -138,7 +146,7 @@ function calcFinal(p,a){
 
 const SB_URL='https://uaqktciswfjzcorrevrh.supabase.co',SB_KEY='sb_publishable_JoSi5-B_NIAD12NDtpaSQw_Yxp6HMbj';
 const sb=window.supabase.createClient(SB_URL,SB_KEY);
-const TBL={proyectos:'pe_proyectos',alumnos:'pe_alumnos',roles:'pe_roles',asignaciones:'pe_asignaciones',sesiones:'pe_sesiones',marcas:'pe_marcas',eventos:'pe_eventos',vico:'pe_vico'};
+const TBL={proyectos:'pe_proyectos',alumnos:'pe_alumnos',roles:'pe_roles',asignaciones:'pe_asignaciones',sesiones:'pe_sesiones',marcas:'pe_marcas',eventos:'pe_eventos',vico:'pe_vico',notas:'pe_notas'};
 const $=s=>document.querySelector(s),uid=()=>crypto.randomUUID(),hoy=()=>new Date().toISOString().slice(0,10);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const num=v=>{const n=Number(String(v).replace(',','.'));return isNaN(n)?0:n};
@@ -147,10 +155,15 @@ const evDeFecha=f=>{const m=+f.slice(5,7);return m>=9?1:m<=3?2:3};
 let auth={mode:'login',user:null},view={tab:'home',sub:'hoy',pid:null,aid:null,conf:'datos'};
 let fecha=hoy(),evalSel=evDeFecha(hoy()),verVal=localStorage.getItem('pe_ver')==='1',modoAlumno=false;
 const P=()=>DB.proyectos.find(p=>p.id===view.pid);
-const alumnosDe=p=>DB.alumnos.filter(a=>a.proyecto_id===p.id).sort((x,y)=>x.nombre.localeCompare(y.nombre,'es'));
+const ordAl=(x,y)=>(x.numero??1e9)-(y.numero??1e9)||x.nombre.localeCompare(y.nombre,'es');
+const alumnosDe=p=>DB.alumnos.filter(a=>a.proyecto_id===p.id).sort(ordAl);
+const titulo=s=>String(s).trim().toLowerCase().replace(/(^|[\s\-'’])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
+const limpia=s=>String(s||'').replace(/["“”«»]/g,'').trim();
+function parseAl(l){const m=l.match(/^\s*(\d+)[\s.\-;\t]+(.+)$/),num=m?+m[1]:null,r=(m?m[2]:l).split(/[;\t]/).map(x=>x.trim());return {numero:num,nombre:titulo(r[0]||''),grupo:r[1]||''}}
+const nAl=a=>(a.numero?a.numero+'. ':'')+esc(a.nombre);
 const rolesDe=p=>DB.roles.filter(r=>r.proyecto_id===p.id).sort((x,y)=>x.orden-y.orden);
 function toast(m,ms=3500){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',ms)}
-function fail(e){console.warn(e);toast('No se pudo guardar: '+(e.message||e)+'. Recarga la página para ver el estado real.',7000)}
+function fail(e){console.warn(e);const m=String(e.message||e);toast(/Load failed|Failed to fetch|NetworkError/i.test(m)?'No hay conexión con Supabase. Si usas Safari, prueba en ventana privada o desactiva extensiones y bloqueadores para esta web.':'No se pudo guardar: '+m,8000)}
 async function ins(k,rows){const arr=Array.isArray(rows)?rows:[rows];arr.forEach(x=>x.id=x.id||uid());const {error}=await sb.from(TBL[k]).insert(arr);if(error){fail(error);return null}DB[k].push(...arr);return arr}
 async function upd(k,id,patch){const {error}=await sb.from(TBL[k]).update(patch).eq('id',id);if(error){fail(error);return false}Object.assign(DB[k].find(x=>x.id===id),patch);return true}
 async function del(k,id){const {error}=await sb.from(TBL[k]).delete().eq('id',id);if(error){fail(error);return false}DB[k]=DB[k].filter(x=>x.id!==id);return true}
@@ -159,7 +172,7 @@ async function loadData(){
   const keys=Object.keys(TBL);
   const res=await Promise.all(keys.map(k=>sb.from(TBL[k]).select('*')));
   const bad=res.find(r=>r.error);
-  if(bad){$('#app').innerHTML=`<div class="card"><b>No se pudieron cargar los datos.</b><p class="muted">${esc(bad.error.message)}</p><p class="muted">¿Has ejecutado el archivo SQL en Supabase?</p></div>`;return}
+  if(bad){$('#app').innerHTML=`<div class="card"><b>No se pudieron cargar los datos.</b><p class="muted">${esc(bad.error.message)}</p><p class="muted">¿Has ejecutado el archivo SQL en Supabase (y el de actualización A)?</p></div>`;return}
   keys.forEach((k,i)=>DB[k]=res[i].data||[]);
   DB.proyectos.sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||''));
   render();
@@ -194,12 +207,12 @@ sb.auth.onAuthStateChange((ev,s)=>{if(ev==='PASSWORD_RECOVERY'){auth.mode='reset
 /* ---------- estructura ---------- */
 function pintaBarra(){
   const p=P();let t='';
-  const tabs=p?[['dia','Día a día'],['archivo','Archivo'],...(p.curso==='1BACH'?[['prod','Producción']]:[]),['eval','Evaluar']]:[];
+  const tabs=p?[['dia','Día a día'],['alumnos','Alumnos'],['archivo','Archivo'],...(p.curso==='1BACH'?[['prod','Producción']]:[]),['eval','Evaluar']]:[];
   t=`<div class="curtain noprint"><div class="brand"><svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="none" stroke="#dcb45f" stroke-width="2"/><path d="M12 15q8-6 16 0v6q-8 8-16 0z" fill="#dcb45f"/><circle cx="16.5" cy="18" r="1.6" fill="#4a1228"/><circle cx="23.5" cy="18" r="1.6" fill="#4a1228"/></svg><div><b>Producciones Escénico-Musicales</b><small>by Manuel Esteve</small></div></div>
   <nav class="nav" aria-label="Secciones">${tabs.map(([k,l])=>`<button class="${view.tab===k?'on':''}" data-act="tab" data-v="${k}">${l}</button>`).join('')}
   <button class="${view.tab==='home'?'on':''}" data-act="tab" data-v="home">Mis musicales</button>
   ${p?`<button class="${view.tab==='conf'?'on':''}" data-act="tab" data-v="conf">Configuración</button>`:''}
-  <button data-act="logout">Salir</button></nav></div>`;
+  <button data-act="tema">${document.body.classList.contains('light')?'Modo oscuro':'Modo claro'}</button><button data-act="logout">Salir</button></nav></div>`;
   $('#top').innerHTML=t;
 }
 function render(){
@@ -210,11 +223,12 @@ function render(){
   else if(view.tab==='dia')h=vDia(p);
   else if(view.tab==='archivo')h=vArchivo(p);
   else if(view.tab==='prod')h=vProd(p);
-  else if(view.tab==='eval')h=view.aid?vFicha(p):vEval(p);
+  else if(view.tab==='alumnos')h=view.aid?vFicha(p)+vNotas(p):vAlumnos(p);
+  else if(view.tab==='eval')h=view.aid?vFicha(p)+vNotas(p):vEval(p);
   else if(view.tab==='conf')h=vConf(p);
   $('#app').innerHTML=h;window.scrollTo(0,y);
 }
-function head(p,extra=''){return `<div style="margin-bottom:18px" class="noprint"><div class="muted">${p.curso==='4ESO'?'4º ESO':'1º Bachillerato'} · ${esc(p.optativa||'')}${p.estado==='archivado'?' · archivado':''}</div><h1 style="font-size:32px">${esc(p.nombre)}</h1>${extra}</div>`}
+function head(p,extra=''){return `<div style="margin-bottom:18px" class="noprint"><div class="muted">${p.curso==='4ESO'?'4º ESO':'1º Bachillerato'} · ${esc(p.optativa||'')}${p.estado==='archivado'?' · archivado':''}</div><div class="titulo"><h1 style="font-size:32px">${esc(p.nombre)}</h1></div>${extra}</div>`}
 function vHome(){
   const act=DB.proyectos.filter(p=>p.estado==='activo');
   return `<div class="row" style="justify-content:space-between;margin-bottom:20px"><div><div class="muted">Tus proyectos</div><h1 style="font-size:36px">Mis musicales</h1></div></div>
@@ -227,7 +241,7 @@ function vHome(){
 }
 function subtabs(list,cur,act){return `<div class="sub noprint">${list.map(([k,l])=>`<button class="${cur===k?'on':''}" data-act="${act}" data-v="${k}">${l}</button>`).join('')}</div>`}
 function vDia(p){
-  return head(p)+subtabs([['hoy','Hoy en clase'],['eventos','Eventos'],['vico','Teatro Vico']],view.sub,'sub')+(view.sub==='eventos'?vEventos(p):view.sub==='vico'?vVico(p):vHoy(p));
+  return head(p)+subtabs([['hoy','Hoy en clase'],['roles','Roles'],['eventos','Eventos'],['vico','Teatro Vico']],view.sub,'sub')+(view.sub==='eventos'?vEventos(p):view.sub==='vico'?vVico(p):view.sub==='roles'?vRolesLista(p):vHoy(p));
 }
 function colorBtns(cur,act,extra){
   const r=reglas(P()).rubrica;
@@ -244,7 +258,7 @@ function vHoy(p){
   ${ses&&ses.cerrada?'<div class="warn">Día cerrado. <button class="btn sm" data-act="reabrir">Reabrir</button></div>':''}
   ${als.length?als.map(a=>{const m=marks.find(x=>x.alumno_id===a.id),c=calcEval(p,a,ev),rl=DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>(DB.roles.find(q=>q.id===x.rol_id)||{}).nombre).filter(Boolean).join(' + '),r=reglas(p);
     const av=c.fj>=r.aviso_rojo?'<span class="chip r">'+c.fj+' justif.</span>':c.fj>=r.aviso_amarillo?'<span class="chip y">'+c.fj+' justif.</span>':'';
-    return `<div class="al"><div class="t"><b>${esc(a.nombre)} ${av}</b><span>${esc(rl||'sin rol')}</span></div>${colorBtns(m?m.color:null,'mark',`data-a="${a.id}"`)}</div>`}).join(''):'<div class="card muted">Añade alumnos en Configuración.</div>'}
+    return `<div class="al"><div class="t"><b>${nAl(a)} ${av}</b><span>${esc(rl||'sin rol')}</span></div>${colorBtns(m?m.color:null,'mark',`data-a="${a.id}"`)}</div>`}).join(''):'<div class="card muted">Añade alumnos en Configuración.</div>'}
   ${als.length?'<button class="btn gold" style="width:100%;margin-top:8px" data-act="cerrar">Cerrar el día</button>':''}</div>`;
 }
 function vEventos(p){
@@ -261,9 +275,9 @@ function vVico(p){
 function vEval(p){
   const als=alumnosDe(p),b=p.curso==='1BACH',r=reglas(p);
   const rows=als.map(a=>{const f=calcFinal(p,a);const man=a.nota_manual;
-    const chip=x=>x.nota===null?'<span class="muted">—</span>':`<span class="nota" style="color:${x.nota>=8?'#63d08f':x.nota>=5?'#f2bb43':'#ef6f6f'}">${fmt(x.notaFinalEv??x.nota)}</span>${x.real>10.04?` <span class="chip g">real ${fmt(x.real)}</span>`:''}`;
+    const chip=x=>x.nota===null?'<span class="muted">—</span>':`<span class="nota" style="color:${x.nota>=8?'var(--ok)':x.nota>=5?'var(--mid)':'var(--bad)'}">${fmt(x.notaFinalEv??x.nota)}</span>${x.real>10.04?` <span class="chip g">real ${fmt(x.real)}</span>`:''}`;
     const maxJ=Math.max(...f.ev.map(x=>x.fj)),fsj=f.ev.reduce((t,x)=>t+x.fsj,0);
-    return `<tr><td><a href="#" data-act="ficha" data-id="${a.id}" style="color:var(--gold);font-weight:600">${esc(a.nombre)}</a></td>${f.ev.map(x=>`<td>${chip(x)}</td>`).join('')}${b?`<td>${fmt(f.vico.nota)}${f.vico.sinJust?' <span class="chip r">sin just.</span>':''}${f.vicoPend?' <span class="chip y">manual</span>':''}</td>`:''}
+    return `<tr><td><a href="#" data-act="ficha" data-id="${a.id}" style="color:var(--gold);font-weight:600">${nAl(a)}</a></td>${f.ev.map(x=>`<td>${chip(x)}</td>`).join('')}${b?`<td>${fmt(f.vico.nota)}${f.vico.sinJust?' <span class="chip r">sin just.</span>':''}${f.vicoPend?' <span class="chip y">manual</span>':''}</td>`:''}
     <td>${fsj?`<span class="chip r">${fsj} sin just.</span> `:''}${maxJ>=r.aviso_rojo?`<span class="chip r">${maxJ} just.</span>`:maxJ>=r.aviso_amarillo?`<span class="chip y">${maxJ} just.</span>`:maxJ?`<span class="chip">${maxJ} just.</span>`:''}</td>
     <td><span class="nota">${fmt(f.final)}</span>${f.tope?' <span class="chip r">tope</span>':''}</td><td>${f.final===null?'—':Math.round(f.final)+' / '+Math.floor(f.final)}</td><td>${man!==null&&man!==undefined?`<b style="color:var(--gold)">${fmt(man)}</b>`:'—'}</td></tr>`}).join('');
   return head(p)+`<div class="card scroll"><table><tr><th>Alumno/a</th><th>1ª</th><th>2ª</th><th>3ª</th>${b?'<th>Vico</th>':''}<th>Faltas</th><th>Final calculada</th><th>Redond. / trunc.</th><th>Nota manual</th></tr>${rows||'<tr><td colspan="9" class="muted">Sin alumnos.</td></tr>'}</table></div>
@@ -276,10 +290,28 @@ function vFicha(p){
     return ss.length?ss.map(s=>{const k=DB.marcas.find(x=>x.sesion_id===s.id&&x.alumno_id===a.id),c=k?k.color:'verde';return `<div title="${s.fecha}">${c==='falta'?'F':c==='falta_j'?'J':`<i class="sh c-${c}"></i>`}</div>`}).join(''):'<span class="muted">Sin días cerrados</span>'};
   const roles=DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>(DB.roles.find(q=>q.id===x.rol_id)||{}).nombre).filter(Boolean);
   return `<div class="row noprint" style="margin-bottom:16px"><button class="btn" data-act="back">← Volver</button><button class="btn" data-act="modo">${m?'Salir del modo alumno':'Modo enseñar al alumno'}</button><button class="btn gold" data-act="print">Imprimir ficha</button></div>
-  <div class="muted">${p.curso==='4ESO'?'4º ESO':'1º Bachillerato'} · ${esc(p.nombre)}</div><h1 style="font-size:40px;margin:4px 0 6px">${esc(a.nombre)}</h1><div class="muted" style="margin-bottom:16px">${esc(roles.join(' · ')||'Sin roles asignados')}</div>
+  <div class="muted">${p.curso==='4ESO'?'4º ESO':'1º Bachillerato'} · ${esc(p.nombre)}</div><h1 style="font-size:40px;margin:4px 0 6px">${nAl(a)}</h1><div class="muted" style="margin-bottom:16px">${esc(roles.join(' · ')||'Sin roles asignados')}</div>
   ${[1,2,3].map(e=>{const x=f.ev[e-1];return `<div class="card"><div class="row" style="justify-content:space-between"><h3 style="font-size:20px">${e}ª evaluación</h3>${m?'':`<span><span class="nota">${fmt(x.nota)}</span>${x.real>10.04?` <span class="chip g">trabajo real ${fmt(x.real)}</span>`:''}</span>`}</div><div class="weeks">${strip(e)}</div>${m?'':`<div class="muted" style="font-size:13px;margin-top:8px">${x.fsj?x.fsj+' falta(s) sin justificar. ':''}${x.fj?x.fj+' justificada(s).':''}${x.pen?' Resta '+fmt(x.pen)+' al trabajo real.':''}</div>${x.fj>=r.aviso_rojo?'<div class="warn r">Aviso rojo: muchas faltas justificadas</div>':x.fj>=r.aviso_amarillo?'<div class="warn">Aviso amarillo: faltas justificadas acumuladas</div>':''}`}</div>`}).join('')}
   ${m?'':`<div class="grid2"><div class="card"><div class="muted">Nota final calculada</div><div class="big">${fmt(f.final)}</div><div class="muted" style="margin-top:6px">Redondeada ${f.final===null?'—':Math.round(f.final)} · truncada ${f.final===null?'—':Math.floor(f.final)}</div>${f.tope?`<div class="warn r">Tope de ${r.vico_tope} por no ir al Vico sin justificar. Sin tope sería ${fmt((1-r.vico_peso/100)*f.clase+r.vico_peso/100*f.vico.nota)}.</div>`:''}${f.vicoPend?'<div class="warn">Falta poner el valor manual del Vico (falta justificada).</div>':''}<div class="muted" style="font-size:13px;margin-top:6px">Media de clase ${fmt(f.clase)}${b?' · Vico '+fmt(f.vico.nota):' · bonificación Vico '+fmt(f.vico.bonus)}</div></div>
-  <form data-form="manual" class="card"><h3 style="font-size:18px">Nota final manual</h3><label>Nota (vacío = usar la calculada)<input type="number" step="0.1" min="0" max="10" name="nota_manual" value="${a.nota_manual??''}"></label><label>Comentario<textarea name="comentario_manual">${esc(a.comentario_manual||'')}</textarea></label><label>Notas privadas<textarea name="notas_privadas">${esc(a.notas_privadas||'')}</textarea></label><div><button class="btn gold">Guardar</button></div></form></div>`}`;
+  <form data-form="manual" class="card"><h3 style="font-size:18px">Nota final manual</h3><label>Nota (vacío = usar la calculada)<input type="number" step="0.1" min="0" max="10" name="nota_manual" value="${a.nota_manual??''}"></label><label>Comentario<textarea name="comentario_manual">${esc(a.comentario_manual||'')}</textarea></label><label>Notas generales (se mantienen fijas)<textarea name="notas_privadas">${esc(a.notas_privadas||'')}</textarea></label><div><button class="btn gold">Guardar</button></div></form></div>`}`;
+}
+function rolesDeAl(a){return DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{};return {n:ro.nombre||'?',v:Number(ro.v1||0)*Number(x.factor??1)}}).sort((x,y)=>y.v-x.v)}
+function vAlumnos(p){
+  const als=alumnosDe(p);
+  return head(p)+`<div class="muted" style="margin-bottom:12px">Roles de mayor a menor valor. Pulsa un alumno para abrir su ficha.</div>`+(als.map(a=>{const f=calcFinal(p,a),rs=rolesDeAl(a);
+    return `<div class="al al-click" data-act="ficha" data-id="${a.id}" role="button" tabindex="0"><div class="t"><b style="font-size:16px">${nAl(a)}</b><span class="nota" style="color:${f.final===null?'var(--mut)':f.final>=8?'var(--ok)':f.final>=5?'var(--mid)':'var(--bad)'}">${fmt(f.final)}</span></div><div>${rs.length?rs.map(x=>`<span class="rol">${esc(x.n)} <small>${fmt(x.v)}</small></span>`).join(''):'<span class="chip r">Sin rol</span>'}</div></div>`}).join('')||'<div class="card muted">Añade alumnos en Configuración.</div>');
+}
+function vRolesLista(p){
+  const bloques=rolesDe(p).map(r=>{const als=DB.asignaciones.filter(x=>x.rol_id===r.id).map(x=>DB.alumnos.find(a=>a.id===x.alumno_id)).filter(Boolean).sort(ordAl);
+    return als.length?`<div class="card"><h3 style="font-size:18px"><span class="rol">${esc(r.nombre)} <small>${fmt(r.v1)}</small></span></h3><div style="margin-top:8px">${als.map(a=>`<div>${nAl(a)}</div>`).join('')}</div></div>`:''}).join('');
+  return `<div class="grid2">${bloques||'<div class="card muted">Todavía no hay roles asignados.</div>'}</div>`;
+}
+function vNotas(p){
+  if(modoAlumno)return '';
+  const ns=DB.notas.filter(n=>n.alumno_id===view.aid).sort((x,y)=>(y.fecha||'').localeCompare(x.fecha||'')||(y.created_at||'').localeCompare(x.created_at||''));
+  return `<div class="card noprint"><h3 style="font-size:20px;margin-bottom:10px">Registro de notas del profesor</h3>
+  <form data-form="nota"><div class="fg"><label>Fecha<input type="date" name="fecha" value="${hoy()}"></label></div><label>Anotación<textarea name="texto" required placeholder="Se ha esforzado mucho en el baile…"></textarea></label><div><button class="btn gold">Añadir al registro</button></div></form>
+  <div style="margin-top:14px">${ns.length?ns.map(n=>`<div class="line" style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)"><div><b>${esc(n.fecha||'')}</b><div>${esc(n.texto)}</div></div><button class="btn sm red" data-act="delnota" data-id="${n.id}">Borrar</button></div>`).join(''):'<span class="muted">Todavía no hay anotaciones.</span>'}</div></div>`;
 }
 function vArchivo(p){
   const arch=DB.proyectos.filter(x=>x.estado==='archivado');
@@ -297,15 +329,17 @@ function vConf(p){
 function cDatos(p){return `<form data-form="datos" class="card"><div class="fg"><label>Nombre del musical<input name="nombre" value="${esc(p.nombre)}" required></label><label>Optativa<input name="optativa" value="${esc(p.optativa||'')}"></label><label>Inicio<input type="date" name="fecha_inicio" value="${p.fecha_inicio||''}"></label><label>Fin<input type="date" name="fecha_fin" value="${p.fecha_fin||''}"></label></div><label>Notas<textarea name="notas">${esc(p.notas||'')}</textarea></label><div class="row"><button class="btn gold">Guardar</button><button type="button" class="btn red" data-act="delp" data-id="${p.id}">Borrar musical</button></div></form>`}
 function cAlumnos(p){
   const als=alumnosDe(p);
-  return `<div class="grid2"><form data-form="alumno" class="card"><h3 style="font-size:18px">Añadir uno</h3><label>Nombre completo<input name="nombre" required></label><label>Grupo<input name="grupo"></label><div><button class="btn gold">Añadir</button></div></form>
-  <form data-form="importar" class="card"><h3 style="font-size:18px">Pegar una lista</h3><label>Un alumno por línea (Nombre; Grupo)<textarea name="lista" rows="5"></textarea></label><div><button class="btn gold">Importar</button></div></form></div>
-  <div class="card scroll"><table><tr><th>Alumno/a (${als.length})</th><th>Grupo</th><th></th></tr>${als.map(a=>`<tr><td>${esc(a.nombre)}</td><td>${esc(a.grupo||'')}</td><td><button class="btn sm red" data-act="delal" data-id="${a.id}">Borrar</button></td></tr>`).join('')}</table></div>`;
+  return `<div class="grid2"><form data-form="alumno" class="card"><h3 style="font-size:18px">Añadir uno</h3><div class="fg"><label>Nº de lista<input type="number" name="numero" min="1"></label><label>Grupo<input name="grupo"></label></div><label>Nombre completo<input name="nombre" required></label><div><button class="btn gold">Añadir</button></div></form>
+  <form data-form="importar" class="card"><h3 style="font-size:18px">Pegar una lista</h3><label>Un alumno por línea. Puede empezar por su número: 1 ABELLÁN LÓPEZ, ELSA<textarea name="lista" rows="5"></textarea></label><div class="row"><button class="btn gold">Importar</button><button type="button" class="btn" data-act="normalizar">Normalizar los ya guardados</button></div></form></div>
+  <div class="card scroll"><table><tr><th>Alumno/a (${als.length})</th><th>Grupo</th><th></th></tr>${als.map(a=>`<tr><td>${nAl(a)}</td><td>${esc(a.grupo||'')}</td><td><button class="btn sm red" data-act="delal" data-id="${a.id}">Borrar</button></td></tr>`).join('')}</table></div>`;
 }
 function cReparto(p){
-  const rs=rolesDe(p);
-  return `<div class="muted" style="margin-bottom:10px">Un alumno puede tener varios roles. La intensidad multiplica el valor del rol.</div>`+alumnosDe(p).map(a=>{const as=DB.asignaciones.filter(x=>x.alumno_id===a.id);
-    return `<div class="al"><div class="t"><b>${esc(a.nombre)}</b></div>${as.map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{};return `<div class="row" style="margin-bottom:6px"><span style="flex:1;min-width:140px">${esc(ro.nombre||'?')}</span><select style="width:170px" data-chg="factor" data-id="${x.id}">${[[1,'Principal ×1'],[0.6,'Secundario ×0,6'],[0.3,'Puntual ×0,3']].map(([v,l])=>`<option value="${v}" ${Number(x.factor)===v?'selected':''}>${l}</option>`).join('')}</select><button class="btn sm red" data-act="delasg" data-id="${x.id}">Quitar</button></div>`}).join('')}
-    <select data-chg="addrol" data-a="${a.id}"><option value="">+ Añadir rol…</option>${rs.filter(r=>!as.some(x=>x.rol_id===r.id)).map(r=>`<option value="${r.id}">${esc(r.nombre)} (${r.v1})</option>`).join('')}</select></div>`}).join('')||'<div class="card muted">Añade alumnos primero.</div>';
+  const rs=rolesDe(p),als=alumnosDe(p),sin=als.filter(a=>!DB.asignaciones.some(x=>x.alumno_id===a.id));
+  return `<div class="muted" style="margin-bottom:10px">Un alumno puede tener varios roles. La intensidad multiplica el valor del rol.</div>
+  ${sin.length?`<div class="warn">${sin.length} alumno(s) sin rol: ${esc(sin.map(a=>a.nombre.split(',')[0]).join(', '))}</div>`:(als.length?'<div class="chip g" style="margin-bottom:12px">Todos los alumnos tienen rol</div>':'')}`+
+  als.map(a=>{const as=DB.asignaciones.filter(x=>x.alumno_id===a.id);
+    return `<div class="al ${as.length?'':'sinrol'}"><div class="t"><b style="font-size:16px">${nAl(a)}</b>${as.length?'':'<span class="chip r">Sin rol</span>'}</div>${as.map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{};return `<div class="row" style="margin-bottom:6px"><span class="rol">${esc(ro.nombre||'?')} <small>${fmt(ro.v1)}</small></span><span style="flex:1"></span><select style="width:170px" data-chg="factor" data-id="${x.id}">${[[1,'Principal ×1'],[0.6,'Secundario ×0,6'],[0.3,'Puntual ×0,3']].map(([v,l])=>`<option value="${v}" ${Number(x.factor)===v?'selected':''}>${l}</option>`).join('')}</select><button class="btn sm red" data-act="delasg" data-id="${x.id}">Quitar</button></div>`}).join('')}
+    <select data-chg="addrol" data-a="${a.id}"><option value="">+ Añadir rol…</option>${rs.filter(r=>!as.some(x=>x.rol_id===r.id)).map(r=>`<option value="${r.id}">${esc(r.nombre)} (${fmt(r.v1)})</option>`).join('')}</select></div>`}).join('')||'<div class="card muted">Añade alumnos primero.</div>';
 }
 function cRoles(p){
   const rs=rolesDe(p);
@@ -334,10 +368,16 @@ const ROLES_INI=[['Escena','Actor principal',10],['Escena','Actor secundario',7]
 const rolesIni=pid=>ROLES_INI.map(([bl,n,v,l],i)=>({proyecto_id:pid,nombre:n,bloque:bl,v1:v,v2:v,v3:v,es_libre:!!l,orden:i}));
 async function sesionDe(p){let s=DB.sesiones.find(x=>x.proyecto_id===p.id&&x.fecha===fecha);if(!s){const r=await ins('sesiones',{proyecto_id:p.id,fecha,evaluacion:evalSel,cerrada:false});s=r&&r[0]}return s}
 const nextColor=(cur,c)=>c==='falta'?(cur==='falta'?'falta_j':cur==='falta_j'?null:'falta'):(cur===c?null:c);
+function avisoSinRol(){if(view.tab!=='conf'||view.conf!=='reparto')return;const p=P();if(!p)return;const n=alumnosDe(p).filter(a=>!DB.asignaciones.some(x=>x.alumno_id===a.id)).length;if(n)toast(n+' alumno(s) siguen sin rol. Puedes dejarlo así o volver a Reparto de roles.',6000)}
 const A={
-  tab:el=>{view.tab=el.dataset.v;view.aid=null;render()},
+  tema:()=>{const l=!document.body.classList.contains('light');document.body.classList.toggle('light',l);localStorage.setItem('pe_theme',l?'l':'d');render()},
+  delnota:async el=>{if(confirm('¿Borrar esta anotación?')){await del('notas',el.dataset.id);render()}},
+  normalizar:async()=>{const p=P(),cambios=[];alumnosDe(p).forEach(a=>{const m=a.nombre.match(/^\s*(\d+)[\s.\-]+(.+)$/),nombre=titulo(m?m[2]:a.nombre),numero=m?+m[1]:(a.numero??null);if(nombre!==a.nombre||numero!==(a.numero??null))cambios.push([a.id,{nombre,numero}])});
+    if(!cambios.length)return toast('Ya está todo normalizado.');if(!confirm(`Se normalizarán ${cambios.length} alumno(s): el número pasa a su casilla y el nombre a minúsculas con inicial. ¿Continuar?`))return;
+    await Promise.all(cambios.map(([id,pt])=>upd('alumnos',id,pt)));toast('Listo');render()},
+  tab:el=>{avisoSinRol();view.tab=el.dataset.v;view.aid=null;render()},
   sub:el=>{view.sub=el.dataset.v;render()},
-  conf:el=>{view.conf=el.dataset.v;render()},
+  conf:el=>{avisoSinRol();view.conf=el.dataset.v;render()},
   open:el=>{view={...view,tab:'dia',sub:'hoy',pid:el.dataset.id,aid:null};render()},
   logout:async()=>{await sb.auth.signOut()},
   amode:el=>{auth.mode=el.dataset.v;renderLogin()},
@@ -374,11 +414,12 @@ const C={
   addrol:async el=>{if(!el.value)return;await ins('asignaciones',{proyecto_id:view.pid,alumno_id:el.dataset.a,rol_id:el.value,factor:1});render()}
 };
 const F={
-  nuevo:async d=>{const r=await ins('proyectos',{nombre:d.nombre,curso:d.curso,optativa:d.curso==='4ESO'?'Creaciones escénico-musicales':'Música, espectáculo y comunicación',fecha_inicio:d.fecha_inicio||null,fecha_fin:d.fecha_fin||null,estado:'activo',reglas:{}});if(!r)return;await ins('roles',rolesIni(r[0].id));view={...view,tab:'conf',conf:'alumnos',pid:r[0].id};toast('Musical creado. Añade ahora los alumnos.');render()},
-  datos:async d=>{if(await upd('proyectos',view.pid,{nombre:d.nombre,optativa:d.optativa,fecha_inicio:d.fecha_inicio||null,fecha_fin:d.fecha_fin||null,notas:d.notas})){toast('Guardado');render()}},
+  nuevo:async d=>{const r=await ins('proyectos',{nombre:limpia(d.nombre),curso:d.curso,optativa:d.curso==='4ESO'?'Creaciones escénico-musicales':'Música, espectáculo y comunicación',fecha_inicio:d.fecha_inicio||null,fecha_fin:d.fecha_fin||null,estado:'activo',reglas:{}});if(!r)return;await ins('roles',rolesIni(r[0].id));view={...view,tab:'conf',conf:'alumnos',pid:r[0].id};toast('Musical creado. Añade ahora los alumnos.');render()},
+  datos:async d=>{if(await upd('proyectos',view.pid,{nombre:limpia(d.nombre),optativa:d.optativa,fecha_inicio:d.fecha_inicio||null,fecha_fin:d.fecha_fin||null,notas:d.notas})){toast('Guardado');render()}},
   evento:async d=>{if(await ins('eventos',{proyecto_id:view.pid,nombre:d.nombre,tipo:d.tipo,evaluacion:+d.evaluacion,fecha:d.fecha||null,sede:d.sede})){render()}},
-  alumno:async d=>{if(await ins('alumnos',{proyecto_id:view.pid,nombre:d.nombre.trim(),grupo:d.grupo||''})){render()}},
-  importar:async d=>{const ya=new Set(DB.alumnos.filter(a=>a.proyecto_id===view.pid).map(a=>a.nombre.toLowerCase()));const rows=[];String(d.lista||'').split(/\r?\n/).forEach(l=>{const [n,g]=l.split(/[;\t]/).map(x=>x.trim());if(n&&!ya.has(n.toLowerCase())){ya.add(n.toLowerCase());rows.push({proyecto_id:view.pid,nombre:n,grupo:g||''})}});if(!rows.length)return toast('No hay alumnos nuevos.');if(await ins('alumnos',rows)){toast(rows.length+' alumno(s) importados');render()}},
+  alumno:async d=>{if(await ins('alumnos',{proyecto_id:view.pid,numero:d.numero?+d.numero:null,nombre:titulo(d.nombre),grupo:d.grupo||''})){render()}},
+  nota:async d=>{if(await ins('notas',{proyecto_id:view.pid,alumno_id:view.aid,fecha:d.fecha||hoy(),texto:d.texto.trim()})){render()}},
+  importar:async d=>{const ya=new Set(DB.alumnos.filter(a=>a.proyecto_id===view.pid).map(a=>titulo(a.nombre.replace(/^\s*\d+[\s.\-]+/,'')).toLowerCase()));const rows=[];String(d.lista||'').split(/\r?\n/).forEach(l=>{const r=parseAl(l);if(r.nombre&&!ya.has(r.nombre.toLowerCase())){ya.add(r.nombre.toLowerCase());rows.push({proyecto_id:view.pid,...r})}});if(!rows.length)return toast('No hay alumnos nuevos.');if(await ins('alumnos',rows)){toast(rows.length+' alumno(s) importados');render()}},
   rol:async d=>{const v=num(d.valor),rs=rolesDe(P());if(await ins('roles',{proyecto_id:view.pid,nombre:d.nombre,bloque:d.bloque||'',v1:v,v2:v,v3:v,es_libre:true,orden:rs.length})){render()}},
   manual:async d=>{if(await upd('alumnos',view.aid,{nota_manual:d.nota_manual===''?null:num(d.nota_manual),comentario_manual:d.comentario_manual,notas_privadas:d.notas_privadas})){toast('Guardado');render()}},
   reglas:async d=>{const p=P(),r=reglas(p);const rub={},bon={};COLORES.forEach(c=>{rub[c]=num(d['rub_'+c]);bon[c]=num(d['bon_'+c])});
