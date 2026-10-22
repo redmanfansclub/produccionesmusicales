@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Creación Escénico-Musical</title>
+<title>CEM · Creación Escénico-Musical</title>
 <meta name="theme-color" content="#4d1229">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23241a22%22/%3E%3Crect x=%226%22 y=%229%22 width=%2252%22 height=%228%22 rx=%222%22 fill=%22%23dcb45f%22/%3E%3Cpath d=%22M7 17H28C27 28 19 32 19 42C19 47 18 50 17 53H7Z%22 fill=%22%23b0305c%22/%3E%3Cpath d=%22M57 17H36C37 28 45 32 45 42C45 47 46 50 47 53H57Z%22 fill=%22%23b0305c%22/%3E%3Cpath d=%22M14 17C16 28 13 40 12 53%22 stroke=%22%237a1f3f%22 stroke-width=%222.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M50 17C48 28 51 40 52 53%22 stroke=%22%237a1f3f%22 stroke-width=%222.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Crect x=%226%22 y=%2253%22 width=%2252%22 height=%225%22 rx=%222%22 fill=%22%23dcb45f%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Playfair+Display:wght@600;700;800&family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#1b1015;--card:#2a1921;--line:#573441;--ink:#f8eee6;--mut:#cfb6bd;--gold:#e4ba68;--goldbg:#dcb45f;--wine:#6e1d3a;--head1:#7a1f3f;--head2:#4d1229;--inp:#1f1218;--chip:#3a2530;--ok:#63d08f;--mid:#f2bb43;--bad:#ef6f6f;--c-verde:#63d08f;--c-lima:#b9e35c;--c-amarillo:#f2bb43;--c-naranja:#f08a3c;--c-rojo:#ef6f6f;--st-ini:#9aa0ad;--st-prog:#e4ba68;--st-fin:#4cc3d6;--f-bg:#050304;--f-fg:#f8eee6;--f-bd:#f8eee6;--j-bg:#8a7a86;--j-fg:#120a0e}
@@ -18,12 +18,14 @@ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-u
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
 h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;line-height:1.15}
-.curtain{color:#f6eee3;background:linear-gradient(180deg,var(--head1),var(--head2));border-bottom:3px solid var(--goldbg);padding:10px 20px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-.brand{display:flex;gap:12px;align-items:center;margin-right:auto}
-.brand b{font-family:Fraunces,serif;font-size:19px;display:block;line-height:1.1}
-.brand small{color:#e8c9d3;font-size:12px}
-.nav{display:flex;gap:6px;overflow-x:auto;max-width:100%}
-.nav button{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid #9b5870;background:transparent;font-weight:600;white-space:nowrap}
+.curtain{--cemc:#ecc97b;color:#f6eee3;background:linear-gradient(180deg,var(--head1),var(--head2));border-bottom:3px solid var(--goldbg);box-shadow:0 5px 22px rgba(0,0,0,.35);padding:27px 28px;display:flex;gap:14px 22px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;gap:14px;align-items:center;margin-right:auto}
+.brand b{font-family:'Playfair Display',Fraunces,Georgia,serif;font-weight:700;font-size:21px;letter-spacing:.01em;display:flex;align-items:center;line-height:1.15}
+.cem{--c2:var(--cemc,var(--gold));display:inline-flex;align-items:center;font:inherit;font-weight:700;letter-spacing:.1em;line-height:1;color:var(--c2);border:1.5px solid var(--c2);border-radius:4px;padding:10px 4px 10px 14px;margin-right:14px;box-shadow:inset 0 0 0 3px rgba(0,0,0,.22),inset 0 0 0 4.5px color-mix(in srgb,var(--c2) 55%,transparent);white-space:nowrap}
+.login h1 .cem{display:inline-flex;vertical-align:middle;margin-right:12px;padding:8px 3px 8px 12px}
+.brand small{display:block;margin-top:6px;font:600 9.5px/1 Cinzel,'Trajan Pro',Optima,Georgia,serif;letter-spacing:.26em;text-transform:uppercase;color:#e6c8a8;opacity:.72}
+.nav{display:flex;gap:6px;overflow-x:auto;max-width:100%;padding:3px 2px}
+.nav button{min-height:44px;padding:0 12px;border-radius:10px;border:1px solid #9b5870;background:transparent;font-weight:600;white-space:nowrap}
 .nav button.on{background:var(--goldbg);color:#241a22;border-color:var(--gold)}
 .nav .sp{flex:1}
 main{max-width:min(1240px,96vw);margin:0 auto;padding:24px 18px 90px}
@@ -51,7 +53,7 @@ th{font-size:12px;color:var(--mut);font-weight:600}
 .sub{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
 .sub button{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--mut)}
 .sub button.on{border-color:var(--gold);color:var(--gold);font-weight:600}
-.phone{width:100%;max-width:1080px}.phone .seg{max-width:520px}.lista-hoy{max-width:990px}
+.phone{width:100%;max-width:1080px}.phone .seg{max-width:520px}.lista-hoy{max-width:900px;margin:0 auto}
 .al{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
 .al .t{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:10px}
 .al .t span{font-size:13px;color:var(--mut)}
@@ -87,7 +89,7 @@ th{font-size:12px;color:var(--mut);font-weight:600}
 .fb{border:2px solid var(--mut);color:var(--ink);display:flex;align-items:center;justify-content:center;gap:6px;font-weight:700}
 .fb.f{background:var(--f-bg);color:var(--f-fg);border-color:var(--f-bd)}.fb.j{background:var(--j-bg);color:var(--j-fg);border-color:var(--j-bg)}
 .motivo{margin-top:8px}.motivo input{min-height:38px}
-.locked .tj{opacity:.42;background:transparent;border-style:solid}.locked .cb,.locked .fb{pointer-events:none}
+.locked .tj{opacity:1;background:color-mix(in srgb,var(--st-fin) 10%,transparent);border:1px solid color-mix(in srgb,var(--st-fin) 38%,var(--line));border-left:6px solid var(--k)}.locked .tj .who b{color:var(--mut);font-weight:600}.locked .tj .rolchip{opacity:.7}.locked .cb.on{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--c);transform:none}.locked .cb:not(.on),.locked .fb:not(.f):not(.j){opacity:.11}.locked .fb.f,.locked .fb.j{opacity:1}.lockico{display:inline-block;vertical-align:-2px;margin-left:6px;color:var(--st-fin);opacity:.9;line-height:0}.locked .cb,.locked .fb{pointer-events:none}
 .lockbar{display:flex;align-items:center;gap:10px;background:var(--chip);border-radius:12px;padding:10px 12px;margin-bottom:10px;font-weight:600}
 .strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin:6px 0 12px}
 button.dia{flex:0 0 auto;min-width:80px;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:6px 8px;text-align:center;font-size:12px;line-height:1.3}
@@ -104,11 +106,28 @@ button.dia b{display:block;font-size:13px}button.dia span{display:block}button.d
 .strip.all{flex-wrap:wrap;overflow:visible;margin-top:8px}
 .drawer{margin-bottom:10px}.drawer summary{cursor:pointer;color:var(--gold);font-weight:600;padding:6px 0}
 .tj{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 14px}
-.tj .who{flex:0 0 350px;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:3px 8px}.tj .who b{font-size:16px}.tj .sub2{flex-basis:100%;font-size:13px;color:var(--mut)}.tj .rolchip{display:inline-block;padding:1px 9px;border-radius:999px;background:var(--chip);color:var(--ink);font-size:12px;font-weight:600}
+.tj .who{flex:0 0 300px;min-width:0}.tj .who b{display:block;font-size:16px;line-height:1.25}.tj .sub2{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:4px;font-size:13px;color:var(--mut)}.tj .rolchip{display:inline-block;padding:1px 9px;border-radius:999px;background:var(--chip);color:var(--ink);font-size:12px;font-weight:600}
 .tj:hover,.tj:focus-within{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
-.tj .tag{margin-left:4px}.tj .mk{flex:0 0 auto;grid-template-columns:repeat(5,48px) 108px}
-.tj .motivo{flex:1 1 150px;margin:0;min-width:150px}
-@media(max-width:700px){.tj .who{flex:1 1 100%}.tj .mk{flex:1 1 100%;grid-template-columns:repeat(5,1fr) 1.5fr}.tj .motivo{flex:1 1 100%}}
+.tj .tag{margin-left:0}.tj .mk{flex:0 0 auto;grid-template-columns:repeat(5,48px) 108px}
+.mk .motivo-in{grid-column:1/6;display:flex;align-items:center}.mk .motivo-in input{width:100%;min-height:46px}
+@media(max-width:700px){.tj .who{flex:1 1 100%}.tj .mk{flex:1 1 100%;grid-template-columns:repeat(5,1fr) 1.5fr}}
+@media(max-width:1400px){.brand b{font-size:16.5px}.cem{padding:8px 2px 8px 10px;margin-right:10px}.nav button{padding:0 7px;font-size:13.5px}.nav{gap:4px}.brand{gap:10px}.brand svg{width:44px;height:44px}.brand small{font-size:8.5px}.curtain{padding:20px 14px}}
+@media(max-width:1520px){.nav button{padding:0 9px;font-size:14px}.nav{gap:5px}.brand b{font-size:19px}.curtain{padding:23px 20px}}
+.lnk{color:inherit;text-decoration:none;cursor:pointer}.lnk:hover{color:var(--gold);text-decoration:underline}
+.ib{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--mut);flex:none;padding:0}.ib:hover{color:var(--gold);border-color:var(--gold)}
+.tj .acts{margin-left:auto;display:flex;gap:6px}.tj .rolchip.lnk:hover{background:var(--goldbg);color:#241a22;text-decoration:none}
+.weeks .cell{cursor:pointer}.weeks .cell:hover{outline:2px solid var(--gold)}
+.card.resalta{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold) inset}
+.evck{display:inline-flex;gap:9px;align-items:center;font-size:12px;color:var(--mut);flex-wrap:wrap}.evck label{flex-direction:row;align-items:center;gap:4px;color:var(--ink);font-weight:600;font-size:12px}.evck input{width:auto;min-height:0}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40}
+.panel-roles{position:fixed;top:0;right:0;bottom:0;width:min(470px,100vw);background:var(--card);border-left:2px solid var(--gold);z-index:41;padding:22px;overflow:auto;box-shadow:-12px 0 40px rgba(0,0,0,.45);animation:entra .18s ease-out}
+@keyframes entra{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
+.pr-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.pr-head h2{font-size:24px}
+.pr-item{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;display:grid;gap:10px;background:var(--bg)}
+.modal{position:fixed;left:50%;top:18vh;transform:translateX(-50%);width:min(520px,94vw);background:var(--card);border:2px solid var(--gold);border-radius:16px;padding:20px;z-index:41;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal h3{font-size:20px;margin-bottom:6px}.modal .res{width:100%;justify-content:flex-start;text-align:left;margin-top:6px;display:flex;align-items:center}
+@media print{.ov,.panel-roles,.modal{display:none!important}}
+.login h1{font-family:'Playfair Display',Fraunces,Georgia,serif;font-weight:700}
 .login{max-width:430px;margin:50px auto;text-align:center}.login form{text-align:left}
 @media print{body{background:#fff;color:#000}.curtain,.noprint{display:none!important}.card{background:#fff;border-color:#999}.muted,th{color:#444}}
 </style>
@@ -136,6 +155,7 @@ const REGLAS_DEF={
 let DB={proyectos:[],alumnos:[],roles:[],asignaciones:[],sesiones:[],marcas:[],eventos:[],vico:[],notas:[]};
 function reglas(p){const r=(p&&p.reglas)||{};return {...REGLAS_DEF,...r,rubrica:{...REGLAS_DEF.rubrica,...(r.rubrica||{})},bonus:{...REGLAS_DEF.bonus,...(r.bonus||{})}}}
 function penalJust(n,r){if(n<=2)return 0;const e=r.escala_just;return n<e.length?e[n]:e[e.length-1]+r.mas_just_resta*(n-(e.length-1))}
+const asgEvs=x=>Array.isArray(x.evals)?x.evals.map(Number):[1,2,3];
 function calcEval(p,a,ev){
   const r=reglas(p);
   const ses=DB.sesiones.filter(s=>s.proyecto_id===p.id&&s.evaluacion===ev&&s.cerrada&&!s.sin_clase);
@@ -148,7 +168,7 @@ function calcEval(p,a,ev){
     sum+=Number(r.rubrica[c])*w;n+=w;
   });
   const media=n?sum/n:10;
-  const roles=DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{};const ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined;return {nombre:ro.nombre||'(rol borrado)',valor:Number(ad?x.valor_adaptado:(ro['v'+ev]||0))*Number(x.factor??1),adaptado:ad}});
+  const roles=DB.asignaciones.filter(x=>x.alumno_id===a.id&&asgEvs(x).includes(ev)).map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{};const ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined;return {nombre:ro.nombre||'(rol borrado)',valor:Number(ad?x.valor_adaptado:(ro['v'+ev]||0))*Number(x.factor??1),adaptado:ad}});
   const base=roles.reduce((t,x)=>t+x.valor,0);
   const bruto=base*media/10;
   const pen=fsjW*r.falta_sj_resta+penalJust(fj,r);
@@ -208,7 +228,7 @@ function parseAl(l){const m=l.match(/^\s*(\d+)[\s.\-;\t]+(.+)$/),num=m?+m[1]:nul
 const nAl=a=>(numDe(a)?numDe(a)+'. ':'')+esc(nomDe(a));
 const rolesDe=p=>DB.roles.filter(r=>r.proyecto_id===p.id).sort((x,y)=>x.orden-y.orden);
 function toast(m,ms=3500){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',ms)}
-function fail(e){console.warn(e);const m=String(e.message||e);toast(/Load failed|Failed to fetch|NetworkError/i.test(m)?'No hay conexión con Supabase. Si usas Safari, prueba en ventana privada o desactiva extensiones y bloqueadores para esta web.':/column|schema cache/i.test(m)?'Falta ejecutar supabase_actualizacion_B.sql en Supabase ('+m+')':'No se pudo guardar: '+m,9000)}
+function fail(e){console.warn(e);const m=String(e.message||e);toast(/Load failed|Failed to fetch|NetworkError/i.test(m)?'No hay conexión con Supabase. Si usas Safari, prueba en ventana privada o desactiva extensiones y bloqueadores para esta web.':/column|schema cache/i.test(m)?'Falta ejecutar el último SQL de actualización en Supabase ('+m+')':'No se pudo guardar: '+m,9000)}
 async function ins(k,rows){const arr=Array.isArray(rows)?rows:[rows];arr.forEach(x=>x.id=x.id||uid());const {error}=await sb.from(TBL[k]).insert(arr);if(error){fail(error);return null}DB[k].push(...arr);return arr}
 async function upd(k,id,patch){const {error}=await sb.from(TBL[k]).update(patch).eq('id',id);if(error){fail(error);return false}Object.assign(DB[k].find(x=>x.id===id),patch);return true}
 async function del(k,id){const {error}=await sb.from(TBL[k]).delete().eq('id',id);if(error){fail(error);return false}DB[k]=DB[k].filter(x=>x.id!==id);return true}
@@ -234,7 +254,7 @@ async function autoNormaliza(){
 function renderLogin(msg=''){
   $('#top').innerHTML='';
   const m=auth.mode,t={login:'Acceso del profesorado',signup:'Crear cuenta',recover:'Recuperar contraseña',reset:'Nueva contraseña'}[m];
-  $('#app').innerHTML=`<div class="card login"><h1 style="font-size:28px">Creación Escénico-Musical</h1><div class="muted" style="margin:4px 0 18px">by Manuel Esteve</div><h3 style="margin-bottom:12px">${t}</h3>
+  $('#app').innerHTML=`<div class="card login"><h1 style="font-size:28px"><span class="cem">CEM</span>Creación Escénico-Musical</h1><div class="muted" style="margin:4px 0 18px">by Manuel Esteve</div><h3 style="margin-bottom:12px">${t}</h3>
   ${msg?`<div class="warn">${esc(msg)}</div>`:''}
   <form id="fl">${m!=='reset'?'<label>Correo<input type="email" id="le" required autocomplete="email"></label>':''}
   ${m!=='recover'?`<label>${m==='reset'?'Nueva contraseña':'Contraseña'}<input type="password" id="lp" minlength="10" required autocomplete="${m==='login'?'current-password':'new-password'}"></label>`:''}
@@ -263,11 +283,11 @@ const MOON='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="
 function pintaBarra(){
   const p=P();let t='';
   const tabs=p?[['dia','Día a día'],['alumnos','Alumnos'],['archivo','Archivo'],...(p.curso==='1BACH'?[['prod','Producción']]:[]),['eval','Evaluar'],['stats','Estadísticas']]:[];
-  t=`<div class="curtain noprint"><div class="brand"><svg width="38" height="38" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#241a22"/><rect x="6" y="9" width="52" height="8" rx="2" fill="#dcb45f"/><path d="M7 17H28C27 28 19 32 19 42C19 47 18 50 17 53H7Z" fill="#b0305c"/><path d="M57 17H36C37 28 45 32 45 42C45 47 46 50 47 53H57Z" fill="#b0305c"/><path d="M14 17C16 28 13 40 12 53" stroke="#7a1f3f" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M50 17C48 28 51 40 52 53" stroke="#7a1f3f" stroke-width="2.5" fill="none" stroke-linecap="round"/><rect x="6" y="53" width="52" height="5" rx="2" fill="#dcb45f"/></svg><div><b>Creación Escénico-Musical</b><small>by Manuel Esteve</small></div></div>
+  t=`<div class="curtain noprint"><div class="brand"><svg width="54" height="54" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#241a22"/><rect x="6" y="9" width="52" height="8" rx="2" fill="#dcb45f"/><path d="M7 17H28C27 28 19 32 19 42C19 47 18 50 17 53H7Z" fill="#b0305c"/><path d="M57 17H36C37 28 45 32 45 42C45 47 46 50 47 53H57Z" fill="#b0305c"/><path d="M14 17C16 28 13 40 12 53" stroke="#7a1f3f" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M50 17C48 28 51 40 52 53" stroke="#7a1f3f" stroke-width="2.5" fill="none" stroke-linecap="round"/><rect x="6" y="53" width="52" height="5" rx="2" fill="#dcb45f"/></svg><div><b><span class="cem">CEM</span>Creación Escénico-Musical</b><small>by Manuel Esteve</small></div></div>
   <nav class="nav" aria-label="Secciones">${tabs.map(([k,l])=>`<button class="${view.tab===k?'on':''}" data-act="tab" data-v="${k}">${l}</button>`).join('')}
   <button class="${view.tab==='home'?'on':''}" data-act="tab" data-v="home">Mis musicales</button>
   ${p?`<button class="${view.tab==='conf'?'on':''}" data-act="tab" data-v="conf">Configuración</button>`:''}
-  <button class="ico" data-act="tema" aria-label="Cambiar entre modo claro y oscuro" title="${document.body.classList.contains('light')?'Pasar a modo oscuro':'Pasar a modo claro'}">${document.body.classList.contains('light')?MOON:SUN}</button><button data-act="logout">Salir</button></nav></div>`;
+  ${p?`<button class="ico" data-act="buscar" aria-label="Buscar alumno" title="Buscar alumno (⌘K)">${IC.lupa}</button>`:''}<button class="ico" data-act="tema" aria-label="Cambiar entre modo claro y oscuro" title="${document.body.classList.contains('light')?'Pasar a modo oscuro':'Pasar a modo claro'}">${document.body.classList.contains('light')?MOON:SUN}</button><button data-act="logout">Salir</button></nav></div>`;
   $('#top').innerHTML=t;
 }
 function render(){
@@ -282,7 +302,12 @@ function render(){
   else if(view.tab==='eval')h=view.aid?vFicha(p)+vFaltas(p)+vNotas(p):vEval(p);
   else if(view.tab==='stats')h=vStats(p);
   else if(view.tab==='conf')h=vConf(p);
-  $('#app').innerHTML=h;window.scrollTo(0,y);const sl=document.querySelector('.dia.sel');if(sl&&sl.parentElement){const c=sl.parentElement;c.scrollLeft=sl.offsetLeft-c.clientWidth/2+sl.clientWidth/2;if(c.scrollHeight>c.clientHeight+4)c.scrollTop=sl.offsetTop-c.clientHeight/2+sl.clientHeight/2}
+  h+=overlays(p);const pr=document.querySelector('.panel-roles'),pst=pr?pr.scrollTop:0;
+  $('#app').innerHTML=h;window.scrollTo(0,y);const np=document.querySelector('.panel-roles');if(np)np.scrollTop=pst;
+  if(view.buscar){const q=$('#qalumno');if(q){q.focus();pintaBuscar(q.value)}}
+  if(view.go){const e=document.getElementById(view.go);if(e)e.scrollIntoView({block:'start'});view.go=null}
+  if(view.rolSel){const e=document.getElementById('rol-'+view.rolSel);if(e)e.scrollIntoView({block:'center'})}
+ const sl=document.querySelector('.dia.sel');if(sl&&sl.parentElement){const c=sl.parentElement;c.scrollLeft=sl.offsetLeft-c.clientWidth/2+sl.clientWidth/2;if(c.scrollHeight>c.clientHeight+4)c.scrollTop=sl.offsetTop-c.clientHeight/2+sl.clientHeight/2}
 }
 function head(p,extra=''){return `<div style="margin-bottom:18px" class="noprint"><div class="muted">${p.curso==='4ESO'?'4º ESO':'1º Bachillerato'} · ${esc(p.optativa||'')}${p.estado==='archivado'?' · archivado':''}</div><div class="titulo"><h1 style="font-size:32px">${esc(p.nombre)}</h1></div>${extra}</div>`}
 function vHome(){
@@ -303,8 +328,15 @@ function vDia(p){
 const DOW=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],DOWL=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const fd=f=>f?f.split('-').reverse().join('/'):'';
 const HORAS_DEF=[{n:'1ª',ini:'08:30',fin:'09:25'},{n:'2ª',ini:'09:25',fin:'10:20'},{n:'3ª',ini:'10:20',fin:'11:15'},{n:'Recreo',ini:'11:15',fin:'11:45',recreo:true},{n:'4ª',ini:'11:45',fin:'12:40'},{n:'5ª',ini:'12:40',fin:'13:35'},{n:'6ª',ini:'13:35',fin:'14:30'}];
-function horarioDe(p){const h=(p&&p.horario)||{};return {horas:(h.horas&&h.horas.length)?h.horas:HORAS_DEF,clases:h.clases||[],festivos:h.festivos||[],evals:h.evals||[],desde:h.desde||''}}
-const evDe=(p,f)=>{const [a,b]=horarioDe(p).evals;return a&&b?(f<=a?1:f<=b?2:3):evDeFecha(f)};
+function horarioDe(p){const h=(p&&p.horario)||{};return {horas:(h.horas&&h.horas.length)?h.horas:HORAS_DEF,clases:h.clases||[],festivos:h.festivos||[],evals:h.evals||[],inis:h.inis||[],desde:h.desde||''}}
+const addD=(f,n)=>{const d=new Date(f+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+function evDe(p,f){const h=horarioDe(p),[a,b]=h.evals;if(!(a&&b))return evDeFecha(f);const s2=h.inis[0]||addD(a,1),s3=h.inis[1]||addD(b,1),fin=p.fecha_fin||'9999-12-31';return f<=a?1:f<s2?0:f<=b?2:f<s3?0:f<=fin?3:0}
+function evDeSeguro(p,f){const e=evDe(p,f);if(e)return e;const h=horarioDe(p),[a,b]=h.evals;return f<(h.inis[0]||addD(a,1))?1:f<(h.inis[1]||addD(b,1))?2:3}
+const evActual=p=>evDeSeguro(p,hoy());
+const evR=p=>view.evRoles||evActual(p);
+const evsDesde=p=>{const e=evActual(p);return [1,2,3].filter(v=>v>=e)};
+const ES_JEFE=true; /* En la entrega B: solo el jefe de departamento ve los botones de roles */
+function listaEval(p,ag,e){const ev=d=>d.ses?d.ses.evaluacion:evDeSeguro(p,d.fecha),nc=d=>['festivo','sinclase'].includes(estadoDe(p,d)),l=ag.filter(d=>ev(d)===e);while(l.length&&nc(l[0]))l.shift();while(l.length&&nc(l[l.length-1]))l.pop();return l}
 const festivoDe=(p,f)=>horarioDe(p).festivos.find(x=>f>=x.ini&&f<=(x.fin||x.ini));
 function diasGenerados(p){
   const h=horarioDe(p),ini=[p.fecha_inicio||'',h.desde||''].sort().pop(),fin=p.fecha_fin||hoy(),out=[];
@@ -312,7 +344,7 @@ function diasGenerados(p){
   const d=new Date(ini+'T12:00:00');
   for(let k=0;k<900;k++,d.setDate(d.getDate()+1)){
     const f=d.toISOString().slice(0,10);if(f>fin)break;
-    h.clases.filter(c=>+c.dia===d.getDay()).forEach(c=>{const hr=h.horas.find(x=>x.n===c.hora)||{};out.push({fecha:f,clave:'clase',hora:c.hora,ini:hr.ini,fin:hr.fin,festivo:festivoDe(p,f)})});
+    h.clases.filter(c=>+c.dia===d.getDay()).forEach(c=>{if(evDe(p,f)===0)return;const hr=h.horas.find(x=>x.n===c.hora)||{};out.push({fecha:f,clave:'clase',hora:c.hora,ini:hr.ini,fin:hr.fin,festivo:festivoDe(p,f)})});
   }
   return out;
 }
@@ -332,7 +364,7 @@ function selActual(p,ag){
   const hy=hoy(),pas=ag.filter(d=>d.fecha<=hy&&estadoDe(p,d)!=='festivo');
   return pas.length?pas[pas.length-1]:(ag.find(d=>estadoDe(p,d)!=='festivo')||ag[0]);
 }
-async function sesionSel(p){const d=selActual(p,agenda(p));if(!d)return null;if(d.ses)return d.ses;const r=await ins('sesiones',{proyecto_id:p.id,fecha:d.fecha,clave:d.clave,tipo:'clase',nombre:'',peso:1,evaluacion:evDe(p,d.fecha),cerrada:false,sin_clase:false});return r&&r[0]}
+async function sesionSel(p){const d=selActual(p,agenda(p));if(!d)return null;if(d.ses)return d.ses;const r=await ins('sesiones',{proyecto_id:p.id,fecha:d.fecha,clave:d.clave,tipo:'clase',nombre:'',peso:1,evaluacion:evDeSeguro(p,d.fecha),cerrada:false,sin_clase:false});return r&&r[0]}
 const IC={
   fin:'<svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="6" width="9" height="6.5" rx="1.5" fill="currentColor"/><path d="M4.5 6V4.5a2.5 2.5 0 0 1 5 0V6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>',
   curso:'<svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 1.5A5.5 5.5 0 0 1 7 12.5z" fill="currentColor"/></svg>',
@@ -340,10 +372,13 @@ const IC={
   fest:'<svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
   ok:'<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M2.5 7.5l3 3 6-7"/></svg>'
 };
+IC.edit='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+IC.nota='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.5 7.2L3 21l1.8-5.5A8 8 0 1 1 21 12z"/></svg>';
+IC.lupa='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>';
 const stCol={pend:'var(--st-ini)',curso:'var(--st-prog)',cerrado:'var(--st-fin)',festivo:'var(--mut)',sinclase:'var(--mut)'},stTxt={pend:'Pendiente',curso:'En curso',cerrado:'Cerrado',festivo:'Festivo',sinclase:'Sin clase'},stIc={pend:IC.pend,curso:IC.curso,cerrado:IC.fin,festivo:IC.fest,sinclase:IC.fest};
-function colorBtns(cur,act,extra,off){
+function colorBtns(cur,act,extra,off,motivo){
   const r=reglas(P()).rubrica;
-  return `<div class="mk">${COLORES.map(c=>`<button class="cb c-${c} ${cur===c?'on':''}" style="--p:${pct(P(),c)}%" data-act="${act}" data-c="${c}" ${extra||''} ${off?'disabled':''} aria-label="${c}"><i class="sh"></i>${verVal?`<small>${r[c]}</small>`:''}</button>`).join('')}<button class="fb ${cur==='falta'?'f':''} ${cur==='falta_j'?'j':''}" data-act="${act}" data-c="falta" ${extra||''} ${off?'disabled':''}><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="${cur==='falta_j'?'M2.5 7.5l3 3 6-7':'M3 3l8 8M11 3l-8 8'}"/></svg>${cur==='falta_j'?'Justificada':'Falta'}</button></div>`;
+  return `<div class="mk">${motivo||COLORES.map(c=>`<button class="cb c-${c} ${cur===c?'on':''}" style="--p:${pct(P(),c)}%" data-act="${act}" data-c="${c}" ${extra||''} ${off?'disabled':''} aria-label="${c}"><i class="sh"></i>${verVal?`<small>${r[c]}</small>`:''}</button>`).join('')}<button class="fb ${cur==='falta'?'f':''} ${cur==='falta_j'?'j':''}" data-act="${act}" data-c="falta" ${extra||''} ${off?'disabled':''}><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="${cur==='falta_j'?'M2.5 7.5l3 3 6-7':'M3 3l8 8M11 3l-8 8'}"/></svg>${cur==='falta_j'?'Justificada':'Falta'}</button></div>`;
 }
 const ventanaN=()=>Math.max(3,Math.min(10,Math.floor((Math.min(window.innerWidth,1080)-140)/92)));
 let ventanaPrev=0;
@@ -351,11 +386,11 @@ function vHoy(p){
   const als=alumnosDe(p),ag=agenda(p);
   const extra=`<details class="card noprint" style="margin-top:12px"><summary style="cursor:pointer;font-weight:600;color:var(--gold)">Añadir un día extra (ensayo, Vico, función…)</summary><form data-form="extra" style="margin-top:12px"><div class="fg"><label>Qué es<input name="nombre" list="extras" required placeholder="Ensayo extra"><datalist id="extras"><option value="Ensayo extra"><option value="Ensayo en el Teatro Vico"><option value="Función"></datalist></label><label>Fecha<input type="date" name="fecha" value="${hoy()}" required></label><label>Cuánto cuenta<select name="peso"><option value="0.5">La mitad (×0,5)</option><option value="1" selected>Como un día normal (×1)</option><option value="2">El doble (×2)</option></select></label><label>Otro valor (opcional)<input type="number" step="0.1" min="0.1" name="peso_otro" placeholder="por ejemplo 3"></label></div><div><button class="btn gold">Añadir</button></div></form></details>`;
   if(!ag.length)return `<div class="phone"><div class="card"><b>Todavía no hay días de clase.</b><p class="muted">Configura tus días y horas en Configuración → Horario y calendario, o añade un día extra.</p><button class="btn gold" data-act="irhorario">Ir al horario</button></div>${extra}</div>`;
-  const sel=selActual(p,ag),est=estadoDe(p,sel),s=sel.ses,ev=s?s.evaluacion:evDe(p,sel.fecha);
+  const sel=selActual(p,ag),est=estadoDe(p,sel),s=sel.ses,ev=s?s.evaluacion:evDeSeguro(p,sel.fecha);
   const marks=s?DB.marcas.filter(m=>m.sesion_id===s.id):[],pend=als.filter(a=>!marks.some(m=>m.alumno_id===a.id)),previos=previosDe(p,sel);
   const rest=ag.filter(d=>d.tipo==='clase'&&d.fecha>=hoy()&&!['festivo','sinclase','cerrado'].includes(estadoDe(p,d))).length;
-  const evOf=d=>d.ses?d.ses.evaluacion:evDe(p,d.fecha);
-  const tab=view.evTab||evOf(sel),lst=ag.filter(d=>evOf(d)===tab),idx=lst.findIndex(d=>d.fecha===sel.fecha&&d.clave===sel.clave);
+  const evOf=d=>d.ses?d.ses.evaluacion:evDeSeguro(p,d.fecha);
+  const tab=view.evTab||evOf(sel),lst=listaEval(p,ag,tab),idx=lst.findIndex(d=>d.fecha===sel.fecha&&d.clave===sel.clave);
   const btnDia=d=>{const e=estadoDe(p,d),on=d.fecha===sel.fecha&&d.clave===sel.clave;return `<button class="dia ${on?'sel':''}" style="--k:${stCol[e]}" data-act="dia" data-f="${d.fecha}" data-k="${d.clave}"><b>${DOW[new Date(d.fecha+'T12:00:00').getDay()]} ${d.fecha.slice(8)}/${d.fecha.slice(5,7)}</b><span style="color:var(--k)">${stIc[e]}</span><span class="muted">${d.tipo==='extra'?'Extra ×'+fmt(d.peso):stTxt[e]}</span></button>`};
   const prev=idx>0?lst[idx-1]:null,next=idx>=0&&idx<lst.length-1?lst[idx+1]:null,N=ventanaN(),ini=idx<0?0:Math.max(0,Math.min(idx-Math.floor((N-1)/2),lst.length-N)),vent=lst.slice(ini,ini+N);ventanaPrev=N;
   const flecha=(d,dir)=>`<button class="btn" ${d?`data-act="dia" data-f="${d.fecha}" data-k="${d.clave}"`:'disabled'} aria-label="${dir<0?'Día anterior':'Día siguiente'}"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="${dir<0?'M11 3L5 9l6 6':'M7 3l6 6-6 6'}"/></svg></button>`;
@@ -374,9 +409,11 @@ function vHoy(p){
   ${locked?'<div class="lockbar"><span>Día cerrado: no se puede cambiar.</span><button class="btn" data-act="reabrir" style="margin-left:auto">Reabrir</button></div>':''}
   ${cierre?(pend.length?`<div class="warn r">Faltan ${pend.length} alumno(s) por marcar. El día no se cierra hasta que todos tengan su marca.</div>`:'<div class="warn" style="background:var(--ok);color:#fff">Todos los alumnos tienen marca. Ya puedes cerrar el día.</div>'):''}
   <div class="${locked?'locked':''}"><div class="cards lista-hoy">${lista.length?lista.map(a=>{const m=marks.find(x=>x.alumno_id===a.id),c=m?m.color:null,has=!!c,col=COLORES.includes(c)?`var(--c-${c})`:c==='falta'?'var(--f-bd)':c==='falta_j'?'var(--j-bg)':'var(--line)';
-    const cv=calcEval(p,a,ev),rl=DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>(DB.roles.find(q=>q.id===x.rol_id)||{}).nombre).filter(Boolean).join(' + ');
-    const av=cv.fj>=r.aviso_rojo?'<span class="chip r">'+cv.fj+' justif.</span>':cv.fj>=r.aviso_amarillo?'<span class="chip y">'+cv.fj+' justif.</span>':'';
-    return `<div class="tj ${has?'has':''} ${cierre&&!has?'pen':''}" style="--k:${col}"><div class="who"><b>${nAl(a)}</b><span class="rolchip">${esc(rl||'sin rol')}</span><span class="sub2">${has?'<span class="tag ok">'+IC.ok+'Marcado</span>':'<span class="tag">Sin marcar</span>'} ${av}</span></div>${colorBtns(c,'mark',`data-a="${a.id}"`,locked)}${c==='falta_j'?(locked?`<div class="motivo muted">Motivo: ${esc(m.motivo||'—')}</div>`:`<div class="motivo"><input value="${esc(m.motivo||'')}" placeholder="Motivo (médico, familia…)" aria-label="Motivo de la justificación" data-chg="motivo" data-id="${m.id}"></div>`):''}</div>`}).join(''):(als.length?'':'<div class="card muted">Añade alumnos en Configuración.</div>')}</div></div>
+    const cv=calcEval(p,a,ev),rls=DB.asignaciones.filter(x=>x.alumno_id===a.id&&asgEvs(x).includes(ev)).map(x=>DB.roles.find(q=>q.id===x.rol_id)).filter(Boolean);
+    const chips=rls.length?rls.map(ro=>`<a href="#" class="rolchip lnk" data-act="verrol" data-id="${ro.id}" title="Ver quién tiene este rol">${esc(ro.nombre)}</a>`).join(''):`<span class="rolchip" ${ES_JEFE?`data-act="rolespanel" data-id="${a.id}" style="cursor:pointer"`:''}>sin rol${ES_JEFE?' · añadir':''}</span>`;
+    const lk=`data-act="ficha" data-id="${a.id}" data-go="faltas" style="cursor:pointer" title="Ver sus faltas"`;
+    const av=cv.fj>=r.aviso_rojo?`<span class="chip r" ${lk}>${cv.fj} justif.</span>`:cv.fj>=r.aviso_amarillo?`<span class="chip y" ${lk}>${cv.fj} justif.</span>`:'';
+    return `<div class="tj ${has?'has':''} ${cierre&&!has?'pen':''}" style="--k:${col}"><div class="who"><b><a href="#" class="lnk" data-act="ficha" data-id="${a.id}">${nAl(a)}</a>${locked?'<span class="lockico" aria-hidden="true">'+IC.fin+'</span>':''}</b><span class="sub2">${chips}${has?'<span class="tag ok">'+IC.ok+'Marcado</span>':'<span class="tag">Sin marcar</span>'}${av}</span></div>${colorBtns(c,'mark',`data-a="${a.id}"`,locked,c==='falta_j'?(locked?`<div class="motivo-in muted">Motivo: ${esc(m.motivo||'—')}</div>`:`<div class="motivo-in"><input value="${esc(m.motivo||'')}" placeholder="Motivo (médico, familia…)" aria-label="Motivo de la justificación" data-chg="motivo" data-id="${m.id}"></div>`):'')}<div class="acts">${ES_JEFE?`<button class="ib" data-act="rolespanel" data-id="${a.id}" aria-label="Cambiar roles de ${esc(nomDe(a))}" title="Cambiar roles">${IC.edit}</button>`:''}<button class="ib" data-act="nota" data-id="${a.id}" aria-label="Nota rápida sobre ${esc(nomDe(a))}" title="Nota rápida">${IC.nota}</button></div></div>`}).join(''):(als.length?'':'<div class="card muted">Añade alumnos en Configuración.</div>')}</div></div>
   ${als.length&&!locked?`<div class="row" style="margin-top:8px">${cierre?'<button class="btn" style="flex:1" data-act="vertodos">Ver todos</button>':''}<button class="btn gold" style="flex:1" data-act="cerrar">Cerrar el día</button></div>`:''}
   ${!locked&&!marks.length&&sel.tipo==='clase'?`<div style="margin-top:12px"><button class="btn" data-act="sinclase" data-f="${sel.fecha}" data-k="${sel.clave}">Hoy no hay clase (festivo / sin clase)</button></div>`:''}
   ${sel.tipo==='extra'&&!locked?`<div style="margin-top:12px"><button class="btn red" data-act="delextra" data-f="${sel.fecha}" data-k="${sel.clave}">Borrar este día extra</button></div>`:''}
@@ -398,9 +435,9 @@ function vEval(p){
   const rows=als.map(a=>{const f=calcFinal(p,a);const man=a.nota_manual;
     const chip=x=>x.nota===null?'<span class="muted">—</span>':`<span class="nota" style="color:${x.nota>=8?'var(--ok)':x.nota>=5?'var(--mid)':'var(--bad)'}">${fmt(x.notaFinalEv??x.nota)}</span>${x.real>10.04?` <span class="chip g">real ${fmt(x.real)}</span>`:''}`;
     const maxJ=Math.max(...f.ev.map(x=>x.fj)),fsj=f.ev.reduce((t,x)=>t+x.fsj,0);
-    return `<tr><td><a href="#" data-act="ficha" data-id="${a.id}" style="color:var(--gold);font-weight:600">${nAl(a)}</a>${esAdaptado(a)?' <span class="chip y">Adaptada</span>':''}</td>${f.ev.map(x=>`<td>${chip(x)}</td>`).join('')}${b?`<td>${fmt(f.vico.nota)}${f.vico.sinJust?' <span class="chip r">sin just.</span>':''}${f.vicoPend?' <span class="chip y">manual</span>':''}</td>`:''}
-    <td>${fsj?`<span class="chip r">${fsj} sin just.</span> `:''}${maxJ>=r.aviso_rojo?`<span class="chip r">${maxJ} just.</span>`:maxJ>=r.aviso_amarillo?`<span class="chip y">${maxJ} just.</span>`:maxJ?`<span class="chip">${maxJ} just.</span>`:''}</td>
-    <td><span class="nota">${fmt(f.final)}</span>${f.tope?' <span class="chip r">tope</span>':''}</td><td>${f.final===null?'—':Math.round(f.final)+' / '+Math.floor(f.final)}</td><td>${man!==null&&man!==undefined?`<b style="color:var(--gold)">${fmt(man)}</b>`:'—'}</td></tr>`}).join('');
+    return `<tr><td><a href="#" data-act="ficha" data-id="${a.id}" style="color:var(--gold);font-weight:600">${nAl(a)}</a>${esAdaptado(a)?' <span class="chip y">Adaptada</span>':''}</td>${f.ev.map(x=>`<td>${chip(x)}</td>`).join('')}${b?`<td>${fmt(f.vico.nota)}${f.vico.sinJust?' <span class="chip r lnk" data-act="irvico">sin just.</span>':''}${f.vicoPend?' <span class="chip y lnk" data-act="irvico">manual</span>':''}</td>`:''}
+    <td>${(()=>{const l=`data-act="ficha" data-id="${a.id}" data-go="faltas" style="cursor:pointer"`;return (fsj?`<span class="chip r" ${l}>${fsj} sin just.</span> `:'')+(maxJ>=r.aviso_rojo?`<span class="chip r" ${l}>${maxJ} just.</span>`:maxJ>=r.aviso_amarillo?`<span class="chip y" ${l}>${maxJ} just.</span>`:maxJ?`<span class="chip" ${l}>${maxJ} just.</span>`:'')})()}</td>
+    <td><span class="nota">${fmt(f.final)}</span>${f.tope?` <span class="chip r" data-act="ficha" data-id="${a.id}" style="cursor:pointer">tope</span>`:''}</td><td>${f.final===null?'—':Math.round(f.final)+' / '+Math.floor(f.final)}</td><td>${man!==null&&man!==undefined?`<b style="color:var(--gold)">${fmt(man)}</b>`:'—'}</td></tr>`}).join('');
   return head(p)+`<div class="card scroll"><table><tr><th>Alumno/a</th><th>1ª</th><th>2ª</th><th>3ª</th>${b?'<th>Vico</th>':''}<th>Faltas</th><th>Final calculada</th><th>Redond. / trunc.</th><th>Nota manual</th></tr>${rows||'<tr><td colspan="9" class="muted">Sin alumnos.</td></tr>'}</table></div>
   <p class="muted">La nota por evaluación se corta en 10; el trabajo real aparece aparte cuando lo supera. La 3ª evaluación no se publica: se pone la nota final. Solo cuentan los días cerrados.</p>`;
 }
@@ -408,24 +445,26 @@ function vFicha(p){
   const a=DB.alumnos.find(x=>x.id===view.aid);if(!a){view.aid=null;return vEval(p)}
   const f=calcFinal(p,a),r=reglas(p),m=modoAlumno,b=p.curso==='1BACH';
   const strip=ev=>{const ss=DB.sesiones.filter(s=>s.proyecto_id===p.id&&s.evaluacion===ev&&s.cerrada&&!s.sin_clase).sort((x,y)=>x.fecha.localeCompare(y.fecha));
-    return ss.length?ss.map(s=>{const k=DB.marcas.find(x=>x.sesion_id===s.id&&x.alumno_id===a.id),c=k?k.color:'verde';return `<div title="${s.fecha}">${c==='falta'?'F':c==='falta_j'?'J':`<i class="sh c-${c}" style="--p:${pct(p,c)}%"></i>`}</div>`}).join(''):'<span class="muted">Sin días cerrados</span>'};
-  const roles=DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>(DB.roles.find(q=>q.id===x.rol_id)||{}).nombre).filter(Boolean);
-  return `<div class="row noprint" style="margin-bottom:16px"><button class="btn" data-act="back">← Volver</button><button class="btn" data-act="modo">${m?'Salir del modo alumno':'Modo enseñar al alumno'}</button><button class="btn gold" data-act="print">Imprimir ficha</button></div>
-  <div class="muted">${p.curso==='4ESO'?'4º ESO':'1º Bachillerato'} · ${esc(p.nombre)}</div><h1 style="font-size:40px;margin:4px 0 6px">${nAl(a)}</h1><div class="muted" style="margin-bottom:16px">${esc(roles.join(' · ')||'Sin roles asignados')}${esAdaptado(a)?' <span class="chip y">Nota adaptada</span>':''}</div>
+    return ss.length?ss.map(s=>{const k=DB.marcas.find(x=>x.sesion_id===s.id&&x.alumno_id===a.id),c=k?k.color:'verde';return `<div class="cell" role="link" tabindex="0" data-act="irdia2" data-f="${s.fecha}" data-k="${s.clave||'clase'}" title="Ir al ${fd(s.fecha)}">${c==='falta'?'F':c==='falta_j'?'J':`<i class="sh c-${c}" style="--p:${pct(p,c)}%"></i>`}</div>`}).join(''):'<span class="muted">Sin días cerrados</span>'};
+  const roles=DB.asignaciones.filter(x=>x.alumno_id===a.id&&asgEvs(x).includes(evR(p))).map(x=>(DB.roles.find(q=>q.id===x.rol_id)||{}).nombre).filter(Boolean);
+  return `<div class="row noprint" style="margin-bottom:16px"><button class="btn" data-act="back">← Volver</button><button class="btn" data-act="fichanav" data-d="-1">‹ Anterior</button><button class="btn" data-act="fichanav" data-d="1">Siguiente ›</button>${ES_JEFE?`<button class="btn" data-act="rolespanel" data-id="${a.id}">Cambiar roles</button>`:''}<button class="btn" data-act="modo">${m?'Salir del modo alumno':'Modo enseñar al alumno'}</button><button class="btn gold" data-act="print">Imprimir ficha</button></div>
+  <div class="muted">${p.curso==='4ESO'?'4º ESO':'1º Bachillerato'} · ${esc(p.nombre)}</div><h1 style="font-size:40px;margin:4px 0 6px">${nAl(a)}</h1><div class="muted" style="margin-bottom:16px">${esc(roles.join(' · ')||'Sin roles en la '+evR(p)+'ª evaluación')}${esAdaptado(a)?' <span class="chip y">Nota adaptada</span>':''}</div>
   ${[1,2,3].map(e=>{const x=f.ev[e-1];return `<div class="card"><div class="row" style="justify-content:space-between"><h3 style="font-size:20px">${e}ª evaluación</h3>${m?'':`<span><span class="nota">${fmt(x.nota)}</span>${x.real>10.04?` <span class="chip g">trabajo real ${fmt(x.real)}</span>`:''}</span>`}</div><div class="weeks">${strip(e)}</div>${m?'':`<div class="muted" style="font-size:13px;margin-top:8px">${x.fsj?x.fsj+' falta(s) sin justificar. ':''}${x.fj?x.fj+' justificada(s).':''}${x.pen?' Resta '+fmt(x.pen)+' al trabajo real.':''}</div>${x.fj>=r.aviso_rojo?'<div class="warn r">Aviso rojo: muchas faltas justificadas</div>':x.fj>=r.aviso_amarillo?'<div class="warn">Aviso amarillo: faltas justificadas acumuladas</div>':''}`}</div>`}).join('')}
   ${m?'':`<div class="grid2"><div class="card"><div class="muted">Nota final calculada</div><div class="big">${fmt(f.final)}</div><div class="muted" style="margin-top:6px">Redondeada ${f.final===null?'—':Math.round(f.final)} · truncada ${f.final===null?'—':Math.floor(f.final)}</div>${f.tope?`<div class="warn r">Tope de ${r.vico_tope} por no ir al Vico sin justificar. Sin tope sería ${fmt((1-r.vico_peso/100)*f.clase+r.vico_peso/100*f.vico.nota)}.</div>`:''}${f.vicoPend?'<div class="warn">Falta poner el valor manual del Vico (falta justificada).</div>':''}<div class="muted" style="font-size:13px;margin-top:6px">Media de clase ${fmt(f.clase)}${b?' · Vico '+fmt(f.vico.nota):' · bonificación Vico '+fmt(f.vico.bonus)}</div></div>
   <form data-form="manual" class="card"><h3 style="font-size:18px">Nota final manual</h3><label>Nota (vacío = usar la calculada)<input type="number" step="0.1" min="0" max="10" name="nota_manual" value="${a.nota_manual??''}"></label><label>Comentario<textarea name="comentario_manual">${esc(a.comentario_manual||'')}</textarea></label><label>Notas generales (se mantienen fijas)<textarea name="notas_privadas">${esc(a.notas_privadas||'')}</textarea></label><div><button class="btn gold">Guardar</button></div></form></div>`}`;
 }
-function rolesDeAl(a){return DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{},ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined;return {n:ro.nombre||'?',v:Number(ad?x.valor_adaptado:(ro.v1||0))*Number(x.factor??1),ad}}).sort((x,y)=>y.v-x.v)}
+function rolesDeAl(a,ev){return DB.asignaciones.filter(x=>x.alumno_id===a.id&&(!ev||asgEvs(x).includes(ev))).map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{},ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined;return {id:ro.id,n:ro.nombre||'?',v:Number(ad?x.valor_adaptado:(ro['v'+(ev||1)]||0))*Number(x.factor??1),ad}}).sort((x,y)=>y.v-x.v)}
+const segRoles=er=>`<div class="seg noprint" style="max-width:520px">${[1,2,3].map(e=>`<button class="${er===e?'on':''}" data-act="evroles" data-v="${e}">Roles de la ${e}ª</button>`).join('')}</div>`;
 function vAlumnos(p){
-  const als=alumnosDe(p);
-  return head(p)+`<div class="muted" style="margin-bottom:12px">Roles de mayor a menor valor. Pulsa un alumno para abrir su ficha.</div>`+'<div class="cards">'+(als.map(a=>{const f=calcFinal(p,a),rs=rolesDeAl(a);
-    return `<div class="al al-click" data-act="ficha" data-id="${a.id}" role="button" tabindex="0"><div class="t"><b style="font-size:16px">${nAl(a)}${esAdaptado(a)?' <span class="chip y">Nota adaptada</span>':''}</b><span class="nota" style="color:${f.final===null?'var(--mut)':f.final>=8?'var(--ok)':f.final>=5?'var(--mid)':'var(--bad)'}">${fmt(f.final)}</span></div><div>${rs.length?rs.map(x=>`<span class="rol">${esc(x.n)} <small>${fmt(x.v)}${x.ad?' · adaptado':''}</small></span>`).join(''):'<span class="chip r">Sin rol</span>'}</div></div>`}).join('')||'<div class="card muted">Añade alumnos en Configuración.</div>')+'</div>';
+  const als=alumnosDe(p),er=evR(p);
+  return head(p)+segRoles(er)+`<div class="muted" style="margin-bottom:12px">Roles de la ${er}ª evaluación, de mayor a menor valor. Pulsa un alumno para abrir su ficha${ES_JEFE?' o el lápiz para cambiar sus roles':''}.</div><div class="cards">`+(als.map(a=>{const f=calcFinal(p,a),rs=rolesDeAl(a,er);
+    return `<div class="al al-click" data-act="ficha" data-id="${a.id}" role="button" tabindex="0"><div class="t"><b style="font-size:16px">${nAl(a)}${esAdaptado(a)?' <span class="chip y">Nota adaptada</span>':''}</b><span class="row" style="gap:10px;flex-wrap:nowrap"><span class="nota" style="color:${f.final===null?'var(--mut)':f.final>=8?'var(--ok)':f.final>=5?'var(--mid)':'var(--bad)'}">${fmt(f.final)}</span>${ES_JEFE?`<button class="ib" data-act="rolespanel" data-id="${a.id}" aria-label="Cambiar roles" title="Cambiar roles">${IC.edit}</button>`:''}</span></div><div>${rs.length?rs.map(x=>`<a href="#" class="rol lnk" data-act="verrol" data-id="${x.id}">${esc(x.n)} <small>${fmt(x.v)}${x.ad?' · adaptado':''}</small></a>`).join(''):`<span class="chip r" ${ES_JEFE?`data-act="rolespanel" data-id="${a.id}" style="cursor:pointer"`:''}>Sin rol en la ${er}ª${ES_JEFE?' · añadir':''}</span>`}</div></div>`}).join('')||'<div class="card muted">Añade alumnos en Configuración.</div>')+'</div>';
 }
 function vRolesLista(p){
-  const bloques=rolesDe(p).map(r=>{const als=DB.asignaciones.filter(x=>x.rol_id===r.id).map(x=>DB.alumnos.find(a=>a.id===x.alumno_id)).filter(Boolean).sort(ordAl);
-    return als.length?`<div class="card"><h3 style="font-size:18px"><span class="rol">${esc(r.nombre)} <small>${fmt(r.v1)}</small></span></h3><div style="margin-top:8px">${als.map(a=>`<div>${nAl(a)}</div>`).join('')}</div></div>`:''}).join('');
-  return `<div class="grid2">${bloques||'<div class="card muted">Todavía no hay roles asignados.</div>'}</div>`;
+  const er=evR(p);
+  const bloques=rolesDe(p).map(r=>{const als=DB.asignaciones.filter(x=>x.rol_id===r.id&&asgEvs(x).includes(er)).map(x=>DB.alumnos.find(a=>a.id===x.alumno_id)).filter(Boolean).sort(ordAl);
+    return als.length?`<div class="card ${view.rolSel===r.id?'resalta':''}" id="rol-${r.id}"><h3 style="font-size:18px"><span class="rol">${esc(r.nombre)} <small>${fmt(r['v'+er])}</small></span></h3><div style="margin-top:8px">${als.map(a=>`<div><a href="#" class="lnk" data-act="ficha" data-id="${a.id}">${nAl(a)}</a></div>`).join('')}</div></div>`:''}).join('');
+  return segRoles(er)+`<div class="grid2" style="margin-top:12px">${bloques||'<div class="card muted">Todavía no hay roles asignados en la '+er+'ª evaluación.</div>'}</div>`;
 }
 function vNotas(p){
   if(modoAlumno)return '';
@@ -451,7 +490,7 @@ function vStats(p){
   const marcas=DB.marcas.filter(m=>ids.has(m.alumno_id)&&ses.some(s=>s.id===m.sesion_id)).length;
   const faltas=cnt.falta+cnt.falta_j;
   /* evolución por día */
-  const dia=ses.map(s=>{const v=[];als.forEach(a=>{const x=val(col(s,a));if(x!==null)v.push(x)});return {f:s.fecha,m:v.length?v.reduce((t,x)=>t+x,0)/v.length:null}});
+  const dia=ses.map(s=>{const v=[];als.forEach(a=>{const x=val(col(s,a));if(x!==null)v.push(x)});return {f:s.fecha,k:s.clave||'clase',m:v.length?v.reduce((t,x)=>t+x,0)/v.length:null}});
   const cc=m=>m>=9?'#63d08f':m>=7?'#b9e35c':m>=5?'#f2bb43':m>=3?'#f08a3c':'#ef6f6f';
   /* faltas por día de la semana */
   const dsem=[0,0,0,0,0];ses.forEach(s=>als.forEach(a=>{const c=col(s,a);if(c==='falta'||c==='falta_j'){const d=new Date(s.fecha+'T12:00:00').getDay();if(d>=1&&d<=5)dsem[d-1]++}}));
@@ -459,7 +498,7 @@ function vStats(p){
   const rach=als.map(a=>{let m=0,c=0,f=0;ses.forEach(s=>{const k=col(s,a);if(k==='verde'){c++;m=Math.max(m,c)}else c=0;if(k==='falta'||k==='falta_j')f++});return {a,m,f}});
   const topR=[...rach].sort((x,y)=>y.m-x.m).filter(x=>x.m>0).slice(0,3),sinF=rach.filter(x=>!x.f),masF=[...rach].sort((x,y)=>y.f-x.f).filter(x=>x.f>0).slice(0,3);
   /* roles */
-  const rs=rolesDe(p),asg=DB.asignaciones.filter(x=>ids.has(x.alumno_id));
+  const rs=rolesDe(p),asg=DB.asignaciones.filter(x=>ids.has(x.alumno_id)&&(ev==='all'||asgEvs(x).includes(+ev)));
   const porRol=rs.map(r=>({r,n:asg.filter(x=>x.rol_id===r.id).length}));
   const blq={};rs.forEach(r=>{const b=r.bloque||'Otros';blq[b]=blq[b]||new Set();asg.filter(x=>x.rol_id===r.id).forEach(x=>blq[b].add(x.alumno_id))});
   const bl=Object.entries(blq).map(([b,st])=>[b,st.size]).filter(x=>x[1]).sort((x,y)=>y[1]-x[1]);
@@ -467,7 +506,7 @@ function vStats(p){
   const conRol=als.filter(a=>asg.some(x=>x.alumno_id===a.id)).length;
   /* distribución de notas */
   const fin=als.map(a=>calcFinal(p,a).final).filter(x=>x!==null),B=[['Menos de 5',x=>x<5,'#ef6f6f'],['De 5 a 6,9',x=>x>=5&&x<7,'#f2bb43'],['De 7 a 8,9',x=>x>=7&&x<9,'#b9e35c'],['9 o más',x=>x>=9,'#63d08f']];
-  const nm=x=>esc(nomDe(x.a||x));
+  const nm=x=>{const a=x.a||x;return `<a href="#" class="lnk" data-act="ficha" data-id="${a.id}">${esc(nomDe(a))}</a>`};
   const rest=agenda(p).filter(d=>d.tipo==='clase'&&d.fecha>=hoy()&&!['festivo','sinclase','cerrado'].includes(estadoDe(p,d))).length;
   const media=v=>v.reduce((t,x)=>t+x,0)/v.length,sd=v=>{const m=media(v);return Math.sqrt(media(v.map(x=>(x-m)**2)))};
   const stA=als.map(a=>{const v=[];ses.forEach(s=>{const x=val(col(s,a));if(x!==null)v.push(x)});const h=Math.floor(v.length/2);
@@ -475,7 +514,7 @@ function vStats(p){
   const mx=k=>stA.filter(x=>x[k]!==null&&x[k]>0).sort((x,y)=>y[k]-x[k])[0];
   const rec=(l,v)=>`<div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)"><span>${l}</span><b style="text-align:right">${v}</b></div>`;
   const best=dia.filter(d=>d.m!==null).sort((x,y)=>y.m-x.m),rV=mx('verdes'),rF=mx('fsj'),rM=mx('mej'),rS=mx('sd');
-  const records=(rV?rec('Más días en verde',`${nm(rV)} · ${rV.verdes}`):'')+(topR[0]?rec('Mejor racha seguida',`${nm(topR[0])} · ${topR[0].m} días`):'')+(rF?rec('Más faltas sin justificar',`${nm(rF)} · ${rF.fsj}`):'')+(rM?rec('El remontador (más mejora)',`${nm(rM)} · +${fmt(rM.mej)}`):'')+(rS?rec('El de los altibajos',nm(rS)):'')+(best.length?rec('Día estrella del grupo',`${esc(best[0].f)} · ${fmt(best[0].m)}`):'')+(best.length>1?rec('Día más flojo',`${esc(best[best.length-1].f)} · ${fmt(best[best.length-1].m)}`):'');
+  const records=(rV?rec('Más días en verde',`${nm(rV)} · ${rV.verdes}`):'')+(topR[0]?rec('Mejor racha seguida',`${nm(topR[0])} · ${topR[0].m} días`):'')+(rF?rec('Más faltas sin justificar',`${nm(rF)} · ${rF.fsj}`):'')+(rM?rec('El remontador (más mejora)',`${nm(rM)} · +${fmt(rM.mej)}`):'')+(rS?rec('El de los altibajos',nm(rS)):'')+(best.length?rec('Día estrella del grupo',`<a href="#" class="lnk" data-act="irdia2" data-f="${best[0].f}" data-k="${best[0].k}">${fd(best[0].f)}</a> · ${fmt(best[0].m)}`):'')+(best.length>1?rec('Día más flojo',`<a href="#" class="lnk" data-act="irdia2" data-f="${best[best.length-1].f}" data-k="${best[best.length-1].k}">${fd(best[best.length-1].f)}</a> · ${fmt(best[best.length-1].m)}`):'');
   return head(p)+`<div class="seg noprint">${[['all','Todo el curso'],['1','1ª eval.'],['2','2ª eval.'],['3','3ª eval.']].map(([k,l])=>`<button class="${ev===k?'on':''}" data-act="stfil" data-v="${k}">${l}</button>`).join('')}<button data-act="print" style="max-width:130px">Imprimir</button></div>
   <div class="grid3" style="margin-bottom:16px">${kpi(als.length,'alumnos')}${kpi(conRol+' / '+als.length,'con rol')}${kpi(ses.length,'días de clase cerrados')}${kpi(rest,'clases por delante')}${kpi(marcas,'marcas puestas')}${kpi(faltas,'faltas')}${kpi(medio===null?'—':fmt(medio),'color medio del grupo')}</div>
   <div class="grid2">
@@ -494,9 +533,33 @@ function vStats(p){
 function vFaltas(p){
   if(modoAlumno)return '';const a=DB.alumnos.find(x=>x.id===view.aid);if(!a)return '';
   const fl=DB.marcas.filter(m=>m.alumno_id===a.id&&(m.color==='falta'||m.color==='falta_j')).map(m=>({m,s:DB.sesiones.find(x=>x.id===m.sesion_id)})).filter(x=>x.s&&!x.s.sin_clase).sort((x,y)=>y.s.fecha.localeCompare(x.s.fecha));
-  return `<div class="card noprint"><h3 style="font-size:20px;margin-bottom:6px">Faltas</h3>${fl.length?fl.map(({m,s})=>{const j=m.color==='falta_j';
+  return `<div class="card noprint" id="faltas"><h3 style="font-size:20px;margin-bottom:6px">Faltas</h3>${fl.length?fl.map(({m,s})=>{const j=m.color==='falta_j';
     return `<div class="fila"><div style="min-width:150px"><b>${fd(s.fecha)}</b><div class="muted" style="font-size:13px">${s.evaluacion}ª evaluación${s.tipo==='extra'?' · '+esc(s.nombre):''}</div></div><span class="stchip ${j?'':'fill'}" style="--k:${j?'var(--j-bg)':'var(--f-bg)'};${j?'color:var(--ink)':'color:var(--f-fg);border-color:var(--f-bd)'}">${j?'Justificada':'Sin justificar'}</span>${j?`<input style="flex:1;min-width:160px;min-height:38px" value="${esc(m.motivo||'')}" placeholder="Motivo (médico, familia…)" aria-label="Motivo" data-chg="motivo" data-id="${m.id}">`:'<span style="flex:1"></span>'}<button class="btn sm ${j?'':'gold'}" data-act="fjust" data-id="${m.id}">${j?'Quitar justificación':'Justificar'}</button></div>`}).join(''):'<span class="muted">Este alumno no tiene faltas.</span>'}</div>`;
 }
+function panelRoles(p){
+  const a=DB.alumnos.find(x=>x.id===view.panel.aid);if(!a)return '';
+  const as=DB.asignaciones.filter(x=>x.alumno_id===a.id),rs=rolesDe(p);
+  const tot=e=>fmt(rolesDeAl(a,e).reduce((t,x)=>t+x.v,0));
+  return `<div class="ov" data-act="cerrarpanel"></div><aside class="panel-roles" role="dialog" aria-modal="true" aria-label="Roles de ${esc(nomDe(a))}">
+  <div class="pr-head"><div><div class="muted" style="font-size:12px">Roles de</div><h2>${nAl(a)}</h2></div><button class="btn sm" data-act="cerrarpanel">Cerrar</button></div>
+  <div class="muted" style="font-size:13px;margin:8px 0 4px">Marca en qué evaluaciones cuenta cada rol. Las evaluaciones que no marques no cambian.</div>
+  ${as.length?as.map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{},ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined;
+    return `<div class="pr-item"><div class="row" style="justify-content:space-between"><span class="rol">${esc(ro.nombre||'?')} <small>${fmt(ad?x.valor_adaptado:ro.v1)}${ad?' · adaptado':''}</small></span><button class="btn sm red" data-act="delasg" data-id="${x.id}">Quitar</button></div>
+    <div class="fg"><label>Intensidad<select data-chg="factor" data-id="${x.id}">${[[1,'Principal ×1'],[0.6,'Secundario ×0,6'],[0.3,'Puntual ×0,3']].map(([v,l])=>`<option value="${v}" ${Number(x.factor)===v?'selected':''}>${l}</option>`).join('')}</select></label><label>Valor adaptado<input type="number" step="0.5" min="0" max="10" placeholder="como el rol" value="${ad?x.valor_adaptado:''}" data-chg="adapt" data-id="${x.id}"></label></div>${evChecks(x)}</div>`}).join(''):'<div class="chip r" style="margin:10px 0">Sin ningún rol</div>'}
+  <label style="margin-top:6px">Añadir un rol<select data-chg="addrol" data-a="${a.id}"><option value="">+ Elegir rol…</option>${rs.filter(r=>!as.some(x=>x.rol_id===r.id)).map(r=>`<option value="${r.id}">${esc(r.nombre)} (${fmt(r.v1)})</option>`).join('')}</select></label>
+  <div class="muted" style="font-size:12px;margin-top:6px">Un rol nuevo cuenta desde la evaluación actual en adelante.</div>
+  <div class="card" style="margin:16px 0 0"><b>Valor de sus roles</b><div class="muted" style="margin-top:4px">1ª: ${tot(1)} · 2ª: ${tot(2)} · 3ª: ${tot(3)}</div></div></aside>`;
+}
+function overlays(p){
+  if(!p)return '';
+  if(view.panel&&ES_JEFE)return panelRoles(p);
+  if(view.nota){const a=DB.alumnos.find(x=>x.id===view.nota.aid);if(a)return `<div class="ov" data-act="cerrarnota"></div><div class="modal" role="dialog" aria-modal="true"><h3>Nota sobre ${esc(nomDe(a))}</h3><div class="muted" style="margin-bottom:10px">Se guarda en su registro de notas con la fecha ${fd(view.nota.fecha)}.</div><form data-form="notarapida"><textarea name="texto" required placeholder="Está mirando el móvil…"></textarea><div class="row"><button class="btn gold">Guardar nota</button><button type="button" class="btn" data-act="cerrarnota">Cancelar</button></div></form></div>`}
+  if(view.buscar)return `<div class="ov" data-act="cerrarbuscar"></div><div class="modal" role="dialog" aria-modal="true" aria-label="Buscar alumno"><input id="qalumno" placeholder="Buscar alumno por nombre o número…" autocomplete="off" aria-label="Buscar alumno"><div id="bres"></div></div>`;
+  return '';
+}
+function pintaBuscar(q){const p=P(),norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),t=norm(q).trim();
+  const r=alumnosDe(p).filter(a=>!t||norm(nomDe(a)).includes(t)||String(numDe(a)||'')===t).slice(0,12);
+  $('#bres').innerHTML=r.length?r.map(a=>`<button class="btn res" data-act="ficha" data-id="${a.id}">${nAl(a)}</button>`).join(''):'<div class="muted" style="padding:10px 4px">No hay nadie con ese nombre.</div>'}
 function vArchivo(p){
   const arch=DB.proyectos.filter(x=>x.estado==='archivado');
   return head(p)+`<div class="grid2"><div class="card"><h3>Plantillas PDF</h3><p class="muted">Escaleta y guion, hoja de asistencia, coreografía, hojas técnicas, ficha de personaje, vestuario y utilería, planning de montaje. Llegarán en la siguiente fase.</p></div>
@@ -517,12 +580,13 @@ function cAlumnos(p){
   <form data-form="importar" class="card"><h3 style="font-size:18px">Pegar una lista</h3><label>Un alumno por línea. Puede empezar por su número: 1 ABELLÁN LÓPEZ, ELSA<textarea name="lista" rows="5"></textarea></label><div class="row"><button class="btn gold">Importar</button><button type="button" class="btn" data-act="normalizar">Normalizar los ya guardados</button></div></form></div>
   <div class="card scroll"><table><tr><th>Alumno/a (${als.length})</th><th>Grupo</th><th></th></tr>${als.map(a=>`<tr><td>${nAl(a)}</td><td>${esc(a.grupo||'')}</td><td><button class="btn sm red" data-act="delal" data-id="${a.id}">Borrar</button></td></tr>`).join('')}</table></div>`;
 }
+const evChecks=x=>`<span class="evck">Cuenta en ${[1,2,3].map(e=>`<label><input type="checkbox" ${asgEvs(x).includes(e)?'checked':''} data-chg="evasg" data-id="${x.id}" data-e="${e}">${e}ª</label>`).join('')}</span>`;
 function cReparto(p){
   const rs=rolesDe(p),als=alumnosDe(p),sin=als.filter(a=>!DB.asignaciones.some(x=>x.alumno_id===a.id));
   return `<div class="muted" style="margin-bottom:10px">Un alumno puede tener varios roles. La intensidad multiplica el valor del rol. Si un alumno necesita una adaptación, escribe el <b>valor adaptado</b>: ese rol contará ese valor solo para él.</div>
   ${sin.length?`<div class="warn">${sin.length} alumno(s) sin rol: ${esc(sin.map(a=>nomDe(a).split(',')[0]).join(', '))}</div>`:(als.length?'<div class="chip g" style="margin-bottom:12px">Todos los alumnos tienen rol</div>':'')}`+
   '<div class="cards">'+(als.map(a=>{const as=DB.asignaciones.filter(x=>x.alumno_id===a.id);
-    return `<div class="al ${as.length?'':'sinrol'}"><div class="t"><b style="font-size:16px">${nAl(a)}${esAdaptado(a)?' <span class="chip y">Nota adaptada</span>':''}</b>${as.length?'':'<span class="chip r">Sin rol</span>'}</div>${as.map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{},ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined;return `<div class="row" style="margin-bottom:8px"><span class="rol">${esc(ro.nombre||'?')} <small>${fmt(ad?x.valor_adaptado:ro.v1)}${ad?' · adaptado':''}</small></span><span style="flex:1"></span><input type="number" step="0.5" min="0" max="10" style="width:150px" placeholder="Valor adaptado" aria-label="Valor adaptado" value="${ad?x.valor_adaptado:''}" data-chg="adapt" data-id="${x.id}"><select style="width:170px" data-chg="factor" data-id="${x.id}">${[[1,'Principal ×1'],[0.6,'Secundario ×0,6'],[0.3,'Puntual ×0,3']].map(([v,l])=>`<option value="${v}" ${Number(x.factor)===v?'selected':''}>${l}</option>`).join('')}</select><button class="btn sm red" data-act="delasg" data-id="${x.id}">Quitar</button></div>`}).join('')}
+    return `<div class="al ${as.length?'':'sinrol'}"><div class="t"><b style="font-size:16px">${nAl(a)}${esAdaptado(a)?' <span class="chip y">Nota adaptada</span>':''}</b>${as.length?'':'<span class="chip r">Sin rol</span>'}</div>${as.map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{},ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined;return `<div class="row" style="margin-bottom:8px"><span class="rol">${esc(ro.nombre||'?')} <small>${fmt(ad?x.valor_adaptado:ro.v1)}${ad?' · adaptado':''}</small></span><span style="flex:1"></span><input type="number" step="0.5" min="0" max="10" style="width:150px" placeholder="Valor adaptado" aria-label="Valor adaptado" value="${ad?x.valor_adaptado:''}" data-chg="adapt" data-id="${x.id}">${evChecks(x)}<select style="width:170px" data-chg="factor" data-id="${x.id}">${[[1,'Principal ×1'],[0.6,'Secundario ×0,6'],[0.3,'Puntual ×0,3']].map(([v,l])=>`<option value="${v}" ${Number(x.factor)===v?'selected':''}>${l}</option>`).join('')}</select><button class="btn sm red" data-act="delasg" data-id="${x.id}">Quitar</button></div>`}).join('')}
     <select data-chg="addrol" data-a="${a.id}"><option value="">+ Añadir rol…</option>${rs.filter(r=>!as.some(x=>x.rol_id===r.id)).map(r=>`<option value="${r.id}">${esc(r.nombre)} (${fmt(r.v1)})</option>`).join('')}</select></div>`}).join('')||'<div class="card muted">Añade alumnos primero.</div>')+'</div>';
 }
 function cRoles(p){
@@ -546,7 +610,7 @@ function cHorario(p){
   const sel=(name,val,opts)=>`<select name="${name}"><option value="">—</option>${opts.map(([v,l])=>`<option value="${v}" ${String(val)===String(v)?'selected':''}>${esc(l)}</option>`).join('')}</select>`;
   const dias=[[1,'Lunes'],[2,'Martes'],[3,'Miércoles'],[4,'Jueves'],[5,'Viernes'],[6,'Sábado']];
   return `<form data-form="clases" class="card"><h3 style="font-size:18px">Días de clase</h3><div class="muted" style="margin:4px 0 10px">Elige el día y la hora de cada clase semanal. Con las fechas de inicio y fin del musical, la app genera todos tus días de clase.</div>${cl.slice(0,6).map((c,i)=>`<div class="fg" style="margin-bottom:8px"><label>Día${sel('c_d'+i,c.dia,dias)}</label><label>Hora${sel('c_h'+i,c.hora,hs.map(x=>[x.n,x.n+' ('+x.ini+'–'+x.fin+')']))}</label></div>`).join('')}<div><button class="btn gold">Guardar días de clase</button></div></form>
-  <form data-form="fechas" class="card"><h3 style="font-size:18px">Fechas</h3><div class="fg"><label>Empezar a contar clases desde<input type="date" name="desde" value="${h.desde}"></label><label>Fin de la 1ª evaluación<input type="date" name="fin1" value="${h.evals[0]||''}"></label><label>Fin de la 2ª evaluación<input type="date" name="fin2" value="${h.evals[1]||''}"></label></div><div class="muted" style="margin:8px 0">Si empiezas a usar la app a mitad de curso, pon aquí la fecha de hoy y no te pedirá los días anteriores. Si no pones las dos fechas de evaluación, se usan los meses (sept–dic, ene–mar, abr–jun).</div><div><button class="btn gold">Guardar fechas</button></div></form>
+  <form data-form="fechas" class="card"><h3 style="font-size:18px">Evaluaciones</h3><div class="muted" style="margin:4px 0 10px">Pon el <b>primer y el último día evaluable</b> de cada evaluación. Los días entre una y la siguiente (vacaciones, actividades, juegos…) no se evalúan y no aparecen en la lista de días.</div><div class="fg"><label>Empieza la 1ª<input type="date" name="desde" value="${h.desde}"></label><label>Termina la 1ª<input type="date" name="fin1" value="${h.evals[0]||''}"></label><label>Empieza la 2ª<input type="date" name="ini2" value="${h.inis[0]||''}"></label><label>Termina la 2ª<input type="date" name="fin2" value="${h.evals[1]||''}"></label><label>Empieza la 3ª<input type="date" name="ini3" value="${h.inis[1]||''}"></label><label>Termina la 3ª (fin del musical, en Datos)<input type="date" value="${p.fecha_fin||''}" disabled></label></div><div class="muted" style="margin:8px 0">Si empiezas a usar la app a mitad de curso, pon en "Empieza la 1ª" la fecha de hoy y no te pedirá los días anteriores. Si dejas vacías las fechas de fin, se usan los meses (sept–dic, ene–mar, abr–jun).</div><div><button class="btn gold">Guardar fechas</button></div></form>
   <div class="card"><h3 style="font-size:18px;margin-bottom:6px">Festivos y días sin clase</h3>${h.festivos.length?h.festivos.map((x,i)=>`<div class="fila"><span><b>${esc(x.nombre||'Festivo')}</b> · ${fd(x.ini)}${x.fin&&x.fin!==x.ini?' → '+fd(x.fin):''}</span><button class="btn sm red" style="margin-left:auto" data-act="delfest" data-i="${i}">Quitar</button></div>`).join(''):'<span class="muted">Ninguno todavía.</span>'}
   <form data-form="festivo" style="margin-top:12px"><div class="fg"><label>Nombre<input name="nombre" placeholder="Navidad"></label><label>Desde<input type="date" name="ini" required></label><label>Hasta (opcional)<input type="date" name="fin"></label></div><div><button class="btn gold">Añadir festivo</button></div></form>
   <form data-form="semana" style="margin-top:12px"><div class="fg"><label>Semana festiva: un día cualquiera de esa semana<input type="date" name="dia" required></label><label>Nombre<input name="nombre" placeholder="Semana Santa"></label></div><div><button class="btn">Añadir la semana (lunes a viernes)</button></div></form></div>
@@ -570,8 +634,8 @@ const A={
   normalizar:async()=>{const p=P(),cambios=[];alumnosDe(p).forEach(a=>{const m=a.nombre.match(/^\s*(\d+)[\s.\-]+(.+)$/),nombre=tit(m?m[2]:a.nombre),numero=m?+m[1]:(a.numero??null);if(nombre!==a.nombre||numero!==(a.numero??null))cambios.push([a.id,{nombre,numero}])});
     if(!cambios.length)return toast('Ya está todo normalizado.');if(!confirm(`Se normalizarán ${cambios.length} alumno(s): el número pasa a su casilla y el nombre a minúsculas con inicial. ¿Continuar?`))return;
     await Promise.all(cambios.map(([id,pt])=>upd('alumnos',id,pt)));toast('Listo');render()},
-  tab:el=>{avisoSinRol();view.tab=el.dataset.v;view.aid=null;view.cerrando=false;view.evTab=null;render()},
-  sub:el=>{view.sub=el.dataset.v;render()},
+  tab:el=>{avisoSinRol();view.tab=el.dataset.v;view.aid=null;view.from=null;view.cerrando=false;view.evTab=null;view.rolSel=null;view.panel=null;render()},
+  sub:el=>{view.sub=el.dataset.v;view.rolSel=null;render()},
   conf:el=>{avisoSinRol();view.conf=el.dataset.v;render()},
   open:el=>{view={...view,tab:'dia',sub:'hoy',pid:el.dataset.id,aid:null,cerrando:false,sel:null,evTab:null};render()},
   logout:async()=>{await sb.auth.signOut()},
@@ -579,7 +643,7 @@ const A={
   dia:el=>{view.sel={fecha:el.dataset.f,clave:el.dataset.k};view.evTab=null;view.cerrando=false;render()},
   completar:el=>{view.sel={fecha:el.dataset.f,clave:el.dataset.k};view.evTab=null;view.cerrando=true;render()},
   irhorario:()=>{view.tab='conf';view.conf='horario';render()},
-  evtab:el=>{const p=P(),e=+el.dataset.v,ag=agenda(p),ev=d=>d.ses?d.ses.evaluacion:evDe(p,d.fecha),lst=ag.filter(d=>ev(d)===e),hy=hoy();
+  evtab:el=>{const p=P(),e=+el.dataset.v,ag=agenda(p),lst=listaEval(p,ag,e),hy=hoy();
     const pend=lst.filter(d=>d.tipo==='clase'&&d.fecha<=hy&&['pend','curso'].includes(estadoDe(p,d))),pas=lst.filter(d=>d.fecha<=hy&&estadoDe(p,d)!=='festivo'),d=pend[0]||pas[pas.length-1]||lst.find(x=>estadoDe(p,x)!=='festivo')||lst[0];
     view.evTab=e;if(d)view.sel={fecha:d.fecha,clave:d.clave};view.cerrando=false;render()},
   mark:async el=>{const p=P(),ag=agenda(p),d=selActual(p,ag);if(!d)return;const est=estadoDe(p,d);
@@ -600,7 +664,7 @@ const A={
   sinclase:async el=>{const p=P(),f=el.dataset.f,k=el.dataset.k||'clase',s=sesDe(p,f,k),n=s?DB.marcas.filter(m=>m.sesion_id===s.id).length:0;
     if(!confirm(n?`Ese día tiene ${n} marca(s) que se borrarán. ¿Marcarlo como festivo / sin clase?`:'¿Marcar ese día como festivo / sin clase? No contará para la nota.'))return;
     if(s){if(n){const {error}=await sb.from('pe_marcas').delete().eq('sesion_id',s.id);if(error)return fail(error);DB.marcas=DB.marcas.filter(m=>m.sesion_id!==s.id)}await upd('sesiones',s.id,{sin_clase:true,cerrada:true})}
-    else await ins('sesiones',{proyecto_id:p.id,fecha:f,clave:k,tipo:'clase',nombre:'',peso:1,evaluacion:evDe(p,f),cerrada:true,sin_clase:true});
+    else await ins('sesiones',{proyecto_id:p.id,fecha:f,clave:k,tipo:'clase',nombre:'',peso:1,evaluacion:evDeSeguro(p,f),cerrada:true,sin_clase:true});
     view.sel=null;render()},
   convertir:async el=>{const s=sesDe(P(),el.dataset.f,el.dataset.k||'clase');if(s&&await del('sesiones',s.id)){view.sel={fecha:el.dataset.f,clave:el.dataset.k||'clase'};render()}},
   delextra:async el=>{if(!confirm('¿Borrar este día extra y sus marcas?'))return;const s=sesDe(P(),el.dataset.f,el.dataset.k);if(s&&await del('sesiones',s.id)){DB.marcas=DB.marcas.filter(m=>m.sesion_id!==s.id);view.sel=null;render()}},
@@ -618,8 +682,19 @@ const A={
   reabrir:async()=>{const p=P(),d=selActual(p,agenda(p));if(d&&d.ses){await upd('sesiones',d.ses.id,{cerrada:false});render()}},
   delfest:async el=>{await guardaH({festivos:horarioDe(P()).festivos.filter((_,i)=>i!==+el.dataset.i)})},
   delev:async el=>{if(confirm('¿Borrar el evento?')){await del('eventos',el.dataset.id);render()}},
-  ficha:(el,e)=>{e.preventDefault();view.aid=el.dataset.id;modoAlumno=false;window.scrollTo(0,0);render()},
-  back:()=>{view.aid=null;modoAlumno=false;render()},
+  ficha:(el,e)=>{e.preventDefault();if(!view.aid)view.from={tab:view.tab,sub:view.sub,conf:view.conf,sel:view.sel,evTab:view.evTab,evRoles:view.evRoles,y:window.scrollY};view.aid=el.dataset.id;view.buscar=false;view.panel=null;view.rolSel=null;modoAlumno=false;if(!['eval','alumnos'].includes(view.tab))view.tab='alumnos';view.go=el.dataset.go||null;window.scrollTo(0,0);render()},
+  back:()=>{const f=view.from;view.aid=null;view.from=null;modoAlumno=false;if(f){Object.assign(view,f);render();window.scrollTo(0,f.y||0)}else render()},
+  fichanav:el=>{const als=alumnosDe(P()),i=als.findIndex(a=>a.id===view.aid),n=als[(i+(+el.dataset.d)+als.length)%als.length];if(n){view.aid=n.id;window.scrollTo(0,0);render()}},
+  irdia2:el=>{view.from=null;view.aid=null;view.tab='dia';view.sub='hoy';view.sel={fecha:el.dataset.f,clave:el.dataset.k};view.evTab=null;view.cerrando=false;window.scrollTo(0,0);render()},
+  irvico:()=>{view.aid=null;view.from=null;view.tab='dia';view.sub='vico';render()},
+  verrol:el=>{view.aid=null;view.from=null;view.tab='dia';view.sub='roles';view.rolSel=el.dataset.id;view.panel=null;render()},
+  evroles:el=>{view.evRoles=+el.dataset.v;render()},
+  rolespanel:el=>{if(!ES_JEFE)return;view.panel={aid:el.dataset.id};render()},
+  cerrarpanel:()=>{view.panel=null;render()},
+  nota:el=>{const p=P(),d=selActual(p,agenda(p));view.nota={aid:el.dataset.id,fecha:d?d.fecha:hoy()};render()},
+  cerrarnota:()=>{view.nota=null;render()},
+  buscar:()=>{view.buscar=true;render()},
+  cerrarbuscar:()=>{view.buscar=false;render()},
   modo:()=>{modoAlumno=!modoAlumno;render()},
   print:()=>window.print(),
   arch:async el=>{const p=DB.proyectos.find(x=>x.id===el.dataset.id);await upd('proyectos',p.id,{estado:p.estado==='activo'?'archivado':'activo'});toast(p.estado==='archivado'?'Musical archivado':'Musical reactivado');render()},
@@ -634,16 +709,18 @@ const C={
   vman:async el=>{await upd('vico',el.dataset.id,{valor_manual:el.value===''?null:num(el.value)});render()},
   rolf:async el=>{await upd('roles',el.dataset.id,{[el.dataset.f]:el.dataset.f==='nombre'?el.value:num(el.value)})},
   factor:async el=>{await upd('asignaciones',el.dataset.id,{factor:num(el.value)});render()},
-  addrol:async el=>{if(!el.value)return;await ins('asignaciones',{proyecto_id:view.pid,alumno_id:el.dataset.a,rol_id:el.value,factor:1});render()}
+  addrol:async el=>{if(!el.value)return;await ins('asignaciones',{proyecto_id:view.pid,alumno_id:el.dataset.a,rol_id:el.value,factor:1,evals:evsDesde(P())});render()},
+  evasg:async el=>{const x=DB.asignaciones.find(q=>q.id===el.dataset.id);if(!x)return;const e=+el.dataset.e,cur=asgEvs(x),nuevo=el.checked?[...new Set([...cur,e])].sort():cur.filter(v=>v!==e);await upd('asignaciones',x.id,{evals:nuevo});render()}
 };
 const guardaH=async patch=>{const p=P(),ok=await upd('proyectos',p.id,{horario:{...(p.horario||{}),...patch}});if(ok){toast('Guardado');render()}};
 const F={
+  notarapida:async d=>{const n=view.nota;if(!n)return;if(await ins('notas',{proyecto_id:view.pid,alumno_id:n.aid,fecha:n.fecha,texto:d.texto.trim()})){view.nota=null;toast('Nota guardada en su registro');render()}},
   clases:async d=>{const cl=[];for(let i=0;i<6;i++)if(d['c_d'+i]&&d['c_h'+i])cl.push({dia:+d['c_d'+i],hora:d['c_h'+i]});await guardaH({clases:cl})},
-  fechas:async d=>guardaH({desde:d.desde||'',evals:[d.fin1||'',d.fin2||'']}),
+  fechas:async d=>guardaH({desde:d.desde||'',evals:[d.fin1||'',d.fin2||''],inis:[d.ini2||'',d.ini3||'']}),
   horas:async d=>{const hs=[];for(let i=0;i<9;i++)if(d['h_n'+i]&&d['h_i'+i]&&d['h_f'+i])hs.push({n:d['h_n'+i].trim(),ini:d['h_i'+i],fin:d['h_f'+i],recreo:!!d['h_r'+i]});if(!hs.length)return toast('Pon al menos una hora.');await guardaH({horas:hs})},
   festivo:async d=>guardaH({festivos:[...horarioDe(P()).festivos,{nombre:d.nombre||'Festivo',ini:d.ini,fin:d.fin||d.ini}]}),
   semana:async d=>{const dt=new Date(d.dia+'T12:00:00'),l=new Date(dt),v=new Date(dt);l.setDate(dt.getDate()-((dt.getDay()+6)%7));v.setDate(l.getDate()+4);const iso=x=>x.toISOString().slice(0,10);await guardaH({festivos:[...horarioDe(P()).festivos,{nombre:d.nombre||'Semana festiva',ini:iso(l),fin:iso(v)}]})},
-  extra:async d=>{const p=P(),peso=d.peso_otro?num(d.peso_otro):(num(d.peso)||1),clave='extra-'+Date.now().toString(36);const r=await ins('sesiones',{proyecto_id:p.id,fecha:d.fecha,clave,tipo:'extra',nombre:d.nombre.trim(),peso,evaluacion:evDe(p,d.fecha),cerrada:false,sin_clase:false});if(r){view.sel={fecha:d.fecha,clave};view.cerrando=false;toast('Día extra añadido');render()}},
+  extra:async d=>{const p=P(),peso=d.peso_otro?num(d.peso_otro):(num(d.peso)||1),clave='extra-'+Date.now().toString(36);const r=await ins('sesiones',{proyecto_id:p.id,fecha:d.fecha,clave,tipo:'extra',nombre:d.nombre.trim(),peso,evaluacion:evDeSeguro(p,d.fecha),cerrada:false,sin_clase:false});if(r){view.sel={fecha:d.fecha,clave};view.cerrando=false;toast('Día extra añadido');render()}},
   nuevo:async d=>{const r=await ins('proyectos',{nombre:limpia(d.nombre),curso:d.curso,optativa:d.curso==='4ESO'?'Creaciones escénico-musicales':'Música, espectáculo y comunicación',fecha_inicio:d.fecha_inicio||null,fecha_fin:d.fecha_fin||null,estado:'activo',reglas:{}});if(!r)return;await ins('roles',rolesIni(r[0].id));view={...view,tab:'conf',conf:'alumnos',pid:r[0].id};toast('Musical creado. Añade ahora los alumnos.');render()},
   datos:async d=>{if(await upd('proyectos',view.pid,{nombre:limpia(d.nombre),optativa:d.optativa,fecha_inicio:d.fecha_inicio||null,fecha_fin:d.fecha_fin||null,notas:d.notas})){toast('Guardado');render()}},
   evento:async d=>{if(await ins('eventos',{proyecto_id:view.pid,nombre:d.nombre,tipo:d.tipo,evaluacion:+d.evaluacion,fecha:d.fecha||null,sede:d.sede})){render()}},
@@ -668,6 +745,12 @@ const F={
 document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||!A[el.dataset.act])return;if(el.tagName==='A')e.preventDefault();A[el.dataset.act](el,e)});
 document.addEventListener('change',e=>{const el=e.target.closest('[data-chg]');if(el&&C[el.dataset.chg])C[el.dataset.chg](el)});
 document.addEventListener('submit',e=>{const f=e.target.closest('form[data-form]');if(!f)return;e.preventDefault();F[f.dataset.form](Object.fromEntries(new FormData(f)),f)});
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&String(e.key).toLowerCase()==='k'&&auth.user&&P()){e.preventDefault();view.buscar=true;render();return}
+  if(e.key==='Escape'&&(view.panel||view.nota||view.buscar)){view.panel=null;view.nota=null;view.buscar=false;render()}
+  if(e.key==='Enter'&&e.target&&e.target.id==='qalumno'){e.preventDefault();const b=document.querySelector('#bres button');if(b)b.click()}
+});
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='qalumno')pintaBuscar(e.target.value)});
 addEventListener('resize',()=>{if(auth.user&&view.tab==='dia'&&view.sub==='hoy'&&ventanaN()!==ventanaPrev)render()});
 init();
 </script>
