@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#171016;--card:#241a22;--line:#46364a;--ink:#f6eee3;--mut:#bfb0c2;--gold:#dcb45f;--goldbg:#dcb45f;--wine:#6e1d3a;--inp:#1b1220;--chip:#30263a;--ok:#63d08f;--mid:#f2bb43;--bad:#ef6f6f}
-body.light{--bg:#faf5ee;--card:#fffdf9;--line:#e0d3c2;--ink:#2a1b25;--mut:#6c5a66;--gold:#8a6410;--inp:#ffffff;--chip:#efe6da;--ok:#1f8f55;--mid:#a86f00;--bad:#c23b3b}
+body.light{--bg:#d9d6d2;--card:#e8e5e1;--line:#bdb8b2;--ink:#26202a;--mut:#58505a;--gold:#7a5608;--inp:#f1efec;--chip:#cdc9c4;--ok:#1c7d4c;--mid:#8f5d00;--bad:#b13434}
 body.light .c-verde{--c:#2fa968}body.light .c-lima{--c:#86ad1c}body.light .c-amarillo{--c:#d99a0b}body.light .c-naranja{--c:#e0701c}body.light .c-rojo{--c:#d9453f}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif}
@@ -55,7 +55,7 @@ th{font-size:12px;color:var(--mut);font-weight:600}
 .al .t span{font-size:13px;color:var(--mut)}
 .mk{display:grid;grid-template-columns:repeat(5,1fr) 1.5fr;gap:6px}
 .sh{display:inline-block;width:22px;height:22px;border-radius:50%;border:2px solid var(--s,var(--c));background:conic-gradient(var(--s,var(--c)) var(--p),transparent 0);flex:none}
-.c-verde{--c:#63d08f;--p:100%}.c-lima{--c:#b9e35c;--p:75%}.c-amarillo{--c:#f2bb43;--p:50%}.c-naranja{--c:#f08a3c;--p:25%}.c-rojo{--c:#ef6f6f;--p:12.5%}
+.c-verde{--c:#63d08f;--p:100%}.c-lima{--c:#b9e35c;--p:80%}.c-amarillo{--c:#f2bb43;--p:60%}.c-naranja{--c:#f08a3c;--p:40%}.c-rojo{--c:#ef6f6f;--p:20%}
 .cb{min-height:46px;border-radius:10px;border:2px solid var(--c);background:transparent;display:flex;align-items:center;justify-content:center;gap:4px;padding:0}
 .cb.on{background:var(--c)}.cb.on .sh{--s:#1b1220}
 .cb small{font-weight:700;color:var(--c)}.cb.on small{color:#1b1220}
@@ -73,6 +73,8 @@ th{font-size:12px;color:var(--mut);font-weight:600}
 .titulo{display:inline-block;border:2px solid var(--gold);border-radius:14px;padding:8px 20px;background:linear-gradient(135deg,rgba(110,29,58,.28),transparent)}
 .rol{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--goldbg);color:#241a22;font-size:13px;font-weight:700;margin:2px 4px 2px 0}.rol small{opacity:.7;font-weight:600}
 .al-click{cursor:pointer}.al-click:hover{border-color:var(--gold)}.al.sinrol{border-color:var(--bad)}
+.bar{height:12px;border-radius:6px;background:var(--chip);overflow:hidden;display:flex}.bar i{display:block;height:100%}
+.cols{display:flex;align-items:flex-end;gap:3px;height:100px;border-bottom:1px solid var(--line)}.cols div{flex:1;min-width:5px;border-radius:3px 3px 0 0}
 .login{max-width:430px;margin:50px auto;text-align:center}.login form{text-align:left}
 @media print{body{background:#fff;color:#000}.curtain,.noprint{display:none!important}.card{background:#fff;border-color:#999}.muted,th{color:#444}}
 </style>
@@ -85,6 +87,7 @@ th{font-size:12px;color:var(--mut);font-weight:600}
 addEventListener('error',e=>aviso(e.message));addEventListener('unhandledrejection',e=>aviso((e.reason&&e.reason.message)||String(e.reason)));
 function aviso(m){let b=document.getElementById('errb');if(!b){b=document.createElement('div');b.id='errb';b.className='warn r';b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99;margin:0;border-radius:0';document.body.prepend(b)}b.textContent='Error: '+m+'. Recarga la página; si persiste, avísame.'}
 document.body.classList.toggle('light',(localStorage.getItem('pe_theme')||(matchMedia('(prefers-color-scheme: light)').matches?'l':'d'))==='l');
+if(!window.supabase){document.getElementById('app').innerHTML='<div class="card"><b>No se pudo cargar la librería de Supabase.</b><p class="muted">Un bloqueador de contenido o la red lo impide. Prueba en una ventana privada o con otra conexión.</p></div>';throw new Error('Supabase no cargó')}
 /*<calc>*/
 const COLORES=['verde','lima','amarillo','naranja','rojo'];
 const REGLAS_DEF={
@@ -155,12 +158,17 @@ const evDeFecha=f=>{const m=+f.slice(5,7);return m>=9?1:m<=3?2:3};
 let auth={mode:'login',user:null},view={tab:'home',sub:'hoy',pid:null,aid:null,conf:'datos'};
 let fecha=hoy(),evalSel=evDeFecha(hoy()),verVal=localStorage.getItem('pe_ver')==='1',modoAlumno=false;
 const P=()=>DB.proyectos.find(p=>p.id===view.pid);
-const ordAl=(x,y)=>(x.numero??1e9)-(y.numero??1e9)||x.nombre.localeCompare(y.nombre,'es');
-const alumnosDe=p=>DB.alumnos.filter(a=>a.proyecto_id===p.id).sort(ordAl);
+const eMay=s=>s===s.toUpperCase()&&s!==s.toLowerCase();
 const titulo=s=>String(s).trim().toLowerCase().replace(/(^|[\s\-'’])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
+const tit=s=>eMay(s)?titulo(s):s;
+const numDe=a=>{if(a.numero!==null&&a.numero!==undefined)return a.numero;const m=String(a.nombre).match(/^\s*(\d+)[\s.\-]+/);return m?+m[1]:null};
+const nomDe=a=>tit(String(a.nombre).replace(/^\s*\d+[\s.\-]+/,'').trim());
+const pct=(p,c)=>Math.max(0,Math.min(100,Number(reglas(p).rubrica[c])*10));
+const ordAl=(x,y)=>(numDe(x)??1e9)-(numDe(y)??1e9)||nomDe(x).localeCompare(nomDe(y),'es');
+const alumnosDe=p=>DB.alumnos.filter(a=>a.proyecto_id===p.id).sort(ordAl);
 const limpia=s=>String(s||'').replace(/["“”«»]/g,'').trim();
-function parseAl(l){const m=l.match(/^\s*(\d+)[\s.\-;\t]+(.+)$/),num=m?+m[1]:null,r=(m?m[2]:l).split(/[;\t]/).map(x=>x.trim());return {numero:num,nombre:titulo(r[0]||''),grupo:r[1]||''}}
-const nAl=a=>(a.numero?a.numero+'. ':'')+esc(a.nombre);
+function parseAl(l){const m=l.match(/^\s*(\d+)[\s.\-;\t]+(.+)$/),num=m?+m[1]:null,r=(m?m[2]:l).split(/[;\t]/).map(x=>x.trim());return {numero:num,nombre:tit(r[0]||''),grupo:r[1]||''}}
+const nAl=a=>(numDe(a)?numDe(a)+'. ':'')+esc(nomDe(a));
 const rolesDe=p=>DB.roles.filter(r=>r.proyecto_id===p.id).sort((x,y)=>x.orden-y.orden);
 function toast(m,ms=3500){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',ms)}
 function fail(e){console.warn(e);const m=String(e.message||e);toast(/Load failed|Failed to fetch|NetworkError/i.test(m)?'No hay conexión con Supabase. Si usas Safari, prueba en ventana privada o desactiva extensiones y bloqueadores para esta web.':'No se pudo guardar: '+m,8000)}
@@ -175,7 +183,15 @@ async function loadData(){
   if(bad){$('#app').innerHTML=`<div class="card"><b>No se pudieron cargar los datos.</b><p class="muted">${esc(bad.error.message)}</p><p class="muted">¿Has ejecutado el archivo SQL en Supabase (y el de actualización A)?</p></div>`;return}
   keys.forEach((k,i)=>DB[k]=res[i].data||[]);
   DB.proyectos.sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||''));
-  render();
+  render();await autoNormaliza();render();
+}
+async function autoNormaliza(){
+  if(!DB.alumnos.length||!('numero' in DB.alumnos[0]))return;
+  const cambios=[];
+  DB.alumnos.forEach(a=>{if(/^\s*\d+[\s.\-]/.test(a.nombre)||eMay(a.nombre)){const nombre=nomDe(a),numero=numDe(a);if(nombre!==a.nombre||numero!==(a.numero??null))cambios.push([a.id,{nombre,numero}])}});
+  if(!cambios.length)return;
+  await Promise.all(cambios.map(([id,pt])=>upd('alumnos',id,pt)));
+  toast(cambios.length+' alumno(s) ordenados: número aparte y nombre con inicial.');
 }
 /* ---------- acceso ---------- */
 function renderLogin(msg=''){
@@ -207,7 +223,7 @@ sb.auth.onAuthStateChange((ev,s)=>{if(ev==='PASSWORD_RECOVERY'){auth.mode='reset
 /* ---------- estructura ---------- */
 function pintaBarra(){
   const p=P();let t='';
-  const tabs=p?[['dia','Día a día'],['alumnos','Alumnos'],['archivo','Archivo'],...(p.curso==='1BACH'?[['prod','Producción']]:[]),['eval','Evaluar']]:[];
+  const tabs=p?[['dia','Día a día'],['alumnos','Alumnos'],['archivo','Archivo'],...(p.curso==='1BACH'?[['prod','Producción']]:[]),['eval','Evaluar'],['stats','Estadísticas']]:[];
   t=`<div class="curtain noprint"><div class="brand"><svg width="38" height="38" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="none" stroke="#dcb45f" stroke-width="2"/><path d="M12 15q8-6 16 0v6q-8 8-16 0z" fill="#dcb45f"/><circle cx="16.5" cy="18" r="1.6" fill="#4a1228"/><circle cx="23.5" cy="18" r="1.6" fill="#4a1228"/></svg><div><b>Producciones Escénico-Musicales</b><small>by Manuel Esteve</small></div></div>
   <nav class="nav" aria-label="Secciones">${tabs.map(([k,l])=>`<button class="${view.tab===k?'on':''}" data-act="tab" data-v="${k}">${l}</button>`).join('')}
   <button class="${view.tab==='home'?'on':''}" data-act="tab" data-v="home">Mis musicales</button>
@@ -225,6 +241,7 @@ function render(){
   else if(view.tab==='prod')h=vProd(p);
   else if(view.tab==='alumnos')h=view.aid?vFicha(p)+vNotas(p):vAlumnos(p);
   else if(view.tab==='eval')h=view.aid?vFicha(p)+vNotas(p):vEval(p);
+  else if(view.tab==='stats')h=vStats(p);
   else if(view.tab==='conf')h=vConf(p);
   $('#app').innerHTML=h;window.scrollTo(0,y);
 }
@@ -245,21 +262,26 @@ function vDia(p){
 }
 function colorBtns(cur,act,extra){
   const r=reglas(P()).rubrica;
-  return `<div class="mk">${COLORES.map(c=>`<button class="cb c-${c} ${cur===c?'on':''}" data-act="${act}" data-c="${c}" ${extra} aria-label="${c}"><i class="sh"></i>${verVal?`<small>${r[c]}</small>`:''}</button>`).join('')}<button class="fb ${cur==='falta'?'on':''} ${cur==='falta_j'?'on j':''}" data-act="${act}" data-c="falta" ${extra}>${cur==='falta_j'?'Justif.':cur==='falta'?'Falta':'Falta'}</button></div>`;
+  return `<div class="mk">${COLORES.map(c=>`<button class="cb c-${c} ${cur===c?'on':''}" style="--p:${pct(P(),c)}%" data-act="${act}" data-c="${c}" ${extra} aria-label="${c}"><i class="sh"></i>${verVal?`<small>${r[c]}</small>`:''}</button>`).join('')}<button class="fb ${cur==='falta'?'on':''} ${cur==='falta_j'?'on j':''}" data-act="${act}" data-c="falta" ${extra}><i class="sh" style="--c:#9a8aa6;--p:0%;width:16px;height:16px;margin-right:6px"></i>${cur==='falta_j'?'Justif.':'Falta'}</button></div>`;
 }
 function vHoy(p){
   const als=alumnosDe(p),ses=DB.sesiones.find(s=>s.proyecto_id===p.id&&s.fecha===fecha),ev=ses?ses.evaluacion:evalSel;
   const marks=ses?DB.marcas.filter(m=>m.sesion_id===ses.id):[];
-  const sinCerrar=DB.sesiones.filter(s=>s.proyecto_id===p.id&&!s.cerrada&&s.fecha!==fecha).length;
-  return `<div class="phone"><div class="row" style="justify-content:space-between"><label style="flex:1">Fecha<input type="date" value="${fecha}" data-chg="fecha"></label></div>
-  <div class="seg">${[1,2,3].map(e=>`<button class="${ev===e?'on':''}" data-act="evsel" data-v="${e}">${e}ª eval.</button>`).join('')}</div>
-  <div class="muted row" style="justify-content:space-between;margin-bottom:10px"><span>Sin marca = verde</span><b style="color:var(--gold)">${marks.length} marcas</b></div>
-  ${sinCerrar?`<div class="warn">Tienes ${sinCerrar} día(s) anteriores sin cerrar. No cuentan para la nota hasta cerrarlos.</div>`:''}
-  ${ses&&ses.cerrada?'<div class="warn">Día cerrado. <button class="btn sm" data-act="reabrir">Reabrir</button></div>':''}
-  ${als.length?als.map(a=>{const m=marks.find(x=>x.alumno_id===a.id),c=calcEval(p,a,ev),rl=DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>(DB.roles.find(q=>q.id===x.rol_id)||{}).nombre).filter(Boolean).join(' + '),r=reglas(p);
+  const pend=als.filter(a=>!marks.some(m=>m.alumno_id===a.id));
+  const cab=`<label>Fecha<input type="date" value="${fecha}" data-chg="fecha"></label>
+  <div class="seg">${[1,2,3].map(e=>`<button class="${ev===e?'on':''}" data-act="evsel" data-v="${e}">${e}ª eval.</button>`).join('')}</div>`;
+  const atras=DB.sesiones.filter(s=>s.proyecto_id===p.id&&!s.cerrada&&s.fecha<fecha).sort((x,y)=>x.fecha.localeCompare(y.fecha));
+  if(atras.length)return `<div class="phone">${cab}<div class="warn r">Antes de evaluar el ${esc(fecha)}, completa los días que dejaste sin cerrar.</div>${atras.map(s=>{const n=als.filter(a=>!DB.marcas.some(m=>m.sesion_id===s.id&&m.alumno_id===a.id)).length;
+    return `<div class="card"><b>${esc(s.fecha)}</b> · faltan ${n} alumno(s) por marcar<div class="row" style="margin-top:10px"><button class="btn gold" data-act="irdia" data-f="${s.fecha}">Completar ese día</button><button class="btn red" data-act="sinclase" data-id="${s.id}">No hubo clase</button></div></div>`}).join('')}</div>`;
+  const cerrada=!!(ses&&ses.cerrada),cierre=!!view.cerrando&&!cerrada,lista=cierre?pend:als;
+  return `<div class="phone">${cab}
+  <div class="muted row" style="justify-content:space-between;margin-bottom:10px"><span>${cerrada?'Día cerrado':'Marca a todos para poder cerrar el día'}</span><b style="color:var(--gold)">${als.length-pend.length} de ${als.length} marcados</b></div>
+  ${cerrada?'<div class="warn">Día cerrado. <button class="btn sm" data-act="reabrir">Reabrir</button></div>':''}
+  ${cierre?(pend.length?`<div class="warn r">Faltan ${pend.length} alumno(s) por marcar. El día no se cierra hasta que todos tengan su marca.</div>`:'<div class="warn" style="background:var(--ok);color:#fff">Todos los alumnos tienen marca. Ya puedes cerrar el día.</div>'):''}
+  ${lista.length?lista.map(a=>{const m=marks.find(x=>x.alumno_id===a.id),c=calcEval(p,a,ev),rl=DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>(DB.roles.find(q=>q.id===x.rol_id)||{}).nombre).filter(Boolean).join(' + '),r=reglas(p);
     const av=c.fj>=r.aviso_rojo?'<span class="chip r">'+c.fj+' justif.</span>':c.fj>=r.aviso_amarillo?'<span class="chip y">'+c.fj+' justif.</span>':'';
-    return `<div class="al"><div class="t"><b>${nAl(a)} ${av}</b><span>${esc(rl||'sin rol')}</span></div>${colorBtns(m?m.color:null,'mark',`data-a="${a.id}"`)}</div>`}).join(''):'<div class="card muted">Añade alumnos en Configuración.</div>'}
-  ${als.length?'<button class="btn gold" style="width:100%;margin-top:8px" data-act="cerrar">Cerrar el día</button>':''}</div>`;
+    return `<div class="al ${!m&&!cerrada?'sinrol':''}"><div class="t"><b>${nAl(a)} ${av}</b><span>${esc(rl||'sin rol')}</span></div>${colorBtns(m?m.color:null,'mark',`data-a="${a.id}"`)}</div>`}).join(''):(als.length?'':'<div class="card muted">Añade alumnos en Configuración.</div>')}
+  ${als.length?`<div class="row" style="margin-top:8px">${cierre?'<button class="btn" style="flex:1" data-act="vertodos">Ver todos</button>':''}${cerrada?'':'<button class="btn gold" style="flex:1" data-act="cerrar">Cerrar el día</button>'}</div>`:''}</div>`;
 }
 function vEventos(p){
   const evs=DB.eventos.filter(e=>e.proyecto_id===p.id).sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
@@ -269,7 +291,7 @@ function vEventos(p){
 function vVico(p){
   const als=alumnosDe(p),b4=p.curso==='4ESO',r=reglas(p);
   return `<div class="card muted">${b4?'Montaje en el Teatro Vico: cada función da una bonificación en la 3ª evaluación (verde +'+r.bonus.verde+', lima +'+r.bonus.lima+', amarillo +'+r.bonus.amarillo+', naranja +'+r.bonus.naranja+', rojo +'+r.bonus.rojo+'). La media de las dos funciones se suma a la nota.':'Actuación en el Teatro Vico: pesa un '+r.vico_peso+' % de la nota final. Falta sin justificar = 0 y tope de '+r.vico_tope+(r.vico_tope_activo?'':' (desactivado)')+'. Falta justificada: pones tú el valor.'}</div>
-  ${als.map(a=>{const c=calcVico(p,a);return `<div class="al"><div class="t"><b>${esc(a.nombre)}</b><span>${b4?'bonificación '+fmt(c.bonus):'nota Vico '+fmt(c.nota)}${c.sinJust?' · <span class="chip r">sin justificar</span>':''}${c.pend?' · <span class="chip y">falta valor manual</span>':''}</span></div>
+  ${als.map(a=>{const c=calcVico(p,a);return `<div class="al"><div class="t"><b>${nAl(a)}</b><span>${b4?'bonificación '+fmt(c.bonus):'nota Vico '+fmt(c.nota)}${c.sinJust?' · <span class="chip r">sin justificar</span>':''}${c.pend?' · <span class="chip y">falta valor manual</span>':''}</span></div>
   ${[1,2].map(f=>{const x=DB.vico.find(v=>v.alumno_id===a.id&&v.funcion===f);return `<div style="margin-bottom:8px"><div class="muted" style="font-size:12px;margin-bottom:4px">Función ${f}</div>${colorBtns(x?x.color:null,'vmark',`data-a="${a.id}" data-f="${f}"`)}${x&&x.color==='falta_j'&&!b4?`<label style="margin-top:6px">Valor manual (0-10) por falta justificada<input type="number" min="0" max="10" step="0.1" value="${x.valor_manual??''}" data-chg="vman" data-id="${x.id}"></label>`:''}</div>`}).join('')}</div>`}).join('')||'<div class="card muted">Sin alumnos.</div>'}`;
 }
 function vEval(p){
@@ -287,7 +309,7 @@ function vFicha(p){
   const a=DB.alumnos.find(x=>x.id===view.aid);if(!a){view.aid=null;return vEval(p)}
   const f=calcFinal(p,a),r=reglas(p),m=modoAlumno,b=p.curso==='1BACH';
   const strip=ev=>{const ss=DB.sesiones.filter(s=>s.proyecto_id===p.id&&s.evaluacion===ev&&s.cerrada).sort((x,y)=>x.fecha.localeCompare(y.fecha));
-    return ss.length?ss.map(s=>{const k=DB.marcas.find(x=>x.sesion_id===s.id&&x.alumno_id===a.id),c=k?k.color:'verde';return `<div title="${s.fecha}">${c==='falta'?'F':c==='falta_j'?'J':`<i class="sh c-${c}"></i>`}</div>`}).join(''):'<span class="muted">Sin días cerrados</span>'};
+    return ss.length?ss.map(s=>{const k=DB.marcas.find(x=>x.sesion_id===s.id&&x.alumno_id===a.id),c=k?k.color:'verde';return `<div title="${s.fecha}">${c==='falta'?'F':c==='falta_j'?'J':`<i class="sh c-${c}" style="--p:${pct(p,c)}%"></i>`}</div>`}).join(''):'<span class="muted">Sin días cerrados</span>'};
   const roles=DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>(DB.roles.find(q=>q.id===x.rol_id)||{}).nombre).filter(Boolean);
   return `<div class="row noprint" style="margin-bottom:16px"><button class="btn" data-act="back">← Volver</button><button class="btn" data-act="modo">${m?'Salir del modo alumno':'Modo enseñar al alumno'}</button><button class="btn gold" data-act="print">Imprimir ficha</button></div>
   <div class="muted">${p.curso==='4ESO'?'4º ESO':'1º Bachillerato'} · ${esc(p.nombre)}</div><h1 style="font-size:40px;margin:4px 0 6px">${nAl(a)}</h1><div class="muted" style="margin-bottom:16px">${esc(roles.join(' · ')||'Sin roles asignados')}</div>
@@ -313,11 +335,67 @@ function vNotas(p){
   <form data-form="nota"><div class="fg"><label>Fecha<input type="date" name="fecha" value="${hoy()}"></label></div><label>Anotación<textarea name="texto" required placeholder="Se ha esforzado mucho en el baile…"></textarea></label><div><button class="btn gold">Añadir al registro</button></div></form>
   <div style="margin-top:14px">${ns.length?ns.map(n=>`<div class="line" style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)"><div><b>${esc(n.fecha||'')}</b><div>${esc(n.texto)}</div></div><button class="btn sm red" data-act="delnota" data-id="${n.id}">Borrar</button></div>`).join(''):'<span class="muted">Todavía no hay anotaciones.</span>'}</div></div>`;
 }
+function vStats(p){
+  const r=reglas(p),als=alumnosDe(p),ev=view.stEv||'all',ids=new Set(als.map(a=>a.id));
+  const ses=DB.sesiones.filter(s=>s.proyecto_id===p.id&&s.cerrada&&(ev==='all'||s.evaluacion===+ev)).sort((x,y)=>x.fecha.localeCompare(y.fecha));
+  const col=(s,a)=>{const m=DB.marcas.find(x=>x.sesion_id===s.id&&x.alumno_id===a.id);return m?m.color:'verde'};
+  const val=c=>c==='falta'?(r.falta_sj_cuenta_cero?0:null):c==='falta_j'?null:Number(r.rubrica[c]);
+  const cnt={verde:0,lima:0,amarillo:0,naranja:0,rojo:0,falta:0,falta_j:0};
+  ses.forEach(s=>als.forEach(a=>cnt[col(s,a)]++));
+  const total=ses.length*als.length,pc=n=>total?Math.round(n*1000/total)/10:0;
+  const sec=(t,h)=>`<div class="card" style="margin:0"><h3 style="font-size:19px;margin-bottom:10px">${t}</h3>${h}</div>`;
+  const kpi=(n,l)=>`<div class="card" style="text-align:center;margin:0"><div class="big">${n}</div><div class="muted">${l}</div></div>`;
+  const bar=(l,n,max,c)=>`<div style="margin:7px 0"><div class="row" style="justify-content:space-between;font-size:13px"><span>${l}</span><b>${n}</b></div><div class="bar"><i style="width:${max?n*100/max:0}%;background:${c}"></i></div></div>`;
+  const vacio='<span class="muted">Se rellenará cuando cierres días de clase.</span>';
+  const vals=[];ses.forEach(s=>als.forEach(a=>{const v=val(col(s,a));if(v!==null)vals.push(v)}));
+  const medio=vals.length?vals.reduce((t,v)=>t+v,0)/vals.length:null;
+  const marcas=DB.marcas.filter(m=>ids.has(m.alumno_id)&&ses.some(s=>s.id===m.sesion_id)).length;
+  const faltas=cnt.falta+cnt.falta_j;
+  /* evolución por día */
+  const dia=ses.map(s=>{const v=[];als.forEach(a=>{const x=val(col(s,a));if(x!==null)v.push(x)});return {f:s.fecha,m:v.length?v.reduce((t,x)=>t+x,0)/v.length:null}});
+  const cc=m=>m>=9?'#63d08f':m>=7?'#b9e35c':m>=5?'#f2bb43':m>=3?'#f08a3c':'#ef6f6f';
+  /* faltas por día de la semana */
+  const dsem=[0,0,0,0,0];ses.forEach(s=>als.forEach(a=>{const c=col(s,a);if(c==='falta'||c==='falta_j'){const d=new Date(s.fecha+'T12:00:00').getDay();if(d>=1&&d<=5)dsem[d-1]++}}));
+  /* rachas y faltas por alumno */
+  const rach=als.map(a=>{let m=0,c=0,f=0;ses.forEach(s=>{const k=col(s,a);if(k==='verde'){c++;m=Math.max(m,c)}else c=0;if(k==='falta'||k==='falta_j')f++});return {a,m,f}});
+  const topR=[...rach].sort((x,y)=>y.m-x.m).filter(x=>x.m>0).slice(0,3),sinF=rach.filter(x=>!x.f),masF=[...rach].sort((x,y)=>y.f-x.f).filter(x=>x.f>0).slice(0,3);
+  /* roles */
+  const rs=rolesDe(p),asg=DB.asignaciones.filter(x=>ids.has(x.alumno_id));
+  const porRol=rs.map(r=>({r,n:asg.filter(x=>x.rol_id===r.id).length}));
+  const blq={};rs.forEach(r=>{const b=r.bloque||'Otros';blq[b]=blq[b]||new Set();asg.filter(x=>x.rol_id===r.id).forEach(x=>blq[b].add(x.alumno_id))});
+  const bl=Object.entries(blq).map(([b,st])=>[b,st.size]).filter(x=>x[1]).sort((x,y)=>y[1]-x[1]);
+  const multi=als.map(a=>({a,rs:rolesDeAl(a)})).filter(x=>x.rs.length>1).sort((x,y)=>y.rs.length-x.rs.length||y.rs.reduce((t,q)=>t+q.v,0)-x.rs.reduce((t,q)=>t+q.v,0)).slice(0,3);
+  const conRol=als.filter(a=>asg.some(x=>x.alumno_id===a.id)).length;
+  /* distribución de notas */
+  const fin=als.map(a=>calcFinal(p,a).final).filter(x=>x!==null),B=[['Menos de 5',x=>x<5,'#ef6f6f'],['De 5 a 6,9',x=>x>=5&&x<7,'#f2bb43'],['De 7 a 8,9',x=>x>=7&&x<9,'#b9e35c'],['9 o más',x=>x>=9,'#63d08f']];
+  const nm=x=>esc(nomDe(x.a||x));
+  const media=v=>v.reduce((t,x)=>t+x,0)/v.length,sd=v=>{const m=media(v);return Math.sqrt(media(v.map(x=>(x-m)**2)))};
+  const stA=als.map(a=>{const v=[];ses.forEach(s=>{const x=val(col(s,a));if(x!==null)v.push(x)});const h=Math.floor(v.length/2);
+    return {a,verdes:ses.filter(s=>col(s,a)==='verde').length,fsj:ses.filter(s=>col(s,a)==='falta').length,mej:v.length>=4?media(v.slice(h))-media(v.slice(0,h)):null,sd:v.length>=3?sd(v):null}});
+  const mx=k=>stA.filter(x=>x[k]!==null&&x[k]>0).sort((x,y)=>y[k]-x[k])[0];
+  const rec=(l,v)=>`<div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)"><span>${l}</span><b style="text-align:right">${v}</b></div>`;
+  const best=dia.filter(d=>d.m!==null).sort((x,y)=>y.m-x.m),rV=mx('verdes'),rF=mx('fsj'),rM=mx('mej'),rS=mx('sd');
+  const records=(rV?rec('Más días en verde',`${nm(rV)} · ${rV.verdes}`):'')+(topR[0]?rec('Mejor racha seguida',`${nm(topR[0])} · ${topR[0].m} días`):'')+(rF?rec('Más faltas sin justificar',`${nm(rF)} · ${rF.fsj}`):'')+(rM?rec('El remontador (más mejora)',`${nm(rM)} · +${fmt(rM.mej)}`):'')+(rS?rec('El de los altibajos',nm(rS)):'')+(best.length?rec('Día estrella del grupo',`${esc(best[0].f)} · ${fmt(best[0].m)}`):'')+(best.length>1?rec('Día más flojo',`${esc(best[best.length-1].f)} · ${fmt(best[best.length-1].m)}`):'');
+  return head(p)+`<div class="seg noprint">${[['all','Todo el curso'],['1','1ª eval.'],['2','2ª eval.'],['3','3ª eval.']].map(([k,l])=>`<button class="${ev===k?'on':''}" data-act="stfil" data-v="${k}">${l}</button>`).join('')}<button data-act="print" style="max-width:130px">Imprimir</button></div>
+  <div class="grid3" style="margin-bottom:16px">${kpi(als.length,'alumnos')}${kpi(conRol+' / '+als.length,'con rol')}${kpi(ses.length,'días de clase cerrados')}${kpi(marcas,'marcas puestas')}${kpi(faltas,'faltas')}${kpi(medio===null?'—':fmt(medio),'color medio del grupo')}</div>
+  <div class="grid2">
+  ${sec('Colores del grupo',ses.length?`<div class="bar" style="height:20px;margin-bottom:10px">${COLORES.map(c=>`<i class="c-${c}" style="width:${pc(cnt[c])}%;background:var(--c)"></i>`).join('')}<i style="width:${pc(faltas)}%;background:var(--mut)"></i></div><div class="row">${COLORES.map(c=>`<span class="chip"><i class="sh c-${c}" style="--p:${pct(p,c)}%;width:12px;height:12px;vertical-align:-1px"></i> ${pc(cnt[c])} %</span>`).join('')}<span class="chip">Faltas ${pc(faltas)} %</span></div>`:vacio)}
+  ${sec('Evolución del grupo por día',ses.length?`<div class="cols">${dia.map(d=>`<div title="${d.f}: ${d.m===null?'—':fmt(d.m)}" style="height:${d.m===null?0:Math.max(4,d.m*10)}%;background:${d.m===null?'transparent':cc(d.m)}"></div>`).join('')}</div><div class="row muted" style="justify-content:space-between;font-size:12px;margin-top:4px"><span>${esc(dia[0].f)}</span><span>${esc(dia[dia.length-1].f)}</span></div>`:vacio)}
+  ${sec('Asistencia',ses.length?`<div class="big" style="margin-bottom:6px">${fmt(100-pc(faltas))} %</div><div class="muted" style="margin-bottom:8px">de asistencia del grupo</div>${sinF.length?`<div style="margin-bottom:8px"><b>Sin ninguna falta (${sinF.length}):</b> ${sinF.slice(0,8).map(nm).join(' · ')}${sinF.length>8?' …':''}</div>`:''}${masF.length?`<div><b>Con más faltas:</b> ${masF.map(x=>nm(x)+' ('+x.f+')').join(' · ')}</div>`:''}`:vacio)}
+  ${sec('Faltas por día de la semana',ses.length&&faltas?['Lunes','Martes','Miércoles','Jueves','Viernes'].map((d,i)=>bar(d,dsem[i],Math.max(...dsem),'var(--bad)')).join(''):(ses.length?'<span class="muted">Ninguna falta registrada.</span>':vacio))}
+  ${sec('Racha de oro (días seguidos en verde)',topR.length?topR.map((x,i)=>`<div class="row" style="justify-content:space-between;padding:4px 0"><span>${['1.º','2.º','3.º'][i]} ${nm(x)}</span><b>${x.m} días</b></div>`).join(''):vacio)}
+  ${sec('Récords de la clase',ses.length?(records||'<span class="muted">Aún no hay suficientes datos.</span>'):vacio)}
+  ${sec('Reparto por bloque',bl.length?bl.map(([b,n])=>bar(esc(b),n,als.length||1,'var(--gold)')).join(''):'<span class="muted">Aún no hay roles repartidos.</span>')}
+  ${sec('Roles más repartidos',(()=>{const t=[...porRol].filter(x=>x.n).sort((x,y)=>y.n-x.n).slice(0,5),v=porRol.filter(x=>!x.n&&!x.r.es_libre);return (t.length?t.map(x=>bar(esc(x.r.nombre),x.n,t[0].n,'var(--gold)')).join(''):'<span class="muted">Aún no hay roles repartidos.</span>')+(v.length?`<div style="margin-top:10px"><b>Sin cubrir:</b> ${v.map(x=>`<span class="chip">${esc(x.r.nombre)}</span>`).join(' ')}</div>`:'')})())}
+  ${sec('Los multiusos (más roles)',multi.length?multi.map(x=>`<div style="padding:6px 0"><b>${nm(x)}</b> · ${x.rs.length} roles<div>${x.rs.map(q=>`<span class="rol">${esc(q.n)}</span>`).join('')}</div></div>`).join(''):'<span class="muted">Nadie tiene más de un rol todavía.</span>')}
+  ${sec('Distribución de notas calculadas',fin.length?B.map(([l,fn,c])=>bar(l,fin.filter(fn).length,fin.length,c)).join(''):vacio)}
+  </div><p class="muted" style="margin-top:14px">Las estadísticas usan solo los días de clase cerrados.</p>`;
+}
 function vArchivo(p){
   const arch=DB.proyectos.filter(x=>x.estado==='archivado');
   return head(p)+`<div class="grid2"><div class="card"><h3>Plantillas PDF</h3><p class="muted">Escaleta y guion, hoja de asistencia, coreografía, hojas técnicas, ficha de personaje, vestuario y utilería, planning de montaje. Llegarán en la siguiente fase.</p></div>
   <div class="card"><h3>Este musical</h3><p class="muted">Archivar lo deja en solo historial.</p><div class="row"><button class="btn" data-act="arch" data-id="${p.id}">${p.estado==='activo'?'Archivar':'Reactivar'}</button></div></div></div>
-  ${p.curso==='4ESO'?`<details class="card"><summary style="cursor:pointer;font-weight:600;color:var(--gold)">Crear Bachillerato a partir de este musical</summary><form data-form="derivar" style="margin-top:12px"><label>Nombre del nuevo proyecto<input name="nombre" value="${esc(p.nombre)} (1º Bachillerato)" required></label><div class="muted">Alumnos que continúan:</div>${alumnosDe(p).map(a=>`<label style="flex-direction:row;align-items:center;gap:10px;color:var(--ink)"><input type="checkbox" name="al" value="${a.id}" checked style="width:auto;min-height:0"> ${esc(a.nombre)}</label>`).join('')}<div><button class="btn gold">Crear proyecto de Bachillerato</button></div></form></details>`:''}
+  ${p.curso==='4ESO'?`<details class="card"><summary style="cursor:pointer;font-weight:600;color:var(--gold)">Crear Bachillerato a partir de este musical</summary><form data-form="derivar" style="margin-top:12px"><label>Nombre del nuevo proyecto<input name="nombre" value="${esc(p.nombre)} (1º Bachillerato)" required></label><div class="muted">Alumnos que continúan:</div>${alumnosDe(p).map(a=>`<label style="flex-direction:row;align-items:center;gap:10px;color:var(--ink)"><input type="checkbox" name="al" value="${a.id}" checked style="width:auto;min-height:0"> ${nAl(a)}</label>`).join('')}<div><button class="btn gold">Crear proyecto de Bachillerato</button></div></form></details>`:''}
   <div class="card"><h3 style="margin-bottom:8px">Historial de musicales archivados</h3>${arch.length?arch.map(x=>`<div class="row" style="justify-content:space-between;padding:6px 0"><span>${esc(x.nombre)} <span class="muted">· ${x.curso==='4ESO'?'4º ESO':'1º Bach.'}</span></span><button class="btn sm" data-act="open" data-id="${x.id}">Abrir</button></div>`).join(''):'<span class="muted">Ninguno todavía.</span>'}</div>`;
 }
 function vProd(p){
@@ -336,7 +414,7 @@ function cAlumnos(p){
 function cReparto(p){
   const rs=rolesDe(p),als=alumnosDe(p),sin=als.filter(a=>!DB.asignaciones.some(x=>x.alumno_id===a.id));
   return `<div class="muted" style="margin-bottom:10px">Un alumno puede tener varios roles. La intensidad multiplica el valor del rol.</div>
-  ${sin.length?`<div class="warn">${sin.length} alumno(s) sin rol: ${esc(sin.map(a=>a.nombre.split(',')[0]).join(', '))}</div>`:(als.length?'<div class="chip g" style="margin-bottom:12px">Todos los alumnos tienen rol</div>':'')}`+
+  ${sin.length?`<div class="warn">${sin.length} alumno(s) sin rol: ${esc(sin.map(a=>nomDe(a).split(',')[0]).join(', '))}</div>`:(als.length?'<div class="chip g" style="margin-bottom:12px">Todos los alumnos tienen rol</div>':'')}`+
   als.map(a=>{const as=DB.asignaciones.filter(x=>x.alumno_id===a.id);
     return `<div class="al ${as.length?'':'sinrol'}"><div class="t"><b style="font-size:16px">${nAl(a)}</b>${as.length?'':'<span class="chip r">Sin rol</span>'}</div>${as.map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{};return `<div class="row" style="margin-bottom:6px"><span class="rol">${esc(ro.nombre||'?')} <small>${fmt(ro.v1)}</small></span><span style="flex:1"></span><select style="width:170px" data-chg="factor" data-id="${x.id}">${[[1,'Principal ×1'],[0.6,'Secundario ×0,6'],[0.3,'Puntual ×0,3']].map(([v,l])=>`<option value="${v}" ${Number(x.factor)===v?'selected':''}>${l}</option>`).join('')}</select><button class="btn sm red" data-act="delasg" data-id="${x.id}">Quitar</button></div>`}).join('')}
     <select data-chg="addrol" data-a="${a.id}"><option value="">+ Añadir rol…</option>${rs.filter(r=>!as.some(x=>x.rol_id===r.id)).map(r=>`<option value="${r.id}">${esc(r.nombre)} (${fmt(r.v1)})</option>`).join('')}</select></div>`}).join('')||'<div class="card muted">Añade alumnos primero.</div>';
@@ -349,7 +427,7 @@ function cRoles(p){
 function cReglas(p){
   const r=reglas(p),e=r.escala_just;
   const n=(name,l,v,st='0.1')=>`<label>${l}<input type="number" step="${st}" name="${name}" value="${v}"></label>`;
-  return `<form data-form="reglas" class="card"><h3 style="margin-bottom:10px">Rúbrica de colores (solo la ves tú)</h3><div class="fg">${COLORES.map(c=>`<label><span class="row"><i class="sh c-${c}"></i> ${c}</span><input type="number" step="0.5" name="rub_${c}" value="${r.rubrica[c]}"></label>`).join('')}</div>
+  return `<form data-form="reglas" class="card"><h3 style="margin-bottom:10px">Rúbrica de colores (solo la ves tú)</h3><div class="fg">${COLORES.map(c=>`<label><span class="row"><i class="sh c-${c}" style="--p:${pct(p,c)}%"></i> ${c}</span><input type="number" step="0.5" name="rub_${c}" value="${r.rubrica[c]}"></label>`).join('')}</div>
   <h3 style="margin:16px 0 10px">Peso de cada evaluación (%)</h3><div class="fg">${n('pe0','1ª',r.pesos_eval[0],'1')}${n('pe1','2ª',r.pesos_eval[1],'1')}${n('pe2','3ª (final)',r.pesos_eval[2],'1')}</div>
   <h3 style="margin:16px 0 10px">Faltas</h3><div class="fg">${n('sj_resta','Resta por falta sin justificar',r.falta_sj_resta)}<label style="flex-direction:row;align-items:center;gap:10px;color:var(--ink)"><input type="checkbox" name="sj_cero" ${r.falta_sj_cuenta_cero?'checked':''} style="width:auto;min-height:0"> La falta sin justificar cuenta como 0 en la media</label>${[3,4,5,6,7].map(i=>n('j'+i,'Resta con '+i+' justificadas',e[i])).join('')}${n('mas_j','Cada justificada más',r.mas_just_resta)}${n('av_a','Aviso amarillo desde',r.aviso_amarillo,'1')}${n('av_r','Aviso rojo desde',r.aviso_rojo,'1')}</div>
   <h3 style="margin:16px 0 10px">Teatro Vico</h3><div class="fg">${n('v_peso','Peso en la nota final de Bachillerato (%)',r.vico_peso,'1')}${n('v_tope','Tope si no va sin justificar',r.vico_tope)}<label style="flex-direction:row;align-items:center;gap:10px;color:var(--ink)"><input type="checkbox" name="v_tope_on" ${r.vico_tope_activo?'checked':''} style="width:auto;min-height:0"> Tope activo</label></div>
@@ -370,15 +448,16 @@ async function sesionDe(p){let s=DB.sesiones.find(x=>x.proyecto_id===p.id&&x.fec
 const nextColor=(cur,c)=>c==='falta'?(cur==='falta'?'falta_j':cur==='falta_j'?null:'falta'):(cur===c?null:c);
 function avisoSinRol(){if(view.tab!=='conf'||view.conf!=='reparto')return;const p=P();if(!p)return;const n=alumnosDe(p).filter(a=>!DB.asignaciones.some(x=>x.alumno_id===a.id)).length;if(n)toast(n+' alumno(s) siguen sin rol. Puedes dejarlo así o volver a Reparto de roles.',6000)}
 const A={
+  stfil:el=>{view.stEv=el.dataset.v;render()},
   tema:()=>{const l=!document.body.classList.contains('light');document.body.classList.toggle('light',l);localStorage.setItem('pe_theme',l?'l':'d');render()},
   delnota:async el=>{if(confirm('¿Borrar esta anotación?')){await del('notas',el.dataset.id);render()}},
-  normalizar:async()=>{const p=P(),cambios=[];alumnosDe(p).forEach(a=>{const m=a.nombre.match(/^\s*(\d+)[\s.\-]+(.+)$/),nombre=titulo(m?m[2]:a.nombre),numero=m?+m[1]:(a.numero??null);if(nombre!==a.nombre||numero!==(a.numero??null))cambios.push([a.id,{nombre,numero}])});
+  normalizar:async()=>{const p=P(),cambios=[];alumnosDe(p).forEach(a=>{const m=a.nombre.match(/^\s*(\d+)[\s.\-]+(.+)$/),nombre=tit(m?m[2]:a.nombre),numero=m?+m[1]:(a.numero??null);if(nombre!==a.nombre||numero!==(a.numero??null))cambios.push([a.id,{nombre,numero}])});
     if(!cambios.length)return toast('Ya está todo normalizado.');if(!confirm(`Se normalizarán ${cambios.length} alumno(s): el número pasa a su casilla y el nombre a minúsculas con inicial. ¿Continuar?`))return;
     await Promise.all(cambios.map(([id,pt])=>upd('alumnos',id,pt)));toast('Listo');render()},
-  tab:el=>{avisoSinRol();view.tab=el.dataset.v;view.aid=null;render()},
+  tab:el=>{avisoSinRol();view.tab=el.dataset.v;view.aid=null;view.cerrando=false;render()},
   sub:el=>{view.sub=el.dataset.v;render()},
   conf:el=>{avisoSinRol();view.conf=el.dataset.v;render()},
-  open:el=>{view={...view,tab:'dia',sub:'hoy',pid:el.dataset.id,aid:null};render()},
+  open:el=>{view={...view,tab:'dia',sub:'hoy',pid:el.dataset.id,aid:null,cerrando:false,volverA:null};render()},
   logout:async()=>{await sb.auth.signOut()},
   amode:el=>{auth.mode=el.dataset.v;renderLogin()},
   evsel:async el=>{const e=+el.dataset.v,s=DB.sesiones.find(x=>x.proyecto_id===view.pid&&x.fecha===fecha);evalSel=e;if(s)await upd('sesiones',s.id,{evaluacion:e});render()},
@@ -392,8 +471,13 @@ const A={
     if(!nc){render();if(x){const {error}=await sb.from('pe_vico').delete().eq('id',x.id);if(error)fail(error)}return}
     const row={id:x?x.id:uid(),proyecto_id:p.id,alumno_id:aid,funcion:f,color:nc,valor_manual:nc==='falta_j'&&x?x.valor_manual:null};DB.vico.push(row);render();
     const {error}=await sb.from('pe_vico').upsert(row,{onConflict:'alumno_id,funcion'});if(error)fail(error)},
-  cerrar:async()=>{const p=P(),als=alumnosDe(p),s=await sesionDe(p);if(!s)return;const n=als.length-DB.marcas.filter(m=>m.sesion_id===s.id).length;
-    if(confirm(`Se cierra el ${fecha}. ${n} alumno(s) sin marca contarán como verde. ¿Cerrar el día?`)){await upd('sesiones',s.id,{cerrada:true});toast('Día cerrado');render()}},
+  cerrar:async()=>{const p=P(),als=alumnosDe(p),s=await sesionDe(p);if(!s)return;
+    const n=als.filter(a=>!DB.marcas.some(m=>m.sesion_id===s.id&&m.alumno_id===a.id)).length;
+    if(n){view.cerrando=true;toast(`Faltan ${n} alumno(s) por marcar. El día no se cierra hasta que todos tengan su marca.`,6000);render();return}
+    if(confirm(`Todos los alumnos tienen marca. ¿Cerrar el ${fecha}?`)){await upd('sesiones',s.id,{cerrada:true});view.cerrando=false;if(view.volverA){fecha=view.volverA;view.volverA=null;const q=DB.sesiones.find(x=>x.proyecto_id===p.id&&x.fecha===fecha);evalSel=q?q.evaluacion:evDeFecha(fecha)}toast('Día cerrado');render()}},
+  vertodos:()=>{view.cerrando=false;render()},
+  irdia:el=>{view.volverA=fecha;fecha=el.dataset.f;const q=DB.sesiones.find(x=>x.proyecto_id===view.pid&&x.fecha===fecha);if(q)evalSel=q.evaluacion;view.cerrando=true;render()},
+  sinclase:async el=>{if(!confirm('¿Borrar ese día? Se borrarán también las marcas que hubiera.'))return;const id=el.dataset.id;if(await del('sesiones',id)){DB.marcas=DB.marcas.filter(m=>m.sesion_id!==id);render()}},
   reabrir:async()=>{const s=DB.sesiones.find(x=>x.proyecto_id===view.pid&&x.fecha===fecha);if(s){await upd('sesiones',s.id,{cerrada:false});render()}},
   delev:async el=>{if(confirm('¿Borrar el evento?')){await del('eventos',el.dataset.id);render()}},
   ficha:(el,e)=>{e.preventDefault();view.aid=el.dataset.id;modoAlumno=false;window.scrollTo(0,0);render()},
@@ -407,7 +491,7 @@ const A={
   delrol:async el=>{if(DB.asignaciones.some(x=>x.rol_id===el.dataset.id))return toast('Hay alumnos con este rol. Quítaselo primero.');await del('roles',el.dataset.id);render()}
 };
 const C={
-  fecha:el=>{fecha=el.value||hoy();const s=DB.sesiones.find(x=>x.proyecto_id===view.pid&&x.fecha===fecha);evalSel=s?s.evaluacion:evDeFecha(fecha);render()},
+  fecha:el=>{view.cerrando=false;view.volverA=null;fecha=el.value||hoy();const s=DB.sesiones.find(x=>x.proyecto_id===view.pid&&x.fecha===fecha);evalSel=s?s.evaluacion:evDeFecha(fecha);render()},
   vman:async el=>{await upd('vico',el.dataset.id,{valor_manual:el.value===''?null:num(el.value)});render()},
   rolf:async el=>{await upd('roles',el.dataset.id,{[el.dataset.f]:el.dataset.f==='nombre'?el.value:num(el.value)})},
   factor:async el=>{await upd('asignaciones',el.dataset.id,{factor:num(el.value)});render()},
@@ -417,9 +501,9 @@ const F={
   nuevo:async d=>{const r=await ins('proyectos',{nombre:limpia(d.nombre),curso:d.curso,optativa:d.curso==='4ESO'?'Creaciones escénico-musicales':'Música, espectáculo y comunicación',fecha_inicio:d.fecha_inicio||null,fecha_fin:d.fecha_fin||null,estado:'activo',reglas:{}});if(!r)return;await ins('roles',rolesIni(r[0].id));view={...view,tab:'conf',conf:'alumnos',pid:r[0].id};toast('Musical creado. Añade ahora los alumnos.');render()},
   datos:async d=>{if(await upd('proyectos',view.pid,{nombre:limpia(d.nombre),optativa:d.optativa,fecha_inicio:d.fecha_inicio||null,fecha_fin:d.fecha_fin||null,notas:d.notas})){toast('Guardado');render()}},
   evento:async d=>{if(await ins('eventos',{proyecto_id:view.pid,nombre:d.nombre,tipo:d.tipo,evaluacion:+d.evaluacion,fecha:d.fecha||null,sede:d.sede})){render()}},
-  alumno:async d=>{if(await ins('alumnos',{proyecto_id:view.pid,numero:d.numero?+d.numero:null,nombre:titulo(d.nombre),grupo:d.grupo||''})){render()}},
+  alumno:async d=>{if(await ins('alumnos',{proyecto_id:view.pid,numero:d.numero?+d.numero:null,nombre:tit(d.nombre),grupo:d.grupo||''})){render()}},
   nota:async d=>{if(await ins('notas',{proyecto_id:view.pid,alumno_id:view.aid,fecha:d.fecha||hoy(),texto:d.texto.trim()})){render()}},
-  importar:async d=>{const ya=new Set(DB.alumnos.filter(a=>a.proyecto_id===view.pid).map(a=>titulo(a.nombre.replace(/^\s*\d+[\s.\-]+/,'')).toLowerCase()));const rows=[];String(d.lista||'').split(/\r?\n/).forEach(l=>{const r=parseAl(l);if(r.nombre&&!ya.has(r.nombre.toLowerCase())){ya.add(r.nombre.toLowerCase());rows.push({proyecto_id:view.pid,...r})}});if(!rows.length)return toast('No hay alumnos nuevos.');if(await ins('alumnos',rows)){toast(rows.length+' alumno(s) importados');render()}},
+  importar:async d=>{const ya=new Set(DB.alumnos.filter(a=>a.proyecto_id===view.pid).map(a=>nomDe(a).toLowerCase()));const rows=[];String(d.lista||'').split(/\r?\n/).forEach(l=>{const r=parseAl(l);if(r.nombre&&!ya.has(r.nombre.toLowerCase())){ya.add(r.nombre.toLowerCase());rows.push({proyecto_id:view.pid,...r})}});if(!rows.length)return toast('No hay alumnos nuevos.');if(await ins('alumnos',rows)){toast(rows.length+' alumno(s) importados');render()}},
   rol:async d=>{const v=num(d.valor),rs=rolesDe(P());if(await ins('roles',{proyecto_id:view.pid,nombre:d.nombre,bloque:d.bloque||'',v1:v,v2:v,v3:v,es_libre:true,orden:rs.length})){render()}},
   manual:async d=>{if(await upd('alumnos',view.aid,{nota_manual:d.nota_manual===''?null:num(d.nota_manual),comentario_manual:d.comentario_manual,notas_privadas:d.notas_privadas})){toast('Guardado');render()}},
   reglas:async d=>{const p=P(),r=reglas(p);const rub={},bon={};COLORES.forEach(c=>{rub[c]=num(d['rub_'+c]);bon[c]=num(d['bon_'+c])});
