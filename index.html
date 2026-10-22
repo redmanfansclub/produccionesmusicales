@@ -109,6 +109,7 @@ button.dia b{display:block;font-size:13px}button.dia span{display:block}button.d
 .tj .who{flex:0 0 300px;min-width:0}.tj .who b{display:block;font-size:16px;line-height:1.25}.tj .sub2{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:4px;font-size:13px;color:var(--mut)}.tj .rolchip{display:inline-block;padding:1px 9px;border-radius:999px;background:var(--chip);color:var(--ink);font-size:12px;font-weight:600}
 .tj:hover,.tj:focus-within{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
 .tj .tag{margin-left:0}.tj .mk{flex:0 0 auto;grid-template-columns:repeat(5,48px) 108px}
+.mk.sf{grid-template-columns:repeat(5,48px);gap:6px}.vr{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line)}.vr:first-of-type{border-top:0}.vr .rol{min-width:160px}
 .mk .motivo-in{grid-column:1/6;display:flex;align-items:center}.mk .motivo-in input{width:100%;min-height:46px}
 @media(max-width:700px){.tj .who{flex:1 1 100%}.tj .mk{flex:1 1 100%;grid-template-columns:repeat(5,1fr) 1.5fr}}
 @media(max-width:1520px){.nav button{padding:0 9px;font-size:14px}.nav{gap:5px}.brand b{font-size:20px}.brand small{font-size:8.5px;letter-spacing:.1em}.emb{width:80px;height:60px}.curtain{padding:23px 20px}}
@@ -161,12 +162,26 @@ const REGLAS_DEF={
   escala_just:[0,0,0,0.5,0.7,1,1.5,2], mas_just_resta:0.5,
   aviso_amarillo:3, aviso_rojo:5,
   vico_peso:30, vico_w:[1,2], vico_tope:4, vico_tope_activo:true,
-  motivos:MOTIVOS_DEF, hoja:HOJA_DEF, texto_calculo:''
+  motivos:MOTIVOS_DEF, hoja:HOJA_DEF, texto_calculo:'',
+  peso_diaria:70, peso_actuacion:20
 };
-let DB={proyectos:[],alumnos:[],roles:[],asignaciones:[],sesiones:[],marcas:[],eventos:[],vico:[],notas:[]};
+let DB={proyectos:[],alumnos:[],roles:[],asignaciones:[],sesiones:[],marcas:[],eventos:[],vico:[],notas:[],valoraciones:[],resultados:[],cierres:[]};
 function reglas(p){const r=(p&&p.reglas)||{};return {...REGLAS_DEF,...r,rubrica:{...REGLAS_DEF.rubrica,...(r.rubrica||{})},bonus:{...REGLAS_DEF.bonus,...(r.bonus||{})},hoja:{...HOJA_DEF,...(r.hoja||{})}}}
 function penalJust(n,r){if(n<=2)return 0;const e=r.escala_just;return n<e.length?e[n]:e[e.length-1]+r.mas_just_resta*(n-(e.length-1))}
 const asgEvs=x=>Array.isArray(x.evals)?x.evals.map(Number):[1,2,3];
+const evCerrada=(p,e)=>DB.cierres.some(c=>c.proyecto_id===p.id&&Number(c.evaluacion)===e&&c.cerrada);
+function valEvento(p,e,a){
+  const r=reglas(p),x=DB.resultados.find(q=>q.evento_id===e.id&&q.alumno_id===a.id),es=x?x.estado:'participa';
+  if(es==='falta'||es==='noaplica')return {v:0,falta:true};
+  if(es==='falta_j'){const m=x.valor_manual;return (m===null||m===undefined||m==='')?{v:null,faltaJ:true,sinValor:true}:{v:Number(m),faltaJ:true}}
+  if(COLORES.includes(es))return {v:Number(r.rubrica[es]),c:es};
+  const g=e.color_grupo;return g&&COLORES.includes(g)?{v:Number(r.rubrica[g]),c:g}:{v:null,sinNota:true};
+}
+function calcActuacion(p,a,ev){
+  const evs=DB.eventos.filter(e=>e.proyecto_id===p.id&&Number(e.evaluacion)===ev);let sw=0,sv=0;
+  const items=evs.map(e=>{const w=Number(e.peso??1)||1,r=valEvento(p,e,a);if(r.v!==null){sv+=r.v*w;sw+=w}return {e,...r}});
+  return {nota:sw?sv/sw:null,items};
+}
 function calcEval(p,a,ev){
   const r=reglas(p);
   const ses=DB.sesiones.filter(s=>s.proyecto_id===p.id&&s.evaluacion===ev&&s.cerrada&&!s.sin_clase);
@@ -178,17 +193,21 @@ function calcEval(p,a,ev){
     if(c==='falta'){fsj++;fsjW+=w;if(r.falta_sj_cuenta_cero)n+=w;return}
     sum+=Number(r.rubrica[c])*w;n+=w;
   });
-  const media=n?sum/n:10;
-  const roles=DB.asignaciones.filter(x=>x.alumno_id===a.id&&asgEvs(x).includes(ev)).map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{};const ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined;return {nombre:ro.nombre||'(rol borrado)',valor:Number(ad?x.valor_adaptado:(ro['v'+ev]||0))*Number(x.factor??1),adaptado:ad}});
+  const media=n?sum/n:10,m10=media/10;
+  const pd=Math.max(0,Math.min(100,Number(r.peso_diaria)))/100,pr=1-pd;
+  const roles=DB.asignaciones.filter(x=>x.alumno_id===a.id&&asgEvs(x).includes(ev)).map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{};const ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined;const va=DB.valoraciones.find(v=>v.alumno_id===a.id&&v.rol_id===x.rol_id&&Number(v.evaluacion)===ev);return {nombre:ro.nombre||'(rol borrado)',rolId:x.rol_id,valor:Number(ad?x.valor_adaptado:(ro['v'+ev]||0))*Number(x.factor??1),adaptado:ad,val:va?va.color:null}});
   const base=roles.reduce((t,x)=>t+x.valor,0);
-  const bruto=base*media/10;
+  const bruto=roles.reduce((t,x)=>t+x.valor*(x.val?(pd*m10+pr*Number(r.rubrica[x.val])/10):m10),0);
   const pen=fsjW*r.falta_sj_resta+penalJust(fj,r);
   const real=Math.max(0,bruto-pen);
-  return {ses:ses.length,media,base,bruto,pen,real,nota:ses.length?Math.min(10,real):null,fsj,fj,roles};
+  const clase=ses.length?Math.min(10,real):null;
+  const ac=calcActuacion(p,a,ev),cerrada=evCerrada(p,ev),wA=Math.max(0,Math.min(100,Number(r.peso_actuacion)))/100;
+  let nota=clase;if(clase!==null&&cerrada&&ac.nota!==null)nota=Math.min(10,(1-wA)*clase+wA*ac.nota);
+  return {ses:ses.length,media,base,bruto,pen,real,clase,act:ac.nota,actItems:ac.items,wA,cerrada,pendVal:roles.filter(x=>!x.val).length,nota,fsj,fj,roles};
 }
 function calcVico(p,a){
-  const r=reglas(p),W=r.vico_w||[1,2];let vals=[],ws=[],pend=false,sinJust=false,bon=[0,0];
-  [1,2].forEach(f=>{
+  const r=reglas(p),W=r.vico_w||[1,2],fs=p.curso==='1BACH'?[2]:[1,2];let vals=[],ws=[],pend=false,sinJust=false,bon=[0,0];
+  fs.forEach(f=>{
     const x=DB.vico.find(v=>v.alumno_id===a.id&&v.funcion===f);if(!x)return;
     if(x.color==='falta'){vals.push(0);ws.push(W[f-1]);sinJust=true;return}
     if(x.color==='falta_j'){if(x.valor_manual===null||x.valor_manual===undefined||x.valor_manual==='')pend=true;else{vals.push(Number(x.valor_manual));ws.push(W[f-1])}return}
@@ -216,7 +235,7 @@ function calcFinal(p,a){
 
 const SB_URL='https://uaqktciswfjzcorrevrh.supabase.co',SB_KEY='sb_publishable_JoSi5-B_NIAD12NDtpaSQw_Yxp6HMbj';
 const sb=window.supabase.createClient(SB_URL,SB_KEY);
-const TBL={proyectos:'pe_proyectos',alumnos:'pe_alumnos',roles:'pe_roles',asignaciones:'pe_asignaciones',sesiones:'pe_sesiones',marcas:'pe_marcas',eventos:'pe_eventos',vico:'pe_vico',notas:'pe_notas'};
+const TBL={proyectos:'pe_proyectos',alumnos:'pe_alumnos',roles:'pe_roles',asignaciones:'pe_asignaciones',sesiones:'pe_sesiones',marcas:'pe_marcas',eventos:'pe_eventos',vico:'pe_vico',notas:'pe_notas',valoraciones:'pe_valoraciones',resultados:'pe_resultados',cierres:'pe_cierres'};
 const $=s=>document.querySelector(s),uid=()=>crypto.randomUUID(),hoy=()=>new Date().toISOString().slice(0,10);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const num=v=>{const n=Number(String(v).replace(',','.'));return isNaN(n)?0:n};
@@ -247,11 +266,13 @@ async function loadData(){
   $('#app').innerHTML='<div class="card muted" style="text-align:center">Cargando…</div>';
   const keys=Object.keys(TBL);
   const res=await Promise.all(keys.map(k=>sb.from(TBL[k]).select('*')));
+  const OPC=['valoraciones','resultados','cierres'];let faltaE=false;res.forEach((r,i)=>{if(r.error&&OPC.includes(keys[i])){r.data=[];r.error=null;faltaE=true}});
   const bad=res.find(r=>r.error);
   if(bad){$('#app').innerHTML=`<div class="card"><b>No se pudieron cargar los datos.</b><p class="muted">${esc(bad.error.message)}</p><p class="muted">¿Has ejecutado el archivo SQL en Supabase (y el de actualización A)?</p></div>`;return}
   keys.forEach((k,i)=>DB[k]=res[i].data||[]);
   DB.proyectos.sort((a,b)=>(a.created_at||'').localeCompare(b.created_at||''));
   render();await autoNormaliza();render();
+  if(faltaE)toast('Falta ejecutar supabase_actualizacion_E.sql en Supabase para usar la valoración de roles y las actuaciones.',9000);
 }
 async function autoNormaliza(){
   if(!DB.alumnos.length||!('numero' in DB.alumnos[0]))return;
@@ -335,7 +356,7 @@ function vHome(){
 }
 function subtabs(list,cur,act){return `<div class="sub noprint">${list.map(([k,l])=>`<button class="${cur===k?'on':''}" data-act="${act}" data-v="${k}">${l}</button>`).join('')}</div>`}
 function vDia(p){
-  return head(p)+subtabs([['hoy','Hoy en clase'],['roles','Roles'],['eventos','Eventos'],['vico','Teatro Vico']],view.sub,'sub')+(view.sub==='eventos'?vEventos(p):view.sub==='vico'?vVico(p):view.sub==='roles'?vRolesLista(p):vHoy(p));
+  return head(p)+subtabs([['hoy','Hoy en clase'],['fineval','Fin de evaluación'],['roles','Roles'],['eventos','Eventos'],['vico','Teatro Vico']],view.sub,'sub')+(view.sub==='eventos'?vEventos(p):view.sub==='vico'?vVico(p):view.sub==='roles'?vRolesLista(p):view.sub==='fineval'?vFinEval(p):vHoy(p));
 }
 /* ---------- calendario ---------- */
 const DOW=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],DOWL=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
@@ -389,9 +410,9 @@ IC.edit='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="cur
 IC.nota='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.5 7.2L3 21l1.8-5.5A8 8 0 1 1 21 12z"/></svg>';
 IC.lupa='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>';
 const stCol={pend:'var(--st-ini)',curso:'var(--st-prog)',cerrado:'var(--st-fin)',festivo:'var(--mut)',sinclase:'var(--mut)'},stTxt={pend:'Pendiente',curso:'En curso',cerrado:'Cerrado',festivo:'Festivo',sinclase:'Sin clase'},stIc={pend:IC.pend,curso:IC.curso,cerrado:IC.fin,festivo:IC.fest,sinclase:IC.fest};
-function colorBtns(cur,act,extra,off,motivo){
+function colorBtns(cur,act,extra,off,motivo,sinFalta){
   const r=reglas(P()).rubrica;
-  return `<div class="mk">${motivo||COLORES.map(c=>`<button class="cb c-${c} ${cur===c?'on':''}" style="--p:${pct(P(),c)}%" data-act="${act}" data-c="${c}" ${extra||''} ${off?'disabled':''} aria-label="${c}"><i class="sh"></i>${verVal?`<small>${r[c]}</small>`:''}</button>`).join('')}<button class="fb ${cur==='falta'?'f':''} ${cur==='falta_j'?'j':''}" data-act="${act}" data-c="falta" ${extra||''} ${off?'disabled':''}><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="${cur==='falta_j'?'M2.5 7.5l3 3 6-7':'M3 3l8 8M11 3l-8 8'}"/></svg>${cur==='falta_j'?'Justificada':'Falta'}</button></div>`;
+  return `<div class="mk${sinFalta?' sf':''}">${motivo||COLORES.map(c=>`<button class="cb c-${c} ${cur===c?'on':''}" style="--p:${pct(P(),c)}%" data-act="${act}" data-c="${c}" ${extra||''} ${off?'disabled':''} aria-label="${c}"><i class="sh"></i>${verVal?`<small>${r[c]}</small>`:''}</button>`).join('')}${sinFalta?'':`<button class="fb ${cur==='falta'?'f':''} ${cur==='falta_j'?'j':''}" data-act="${act}" data-c="falta" ${extra||''} ${off?'disabled':''}><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="${cur==='falta_j'?'M2.5 7.5l3 3 6-7':'M3 3l8 8M11 3l-8 8'}"/></svg>${cur==='falta_j'?'Justificada':'Falta'}</button>`}</div>`;
 }
 const ventanaN=()=>Math.max(3,Math.min(10,Math.floor((Math.min(window.innerWidth,1080)-140)/92)));
 let ventanaPrev=0;
@@ -415,10 +436,12 @@ function vHoy(p){
     return `<div class="card"><b>${DOW[new Date(d.fecha+'T12:00:00').getDay()]} ${fd(d.fecha)}</b> · faltan ${n} alumno(s) por marcar<div class="row" style="margin-top:10px"><button class="btn gold" data-act="completar" data-f="${d.fecha}" data-k="${d.clave}">Completar ese día</button><button class="btn red" data-act="sinclase" data-f="${d.fecha}" data-k="${d.clave}">Festivo / sin clase</button></div></div>`}).join('')}</div>`;
   if(est==='festivo')return `<div class="phone">${cab}<div class="card"><b>Festivo${festivoDe(p,sel.fecha)?': '+esc(festivoDe(p,sel.fecha).nombre||''):''}</b><p class="muted">Este día no cuenta para la nota. Para cambiarlo, edita los festivos en Configuración → Horario y calendario.</p></div>${extra}</div>`;
   if(est==='sinclase')return `<div class="phone">${cab}<div class="card"><b>Marcado como festivo / sin clase</b><p class="muted">No cuenta para la nota.</p><button class="btn gold" data-act="convertir" data-f="${sel.fecha}" data-k="${sel.clave}">Convertir en día de clase</button></div>${extra}</div>`;
+  const lstE=listaEval(p,ag,ev).filter(d=>d.tipo==='clase'&&!['festivo','sinclase'].includes(estadoDe(p,d))),ult=lstE.slice(-2),pv=pendientesVal(p,ev);
+  const finBanner=(!evCerrada(p,ev)&&ult.length&&sel.fecha>=ult[0].fecha&&pv>0)?`<div class="warn" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span>Últimos días de la ${ev}ª evaluación: faltan ${pv} valoración(es) de roles.</span><button class="btn sm" data-act="irfin" data-e="${ev}">Ir a Fin de evaluación</button></div>`:'';
   const locked=est==='cerrado',cierre=!!view.cerrando&&!locked,lista=cierre?als.filter(a=>pend.includes(a)||falMot.includes(a)):als,r=reglas(p);
   return `<div class="phone">${cab}
   <div class="row" style="margin-bottom:8px"><span class="stchip ${locked?'fill':''}" style="--k:${stCol[est]}">${stIc[est]}${stTxt[est]}${est==='curso'||est==='pend'?' · '+(als.length-pend.length)+' de '+als.length:''}</span>${sel.tipo==='clase'?`<span class="muted" style="font-size:13px">Quedan ${rest} clase(s) por delante</span>`:''}<button class="ib" data-act="hoja" style="margin-left:auto;font-weight:800" title="Qué significa cada color" aria-label="Qué significa cada color">?</button></div>
-  <div class="prog"><i style="width:${als.length?(als.length-pend.length)*100/als.length:0}%"></i></div>
+  <div class="prog"><i style="width:${als.length?(als.length-pend.length)*100/als.length:0}%"></i></div>${finBanner}
   ${locked?'<div class="lockbar"><span>Día cerrado: no se puede cambiar.</span><button class="btn" data-act="reabrir" style="margin-left:auto">Reabrir</button></div>':''}
   ${cierre?((pend.length||falMot.length)?`<div class="warn r">${pend.length?`Faltan ${pend.length} alumno(s) por marcar. `:''}${falMot.length?`Falta el motivo de ${falMot.length} alumno(s) en naranja o rojo. `:''}El día no se cierra hasta completarlo.</div>`:'<div class="warn" style="background:var(--ok);color:#fff">Todo completo. Ya puedes cerrar el día.</div>'):''}
   <div class="${locked?'locked':''}"><div class="cards lista-hoy">${lista.length?lista.map(a=>{const m=marks.find(x=>x.alumno_id===a.id),c=m?m.color:null,has=!!c,col=COLORES.includes(c)?`var(--c-${c})`:c==='falta'?'var(--f-bd)':c==='falta_j'?'var(--j-bg)':'var(--line)';
@@ -433,26 +456,46 @@ function vHoy(p){
   ${sel.tipo==='extra'&&!locked?`<div style="margin-top:12px"><button class="btn red" data-act="delextra" data-f="${sel.fecha}" data-k="${sel.clave}">Borrar este día extra</button></div>`:''}
   ${extra}</div>`;
 }
+const pendientesVal=(p,e)=>alumnosDe(p).reduce((t,a)=>t+DB.asignaciones.filter(x=>x.alumno_id===a.id&&asgEvs(x).includes(e)&&!DB.valoraciones.some(v=>v.alumno_id===a.id&&v.rol_id===x.rol_id&&Number(v.evaluacion)===e)).length,0);
+function vFinEval(p){
+  const e=view.evFin||evActual(p),cerr=evCerrada(p,e),als=alumnosDe(p),r=reglas(p),pend=pendientesVal(p,e),pm=DB.valoraciones.filter(v=>v.proyecto_id===p.id&&Number(v.evaluacion)===e&&pendMotivo(v)).length;
+  const seg=`<div class="seg noprint" style="max-width:520px">${[1,2,3].map(x=>`<button class="${e===x?'on':''}" data-act="evfin" data-v="${x}">${x}ª evaluación ${evCerrada(p,x)?'🔒':''}</button>`).join('')}</div>`;
+  const rows=als.map(a=>{const as=DB.asignaciones.filter(x=>x.alumno_id===a.id&&asgEvs(x).includes(e));
+    return `<div class="al"><div class="t"><b><a href="#" class="lnk" data-act="ficha" data-id="${a.id}">${nAl(a)}</a></b><span>${as.length?'':'<span class="chip r">sin rol en la '+e+'ª</span>'}</span></div>${as.map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{},v=DB.valoraciones.find(q=>q.alumno_id===a.id&&q.rol_id===x.rol_id&&Number(q.evaluacion)===e),nn=v&&(v.color==='naranja'||v.color==='rojo');
+      const mc=nn?(Array.isArray(v.motivos)&&v.motivos.length?`<span class="chip" style="cursor:pointer" data-act="motivosel" data-k="val" data-id="${v.id}">${esc(v.motivos[0])}${v.motivos.length>1?' +'+(v.motivos.length-1):''}</span>`:`<span class="chip r" style="cursor:pointer" data-act="motivosel" data-k="val" data-id="${v.id}">Falta el motivo</span>`):'';
+      return `<div class="vr"><span class="rol" style="margin:0">${esc(ro.nombre||'?')}</span>${colorBtns(v?v.color:null,'valrol',`data-a="${a.id}" data-r="${x.rol_id}" data-e="${e}"`,cerr,null,true)}${v?mc:'<span class="tag">Sin valorar</span>'}</div>`}).join('')}</div>`}).join('');
+  return `${seg}<div class="card" style="margin-top:12px"><div class="row" style="justify-content:space-between"><div><b>Valoración de los roles de la ${e}ª evaluación</b><div class="muted" style="font-size:13px;margin-top:4px">Un toque por rol: cómo lo ha desempeñado durante toda la evaluación. Pesa un ${100-r.peso_diaria} % de la parte de clase.</div></div><span class="stchip ${cerr?'fill':''}" style="--k:${cerr?'var(--st-fin)':'var(--st-prog)'}">${cerr?IC.fin+'Cerrada':IC.curso+'Abierta'}</span></div>
+  <div class="row" style="margin-top:10px">${pend?`<span class="chip y">Faltan ${pend} valoración(es)</span>`:'<span class="chip g">Todos los roles valorados</span>'}${pm?`<span class="chip r">Falta el motivo en ${pm}</span>`:''}${cerr?'<button class="btn sm" data-act="reabrirval" style="margin-left:auto">Reabrir evaluación</button>':'<button class="btn gold" data-act="cerrarval" style="margin-left:auto">Cerrar la '+e+'ª evaluación</button>'}</div>
+  <div class="muted" style="font-size:12px;margin-top:8px">Mientras la evaluación esté abierta, <i>Evaluar</i> muestra solo la nota de clase. Al cerrarla se suma la actuación (${r.peso_actuacion} %).</div></div>
+  <div class="cards ${cerr?'locked':''}">${rows||'<div class="card muted">Añade alumnos en Configuración.</div>'}</div>`;
+}
 function vEventos(p){
-  const evs=DB.eventos.filter(e=>e.proyecto_id===p.id).sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
-  return `<div class="card scroll">${evs.length?`<table><tr><th>Evento</th><th>Tipo</th><th>Eval.</th><th>Fecha</th><th>Sede</th><th></th></tr>${evs.map(e=>`<tr><td><b>${esc(e.nombre)}</b></td><td>${esc(e.tipo)}</td><td>${e.evaluacion||''}</td><td>${esc(e.fecha||'')}</td><td>${esc(e.sede||'')}</td><td><button class="btn sm red" data-act="delev" data-id="${e.id}">Borrar</button></td></tr>`).join('')}</table>`:'<span class="muted">Sin eventos todavía.</span>'}</div>
-  <details class="card"><summary style="cursor:pointer;font-weight:600;color:var(--gold)">Añadir evento</summary><form data-form="evento" style="margin-top:12px"><div class="fg"><label>Nombre<input name="nombre" required placeholder="Concierto solidario en Aspajunide"></label><label>Tipo<select name="tipo"><option value="solidario">Solidario</option><option value="colegios">Colegios</option><option value="audicion">Audición</option><option value="vico">Teatro Vico</option><option value="otro">Otro</option></select></label><label>Evaluación<select name="evaluacion"><option>1</option><option>2</option><option>3</option></select></label><label>Fecha<input type="date" name="fecha"></label><label>Sede<input name="sede"></label></div><div><button class="btn gold">Añadir</button></div></form></details>`;
+  const evs=DB.eventos.filter(e=>e.proyecto_id===p.id).sort((a,b)=>(a.evaluacion||0)-(b.evaluacion||0)||(a.fecha||'').localeCompare(b.fecha||'')),als=alumnosDe(p),r=reglas(p);
+  const TIPOS={solidario:'Solidario',colegios:'Colegios',audicion:'Audición',vico:'Ensayo en el Teatro Vico',otro:'Otro'};
+  return `<div class="muted" style="margin-bottom:12px">Cada evento es el «examen» de su evaluación: la nota de grupo se pone de un toque y vale lo mismo para todos, sea cual sea su rol. Esta parte pesa un ${r.peso_actuacion} % de la nota de la evaluación (si hay dos eventos, se reparte). Faltar al evento es un 0; si lo justifica, esa parte se queda en la parte de clase (o vale lo que pongas tú si le pides un trabajo).</div>
+  ${evs.map(e=>{const g=e.color_grupo,items=als.map(a=>({a,v:valEvento(p,e,a)})),pj=items.filter(x=>x.v.pend).length,nExc=DB.resultados.filter(q=>q.evento_id===e.id).length;
+    return `<div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h3 style="font-size:20px">${esc(e.nombre)}</h3><div class="muted" style="font-size:13px">${TIPOS[e.tipo]||esc(e.tipo)} · ${e.evaluacion}ª evaluación${e.fecha?' · '+fd(e.fecha):''}${e.sede?' · '+esc(e.sede):''} · peso ${fmt(e.peso??1)}</div></div><button class="btn sm red" data-act="delev" data-id="${e.id}">Borrar</button></div>
+    <div style="margin:12px 0 6px;font-weight:600">Nota de grupo</div>${colorBtns(g,'evgrupo',`data-id="${e.id}"`,false,null,true)}
+    <div class="muted" style="font-size:13px;margin-top:6px">${g?'':'Todavía sin nota. '}</div>
+    <details style="margin-top:10px"><summary style="cursor:pointer;color:var(--gold);font-weight:600">Excepciones por alumno${nExc?' ('+nExc+')':''}</summary>${items.map(({a})=>{const x=DB.resultados.find(q=>q.evento_id===e.id&&q.alumno_id===a.id),es=x?x.estado:'participa';
+      return `<div class="fila" style="padding:6px 0"><span style="flex:1;min-width:200px">${nAl(a)}</span><select style="width:210px" data-chg="resest" data-e="${e.id}" data-a="${a.id}">${[['participa','Participa (nota de grupo)'],['verde','Verde'],['lima','Lima'],['amarillo','Amarillo'],['naranja','Naranja'],['rojo','Rojo'],['falta','Falta sin justificar (0)'],['falta_j','Falta justificada']].map(([k,l])=>`<option value="${k}" ${es===k?'selected':''}>${l}</option>`).join('')}</select>${es==='falta_j'?`<input type="number" min="0" max="10" step="0.1" style="width:120px" placeholder="Valor (opcional)" title="Si lo dejas vacío, el 20 % se queda en la parte de clase" aria-label="Valor de la justificada" value="${x.valor_manual??''}" data-chg="resval" data-id="${x.id}">`:''}</div>`}).join('')}</details></div>`}).join('')||'<div class="card muted">Sin eventos todavía.</div>'}
+  <details class="card"><summary style="cursor:pointer;font-weight:600;color:var(--gold)">Añadir evento</summary><form data-form="evento" style="margin-top:12px"><div class="fg"><label>Nombre<input name="nombre" required placeholder="Concierto solidario en Aspajunide"></label><label>Tipo<select name="tipo">${Object.entries(TIPOS).map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select></label><label>Evaluación<select name="evaluacion"><option>1</option><option>2</option><option>3</option></select></label><label>Fecha<input type="date" name="fecha"></label><label>Sede<input name="sede"></label><label>Peso (1 = normal)<input type="number" step="0.5" min="0.5" name="peso" value="1"></label></div><div><button class="btn gold">Añadir</button></div></form></details>`;
 }
 function vVico(p){
   const als=alumnosDe(p),b4=p.curso==='4ESO',r=reglas(p);
-  return `<div class="card muted">${b4?'Montaje en el Teatro Vico: cada función da una bonificación en la 3ª evaluación (verde +'+r.bonus.verde+', lima +'+r.bonus.lima+', amarillo +'+r.bonus.amarillo+', naranja +'+r.bonus.naranja+', rojo +'+r.bonus.rojo+'). La media de las dos funciones se suma a la nota.':'Actuación en el Teatro Vico: pesa un '+r.vico_peso+' % de la nota final (ensayo '+r.vico_w[0]+', función '+r.vico_w[1]+'). Falta sin justificar = 0 y tope de '+r.vico_tope+(r.vico_tope_activo?'':' (desactivado)')+'. Falta justificada: pones tú el valor.'}</div>
+  return `<div class="card muted">${b4?'Montaje en el Teatro Vico: cada función da una bonificación en la 3ª evaluación (verde +'+r.bonus.verde+', lima +'+r.bonus.lima+', amarillo +'+r.bonus.amarillo+', naranja +'+r.bonus.naranja+', rojo +'+r.bonus.rojo+'). La media de las dos funciones se suma a la nota.':'Función en el Teatro Vico: pesa un '+r.vico_peso+' % de la nota final y participar es obligatorio. Falta sin justificar = 0 y tope de '+r.vico_tope+(r.vico_tope_activo?'':' (desactivado)')+'. Falta justificada: pones tú el valor. El ensayo en el Vico se valora en Eventos, dentro de la 3ª evaluación.'}</div>
   <div class="cards">${als.map(a=>{const c=calcVico(p,a);return `<div class="al"><div class="t"><b>${nAl(a)}</b><span>${b4?'bonificación '+fmt(c.bonus):'nota Vico '+fmt(c.nota)}${c.sinJust?' · <span class="chip r">sin justificar</span>':''}${c.pend?' · <span class="chip y">falta valor manual</span>':''}</span></div>
-  ${[1,2].map(f=>{const x=DB.vico.find(v=>v.alumno_id===a.id&&v.funcion===f);return `<div style="margin-bottom:8px"><div class="muted" style="font-size:12px;margin-bottom:4px">${['Ensayo en el Vico','Función'][f-1]}</div>${colorBtns(x?x.color:null,'vmark',`data-a="${a.id}" data-f="${f}"`)}${x&&x.color==='falta_j'&&!b4?`<label style="margin-top:6px">Valor manual (0-10) por falta justificada<input type="number" min="0" max="10" step="0.1" value="${x.valor_manual??''}" data-chg="vman" data-id="${x.id}"></label>`:''}</div>`}).join('')}</div>`}).join('')||'<div class="card muted">Sin alumnos.</div>'}</div>`;
+  ${(b4?[1,2]:[2]).map(f=>{const x=DB.vico.find(v=>v.alumno_id===a.id&&v.funcion===f);return `<div style="margin-bottom:8px"><div class="muted" style="font-size:12px;margin-bottom:4px">${['Ensayo en el Vico','Función'][f-1]}</div>${colorBtns(x?x.color:null,'vmark',`data-a="${a.id}" data-f="${f}"`)}${x&&x.color==='falta_j'&&!b4?`<label style="margin-top:6px">Valor manual (0-10) por falta justificada<input type="number" min="0" max="10" step="0.1" value="${x.valor_manual??''}" data-chg="vman" data-id="${x.id}"></label>`:''}</div>`}).join('')}</div>`}).join('')||'<div class="card muted">Sin alumnos.</div>'}</div>`;
 }
 function vEval(p){
   const als=alumnosDe(p),b=p.curso==='1BACH',r=reglas(p);
   const rows=als.map(a=>{const f=calcFinal(p,a);const man=a.nota_manual;
-    const chip=x=>x.nota===null?'<span class="muted">—</span>':`<span class="nota" style="color:${x.nota>=8?'var(--ok)':x.nota>=5?'var(--mid)':'var(--bad)'}">${fmt(x.notaFinalEv??x.nota)}</span>${x.real>10.04?` <span class="chip g">real ${fmt(x.real)}</span>`:''}`;
+    const chip=x=>x.nota===null?'<span class="muted">—</span>':`<span class="nota" style="color:${x.nota>=8?'var(--ok)':x.nota>=5?'var(--mid)':'var(--bad)'}">${fmt(x.notaFinalEv??x.nota)}</span>${x.real>10.04?` <span class="chip g">real ${fmt(x.real)}</span>`:''}${x.cerrada?'':' <small class="muted" title="Evaluación abierta: solo cuenta la parte de clase">prov.</small>'}${x.act!==null?`<div class="muted" style="font-size:11px">clase ${fmt(x.clase)} · act. ${fmt(x.act)}</div>`:''}`;
     const maxJ=Math.max(...f.ev.map(x=>x.fj)),fsj=f.ev.reduce((t,x)=>t+x.fsj,0);
     return `<tr><td><a href="#" data-act="ficha" data-id="${a.id}" style="color:var(--gold);font-weight:600">${nAl(a)}</a>${esAdaptado(a)?' <span class="chip y">Adaptada</span>':''}</td>${f.ev.map(x=>`<td>${chip(x)}</td>`).join('')}${b?`<td>${fmt(f.vico.nota)}${f.vico.sinJust?' <span class="chip r lnk" data-act="irvico">sin just.</span>':''}${f.vicoPend?' <span class="chip y lnk" data-act="irvico">manual</span>':''}</td>`:''}
     <td>${(()=>{const l=`data-act="ficha" data-id="${a.id}" data-go="faltas" style="cursor:pointer"`;return (fsj?`<span class="chip r" ${l}>${fsj} sin just.</span> `:'')+(maxJ>=r.aviso_rojo?`<span class="chip r" ${l}>${maxJ} just.</span>`:maxJ>=r.aviso_amarillo?`<span class="chip y" ${l}>${maxJ} just.</span>`:maxJ?`<span class="chip" ${l}>${maxJ} just.</span>`:'')})()}</td>
     <td><span class="nota">${fmt(f.final)}</span>${f.tope?` <span class="chip r" data-act="ficha" data-id="${a.id}" style="cursor:pointer">tope</span>`:''}</td><td>${f.final===null?'—':Math.round(f.final)+' / '+Math.floor(f.final)}</td><td>${man!==null&&man!==undefined?`<b style="color:var(--gold)">${fmt(man)}</b>`:'—'}</td></tr>`}).join('');
-  return head(p)+`<div class="row noprint" style="margin-bottom:12px"><button class="btn gold" data-act="pdfgrupo">PDF de la evaluación</button></div><div class="card scroll"><table><tr><th>Alumno/a</th><th>1ª</th><th>2ª</th><th>3ª</th>${b?'<th>Vico</th>':''}<th>Faltas</th><th>Final calculada</th><th>Redond. / trunc.</th><th>Nota manual</th></tr>${rows||'<tr><td colspan="9" class="muted">Sin alumnos.</td></tr>'}</table></div>
+  return head(p)+`<div class="row noprint" style="margin-bottom:12px"><button class="btn gold" data-act="pdfgrupo">PDF de la evaluación</button>${[1,2,3].map(e=>`<span class="chip ${evCerrada(p,e)?'g':'y'}" style="cursor:pointer" data-act="irfin" data-e="${e}" title="Ir a Fin de evaluación">${e}ª ${evCerrada(p,e)?'cerrada':'abierta'}</span>`).join('')}</div><div class="card scroll"><table><tr><th>Alumno/a</th><th>1ª</th><th>2ª</th><th>3ª</th>${b?'<th>Vico</th>':''}<th>Faltas</th><th>Final calculada</th><th>Redond. / trunc.</th><th>Nota manual</th></tr>${rows||'<tr><td colspan="9" class="muted">Sin alumnos.</td></tr>'}</table></div>
   <p class="muted">La nota por evaluación se corta en 10; el trabajo real aparece aparte cuando lo supera. La 3ª evaluación no se publica: se pone la nota final. Solo cuentan los días cerrados.</p>`;
 }
 function vFicha(p){
@@ -463,7 +506,7 @@ function vFicha(p){
   const rolesObj=DB.asignaciones.filter(x=>x.alumno_id===a.id&&asgEvs(x).includes(evR(p))).map(x=>DB.roles.find(q=>q.id===x.rol_id)).filter(Boolean);
   return `<div class="row noprint" style="margin-bottom:16px"><button class="btn" data-act="back">← Volver</button><button class="btn" data-act="fichanav" data-d="-1">‹ Anterior</button><button class="btn" data-act="fichanav" data-d="1">Siguiente ›</button><button class="btn" data-act="modo">${m?'Salir del modo alumno':'Modo enseñar al alumno'}</button><span style="flex:1"></span><button class="btn gold" data-act="pdffull">Informe PDF</button><button class="btn" data-act="pdfalu">PDF para el alumno</button></div>
   <div class="muted">${p.curso==='4ESO'?'4º ESO':'1º Bachillerato'} · ${esc(p.nombre)}</div><h1 style="font-size:40px;margin:4px 0 6px">${nAl(a)}</h1><div style="margin-bottom:18px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">${rolesObj.length?rolesObj.map(r=>`<a href="#" class="rol lnk" data-act="verrol" data-id="${r.id}" style="margin:0">${esc(r.nombre)}</a>`).join(''):`<span class="chip r">Sin roles en la ${evR(p)}ª evaluación</span>`}${esAdaptado(a)?'<span class="chip y">Nota adaptada</span>':''}${(()=>{const n=incid(p,a).filter(x=>!Array.isArray(x.m.motivos)||!x.m.motivos.length).length;return n?`<span class="chip y lnk" data-act="ficha" data-id="${a.id}" data-go="motivos" title="Ver las marcas sin motivo">${n} marca(s) sin motivo</span>`:''})()}${ES_JEFE&&!m?`<button class="rolbtn noprint" data-act="rolespanel" data-id="${a.id}" title="Añadir, quitar o cambiar los roles de este alumno">${IC.edit} Cambiar roles</button>`:''}</div>
-  ${[1,2,3].map(e=>{const x=f.ev[e-1];return `<div class="card"><div class="row" style="justify-content:space-between"><h3 style="font-size:20px">${e}ª evaluación</h3>${m?'':`<span><span class="nota">${fmt(x.nota)}</span>${x.real>10.04?` <span class="chip g">trabajo real ${fmt(x.real)}</span>`:''}</span>`}</div><div class="weeks">${strip(e)}</div>${m?'':`<div class="muted" style="font-size:13px;margin-top:8px">${x.fsj?x.fsj+' falta(s) sin justificar. ':''}${x.fj?x.fj+' justificada(s).':''}${x.pen?' Resta '+fmt(x.pen)+' al trabajo real.':''}</div>${x.fj>=r.aviso_rojo?'<div class="warn r">Aviso rojo: muchas faltas justificadas</div>':x.fj>=r.aviso_amarillo?'<div class="warn">Aviso amarillo: faltas justificadas acumuladas</div>':''}`}</div>`}).join('')}
+  ${[1,2,3].map(e=>{const x=f.ev[e-1];return `<div class="card"><div class="row" style="justify-content:space-between"><h3 style="font-size:20px">${e}ª evaluación</h3>${m?'':`<span><span class="nota">${fmt(x.nota)}</span>${x.real>10.04?` <span class="chip g">trabajo real ${fmt(x.real)}</span>`:''}</span>`}</div><div class="weeks">${strip(e)}</div>${detalleEv(p,a,x,e,m)}${m?'':`<div class="muted" style="font-size:13px;margin-top:8px">${x.fsj?x.fsj+' falta(s) sin justificar. ':''}${x.fj?x.fj+' justificada(s).':''}${x.pen?' Resta '+fmt(x.pen)+' al trabajo real.':''}</div>${x.fj>=r.aviso_rojo?'<div class="warn r">Aviso rojo: muchas faltas justificadas</div>':x.fj>=r.aviso_amarillo?'<div class="warn">Aviso amarillo: faltas justificadas acumuladas</div>':''}`}</div>`}).join('')}
   ${m?'':`<div class="grid2"><div class="card"><div class="muted">Nota final calculada</div><div class="big">${fmt(f.final)}</div><div class="muted" style="margin-top:6px">Redondeada ${f.final===null?'—':Math.round(f.final)} · truncada ${f.final===null?'—':Math.floor(f.final)}</div>${f.tope?`<div class="warn r">Tope de ${r.vico_tope} por no ir al Vico sin justificar. Sin tope sería ${fmt((1-r.vico_peso/100)*f.clase+r.vico_peso/100*f.vico.nota)}.</div>`:''}${f.vicoPend?'<div class="warn">Falta poner el valor manual del Vico (falta justificada).</div>':''}<div class="muted" style="font-size:13px;margin-top:6px">Media de clase ${fmt(f.clase)}${b?' · Vico '+fmt(f.vico.nota):' · bonificación Vico '+fmt(f.vico.bonus)}</div></div>
   <form data-form="manual" class="card"><h3 style="font-size:18px">Nota final manual</h3><label>Nota (vacío = usar la calculada)<input type="number" step="0.1" min="0" max="10" name="nota_manual" value="${a.nota_manual??''}"></label><label>Comentario<textarea name="comentario_manual">${esc(a.comentario_manual||'')}</textarea></label><label>Notas generales (se mantienen fijas)<textarea name="notas_privadas">${esc(a.notas_privadas||'')}</textarea></label><div><button class="btn gold">Guardar</button></div></form></div>`}`;
 }
@@ -510,6 +553,10 @@ const pdfHdr=(titulo,sub)=>`<div class="hdr">${EMB()}<div><div class="kicker">CE
 const cursoTxt=p=>p.curso==='4ESO'?'4º ESO · Creaciones escénico-musicales':'1º Bachillerato · Música, espectáculo y comunicación';
 function diasEv(p,a,e){return DB.sesiones.filter(s=>s.proyecto_id===p.id&&s.evaluacion===e&&s.cerrada&&!s.sin_clase).sort((x,y)=>x.fecha.localeCompare(y.fecha)).map(s=>{const k=DB.marcas.find(x=>x.sesion_id===s.id&&x.alumno_id===a.id);return {s,c:k?k.color:'verde',motivo:k?(k.motivo||''):''}})}
 const stripPdf=(p,it)=>it.length?`<div class="strip">${it.map(({s,c})=>`<div class="day">${c==='falta'||c==='falta_j'?`<div class="fal ${c==='falta_j'?'j':''}">${c==='falta'?'F':'J'}</div>`:pie(pct(p,c),PCOL[c],18)}${s.fecha.slice(8)}/${s.fecha.slice(5,7)}</div>`).join('')}</div>`:'<div class="mut">Todavía no hay días cerrados en esta evaluación.</div>';
+const secVal=(p,a,ev,alu)=>`<div class="sec"><h3>Valoración de roles y actuaciones</h3>${ev.map(({e,x})=>{const rr=reglas(p);
+  const rl=x.roles.length?x.roles.map(q=>`<span class="chip" style="display:inline-flex;align-items:center;gap:5px">${esc(q.nombre)} ${q.val?pie(pct(p,q.val),PCOL[q.val],14)+(alu?'':' '+fmt(Number(rr.rubrica[q.val]))):'<span class="mut">sin valorar</span>'}</span>`).join(''):'<span class="mut">Sin roles</span>';
+  const ac=x.actItems.length?x.actItems.map(({e:en,v,c,falta,faltaJ,na,pend})=>`<span class="chip" style="display:inline-flex;align-items:center;gap:5px">${esc(en.nombre)} ${falta?'· falta':c?pie(pct(p,c),PCOL[c],14)+(alu?'':' '+fmt(v)):faltaJ?'· justificada'+(!alu&&v!==null?' '+fmt(v):''):'· sin nota'}</span>`).join(''):'<span class="mut">Sin actuación</span>';
+  return `<div class="ev"><div class="evh"><span>${e}ª evaluación${x.cerrada?'':' (abierta)'}</span></div><div>${rl}</div><div style="margin-top:4px">${ac}</div></div>`}).join('')}</div>`;
 function htmlFicha(p,a,alu){
   const f=calcFinal(p,a),r=reglas(p),b=p.curso==='1BACH',er=evActual(p);
   const roles=rolesDeAl(a,er),ev=[1,2,3].map(e=>({e,x:f.ev[e-1],it:diasEv(p,a,e)}));
@@ -523,15 +570,15 @@ function htmlFicha(p,a,alu){
   const cnt={};incid(p,a).forEach(({m})=>(m.motivos||[]).forEach(n=>cnt[n]=(cnt[n]||0)+1));
   const asp=`<div class="sec"><h3>Aspectos en los que puedes mejorar</h3>${Object.keys(cnt).length?Object.entries(cnt).sort((x,y)=>y[1]-x[1]).map(([n,c])=>`<span class="chip">${esc(n)}${c>1?' ('+c+' veces)':''}</span>`).join(''):'<div class="mut">Ahora mismo no hay aspectos destacados. ¡Sigue así!</div>'}</div>`;
   const calc=`<div class="sec"><h3>Cómo se calcula mi nota</h3><div style="white-space:pre-line">${esc(r.texto_calculo||textoCalculoAuto(p))}</div></div>`;
-  if(alu)return cab+ident+`<div class="mut" style="margin-top:6px">Este informe muestra tu evolución con colores: es una forma de ver cómo trabajas cada día y cómo mejorar.</div>`+evoluc+tFaltas+asp+calc;
+  if(alu)return cab+ident+`<div class="mut" style="margin-top:6px">Este informe muestra tu evolución con colores: es una forma de ver cómo trabajas cada día y cómo mejorar.</div>`+evoluc+secVal(p,a,ev,true)+tFaltas+asp+calc;
   const incT=(()=>{const it=incid(p,a);return `<div class="sec"><h3>Incidencias en clase</h3>${it.length?`<table><thead><tr><th>Fecha</th><th></th><th>Motivos</th><th>Comentario</th></tr></thead><tbody>${it.map(({m,s})=>`<tr><td>${fd(s.fecha)}</td><td>${pie(pct(p,m.color),PCOL[m.color],15)}</td><td>${Array.isArray(m.motivos)&&m.motivos.length?esc(m.motivos.join(' · ')):'<span class="mut">sin motivo registrado</span>'}</td><td>${esc(m.motivo||'')}</td></tr>`).join('')}</tbody></table>`:'<div class="mut">Sin marcas en naranja o rojo.</div>'}</div>`})();
   const rolesTabla=`<h3>Roles y valores</h3><table><tr><th>Rol</th><th>Valor</th><th>Intensidad</th><th>1ª</th><th>2ª</th><th>3ª</th></tr>${DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{},ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined,ee=asgEvs(x);return `<tr><td><b>${esc(ro.nombre||'?')}</b>${ad?' <span class="chip y">adaptado</span>':''}</td><td>${fmt(ad?x.valor_adaptado:ro.v1)}</td><td>${Number(x.factor)===1?'Principal':Number(x.factor)===0.6?'Secundario':'Puntual'}</td>${[1,2,3].map(e=>`<td>${ee.includes(e)?'✓':'—'}</td>`).join('')}</tr>`}).join('')||'<tr><td colspan="6" class="mut">Sin roles.</td></tr>'}</table>`;
-  const cards=`<h3>Resumen por evaluación</h3><div class="g3">${ev.map(({e,x})=>`<div class="card"><div class="t">${e}ª evaluación</div><div class="big">${x.nota===null?'—':fmt(x.notaFinalEv??x.nota)}</div><div class="mut">${x.nota===null?'Sin días cerrados':`Trabajo real ${fmt(x.real)} · ${x.ses} clases${x.pen?`<br>Resta por faltas ${fmt(x.pen)}`:''}`}</div><div class="mut">${x.fsj?x.fsj+' sin justificar':''}${x.fsj&&x.fj?' · ':''}${x.fj?x.fj+' justificadas':''}</div></div>`).join('')}</div>`;
+  const cards=`<h3>Resumen por evaluación</h3><div class="g3">${ev.map(({e,x})=>`<div class="card"><div class="t">${e}ª evaluación</div><div class="big">${x.nota===null?'—':fmt(x.notaFinalEv??x.nota)}</div><div class="mut">${x.nota===null?'Sin días cerrados':`Clase ${fmt(x.clase)}${x.act!==null?' · Actuación '+fmt(x.act):''}${x.cerrada?'':' · prov.'}<br>Trabajo real ${fmt(x.real)} · ${x.ses} clases${x.pen?`<br>Resta por faltas ${fmt(x.pen)}`:''}`}</div><div class="mut">${x.fsj?x.fsj+' sin justificar':''}${x.fsj&&x.fj?' · ':''}${x.fj?x.fj+' justificadas':''}</div></div>`).join('')}</div>`;
   const man=a.nota_manual!==null&&a.nota_manual!==undefined;
   const fin=`<div class="final"><div><div class="mut">Nota final calculada</div><div class="big">${fmt(f.final)}</div></div><div class="mut">${f.final===null?'':`Redondeada <b>${Math.round(f.final)}</b> · truncada <b>${Math.floor(f.final)}</b>`}<br>Media de clase ${fmt(f.clase)}${b?' · Teatro Vico '+fmt(f.vico.nota):' · bonificación Vico '+fmt(f.vico.bonus)}${f.tope?`<br><b style="color:#b13434">Tope de ${r.vico_tope} por no asistir al Vico sin justificar</b>`:''}</div>${man?`<div style="margin-left:auto;text-align:right"><div class="mut">Nota final manual</div><div class="big" style="color:#6e1d3a">${fmt(a.nota_manual)}</div></div>`:''}</div>${man&&a.comentario_manual?`<div class="mut" style="margin-top:6px"><b>Comentario:</b> ${esc(a.comentario_manual)}</div>`:''}`;
   const ns=DB.notas.filter(n=>n.alumno_id===a.id).sort((x,y)=>(x.fecha||'').localeCompare(y.fecha||''));
   const notas=`<div class="sec"><h3>Notas del profesor</h3>${a.notas_privadas?`<div class="card" style="margin-bottom:8px"><div class="mut">Notas generales</div>${esc(a.notas_privadas)}</div>`:''}${ns.length?`<table><tr><th style="width:90px">Fecha</th><th>Anotación</th></tr>${ns.map(n=>`<tr><td>${fd(n.fecha)}</td><td>${esc(n.texto)}</td></tr>`).join('')}</table>`:'<div class="mut">Sin anotaciones.</div>'}</div>`;
-  return cab+ident+cards+fin+rolesTabla+evoluc+tFaltas+incT+notas;
+  return cab+ident+cards+fin+rolesTabla+secVal(p,a,ev,false)+evoluc+tFaltas+incT+notas;
 }
 function htmlHoja(p){const r=reglas(p);return pdfHdr('Qué significa cada color','Guía de valoración en el aula · '+esc(p.nombre))+`<div style="margin-top:14px">${COLORES.map(c=>`<div class="card" style="display:flex;gap:18px;align-items:center;margin-bottom:12px;padding:16px 20px">${pie(pct(p,c),PCOL[c],58)}<div><div class="big2" style="color:${PCOL[c]}">${NOMBRE_COLOR[c]}</div><div style="font-size:12pt;line-height:1.4">${esc(r.hoja[c])}</div></div></div>`).join('')}</div><div class="mut" style="margin-top:6px">Cuanto más lleno está el círculo, mejor ha sido el trabajo. Cuando un día se valora en naranja o rojo se anota siempre el motivo.</div>`}
 function htmlGrupo(p){
@@ -616,6 +663,12 @@ function vStats(p){
   ${sec('Distribución de notas calculadas',fin.length?B.map(([l,fn,c])=>bar(l,fin.filter(fn).length,fin.length,c)).join(''):vacio)}
   </div><p class="muted" style="margin-top:14px">Las estadísticas usan solo los días de clase cerrados.</p>`;
 }
+function detalleEv(p,a,x,e,alu){
+  const r=reglas(p),forma=(c,v)=>`<i class="sh c-${c}" style="--p:${pct(p,c)}%;width:14px;height:14px"></i>`;
+  const rl=x.roles.map(q=>`<span class="chip" style="display:inline-flex;align-items:center;gap:6px">${esc(q.nombre)} ${q.val?forma(q.val)+(alu?'':' '+fmt(Number(r.rubrica[q.val]))):'<span class="muted">sin valorar</span>'}</span>`).join(' ');
+  const ac=x.actItems.map(({e:ev,v,c,falta,faltaJ,na,pend})=>`<span class="chip" style="display:inline-flex;align-items:center;gap:6px">${esc(ev.nombre)} ${falta?'· falta':c?forma(c)+(alu?'':' '+fmt(v)):faltaJ?'· justificada'+(!alu&&v!==null?' '+fmt(v):''):'· sin nota'}</span>`).join(' ');
+  return `${rl?`<div style="margin-top:10px"><span class="muted" style="font-size:12px">Valoración de roles:</span> ${rl}</div>`:''}${ac?`<div style="margin-top:6px"><span class="muted" style="font-size:12px">Actuación:</span> ${ac}</div>`:''}${alu?'':`<div class="muted" style="font-size:13px;margin-top:8px">${x.clase===null?'':`Clase ${fmt(x.clase)}`}${x.act!==null?` · Actuación ${fmt(x.act)} (${r.peso_actuacion} %)`:''}${x.cerrada?'':' · evaluación abierta: la nota es solo de clase'}</div>`}`;
+}
 function vFaltas(p){
   if(modoAlumno)return '';const a=DB.alumnos.find(x=>x.id===view.aid);if(!a)return '';
   const fl=DB.marcas.filter(m=>m.alumno_id===a.id&&(m.color==='falta'||m.color==='falta_j')).map(m=>({m,s:DB.sesiones.find(x=>x.id===m.sesion_id)})).filter(x=>x.s&&!x.s.sin_clase).sort((x,y)=>y.s.fecha.localeCompare(x.s.fecha));
@@ -638,8 +691,8 @@ function panelRoles(p){
 }
 function overlays(p){
   if(!p)return '';
-  if(view.motivo){const m=DB.marcas.find(x=>x.id===view.motivo.mid);if(m){const a=DB.alumnos.find(x=>x.id===m.alumno_id),se=DB.sesiones.find(x=>x.id===m.sesion_id),r=reglas(p),cat=r.motivos.filter(x=>x.a!=='rol'),sel=Array.isArray(m.motivos)?m.motivos:[];
-    return `<div class="ov" data-act="cerrarmotivo"></div><div class="modal" role="dialog" aria-modal="true"><h3 style="display:flex;align-items:center;gap:10px"><i class="sh c-${m.color}" style="--p:${pct(p,m.color)}%;width:26px;height:26px"></i>¿Por qué ${m.color}?</h3><div class="muted">${esc(nomDe(a))}${se?' · '+fd(se.fecha):''}. Elige al menos un motivo: queda como evidencia de esta marca.</div><div class="mchips">${cat.map(x=>`<button type="button" class="mchip ${sel.includes(x.n)?'on':''}" data-act="motivotoggle" data-m="${m.id}" data-n="${esc(x.n)}">${esc(x.n)}</button>`).join('')||'<span class="muted">No hay motivos. Añádelos en Configuración → Colores y motivos.</span>'}</div><label>Comentario (opcional)<input value="${esc(m.motivo||'')}" data-chg="motivo" data-id="${m.id}" placeholder="Algo más que quieras anotar…"></label><div class="row" style="margin-top:12px"><button class="btn gold" data-act="cerrarmotivo">Listo</button>${sel.length?'':'<span class="muted" style="font-size:13px">Sin motivo no se podrá cerrar el día.</span>'}</div></div>`}}
+  if(view.motivo){const kind=view.motivo.kind||'marca',m=kind==='val'?DB.valoraciones.find(x=>x.id===view.motivo.mid):DB.marcas.find(x=>x.id===view.motivo.mid);if(m){const a=DB.alumnos.find(x=>x.id===m.alumno_id),se=kind==='val'?null:DB.sesiones.find(x=>x.id===m.sesion_id),ro=kind==='val'?DB.roles.find(x=>x.id===m.rol_id):null,r=reglas(p),cat=r.motivos.filter(x=>kind==='val'?x.a!=='dia':x.a!=='rol'),sel=Array.isArray(m.motivos)?m.motivos:[];
+    return `<div class="ov" data-act="cerrarmotivo"></div><div class="modal" role="dialog" aria-modal="true"><h3 style="display:flex;align-items:center;gap:10px"><i class="sh c-${m.color}" style="--p:${pct(p,m.color)}%;width:26px;height:26px"></i>¿Por qué ${m.color}?</h3><div class="muted">${esc(nomDe(a))}${se?' · '+fd(se.fecha):''}${ro?' · rol «'+esc(ro.nombre)+'»':''}. Elige al menos un motivo: queda como evidencia.</div><div class="mchips">${cat.map(x=>`<button type="button" class="mchip ${sel.includes(x.n)?'on':''}" data-act="motivotoggle" data-k="${kind}" data-m="${m.id}" data-n="${esc(x.n)}">${esc(x.n)}</button>`).join('')||'<span class="muted">No hay motivos. Añádelos en Configuración → Colores y motivos.</span>'}</div><label>Comentario (opcional)<input value="${esc(kind==='val'?(m.comentario||''):(m.motivo||''))}" data-chg="${kind==='val'?'comval':'motivo'}" data-id="${m.id}" placeholder="Algo más que quieras anotar…"></label><div class="row" style="margin-top:12px"><button class="btn gold" data-act="cerrarmotivo">Listo</button>${sel.length?'':'<span class="muted" style="font-size:13px">Sin motivo no se podrá cerrar.</span>'}</div></div>`}}
   if(view.hoja){const r=reglas(p);return `<div class="ov" data-act="cerrarhoja"></div><div class="modal" role="dialog" aria-modal="true"><h3>Qué significa cada color</h3>${COLORES.map(c=>`<div class="hoja-row"><i class="sh c-${c}" style="--p:${pct(p,c)}%;width:30px;height:30px"></i><div><b>${NOMBRE_COLOR[c]}</b><div class="muted">${esc(r.hoja[c])}</div></div></div>`).join('')}<div class="row" style="margin-top:12px"><button class="btn" data-act="cerrarhoja">Cerrar</button><button class="btn gold" data-act="pdfhoja">PDF para el aula</button></div></div>`}
   if(view.panel&&ES_JEFE)return panelRoles(p);
   if(view.nota){const a=DB.alumnos.find(x=>x.id===view.nota.aid);if(a)return `<div class="ov" data-act="cerrarnota"></div><div class="modal" role="dialog" aria-modal="true"><h3>Nota sobre ${esc(nomDe(a))}</h3><div class="muted" style="margin-bottom:10px">Se guarda en su registro de notas con la fecha ${fd(view.nota.fecha)}.</div><form data-form="notarapida"><textarea name="texto" required placeholder="Está mirando el móvil…"></textarea><div class="row"><button class="btn gold">Guardar nota</button><button type="button" class="btn" data-act="cerrarnota">Cancelar</button></div></form></div>`}
@@ -688,6 +741,7 @@ function cReglas(p){
   const n=(name,l,v,st='0.1')=>`<label>${l}<input type="number" step="${st}" name="${name}" value="${v}"></label>`;
   return `<form data-form="reglas" class="card"><h3 style="margin-bottom:10px">Rúbrica de colores (solo la ves tú)</h3><div class="fg">${COLORES.map(c=>`<label><span class="row"><i class="sh c-${c}" style="--p:${pct(p,c)}%"></i> ${c}</span><input type="number" step="0.5" name="rub_${c}" value="${r.rubrica[c]}"></label>`).join('')}</div>
   <h3 style="margin:16px 0 10px">Peso de cada evaluación (%)</h3><div class="fg">${n('pe0','1ª',r.pesos_eval[0],'1')}${n('pe1','2ª',r.pesos_eval[1],'1')}${n('pe2','3ª (final)',r.pesos_eval[2],'1')}</div>
+  <h3 style="margin:16px 0 10px">Cómo se compone la nota de una evaluación</h3><div class="fg">${n('pd','Parte de clase: % de la media diaria (el resto es la valoración del rol)',r.peso_diaria,'1')}${n('pa','Peso de la actuación en la evaluación (%)',r.peso_actuacion,'1')}</div>
   <h3 style="margin:16px 0 10px">Faltas</h3><div class="fg">${n('sj_resta','Resta por falta sin justificar',r.falta_sj_resta)}<label style="flex-direction:row;align-items:center;gap:10px;color:var(--ink)"><input type="checkbox" name="sj_cero" ${r.falta_sj_cuenta_cero?'checked':''} style="width:auto;min-height:0"> La falta sin justificar cuenta como 0 en la media</label>${[3,4,5,6,7].map(i=>n('j'+i,'Resta con '+i+' justificadas',e[i])).join('')}${n('mas_j','Cada justificada más',r.mas_just_resta)}${n('av_a','Aviso amarillo desde',r.aviso_amarillo,'1')}${n('av_r','Aviso rojo desde',r.aviso_rojo,'1')}</div>
   <h3 style="margin:16px 0 10px">Teatro Vico</h3><div class="fg">${n('v_peso','Peso en la nota final de Bachillerato (%)',r.vico_peso,'1')}${n('vw1','Peso del ensayo del Vico',r.vico_w[0],'0.5')}${n('vw2','Peso de la función del Vico',r.vico_w[1],'0.5')}${n('v_tope','Tope si no va sin justificar',r.vico_tope)}<label style="flex-direction:row;align-items:center;gap:10px;color:var(--ink)"><input type="checkbox" name="v_tope_on" ${r.vico_tope_activo?'checked':''} style="width:auto;min-height:0"> Tope activo</label></div>
   <div class="muted" style="margin:10px 0 6px">Bonificación en 4º ESO por función</div><div class="fg">${COLORES.map(c=>`<label><span class="row"><i class="sh c-${c}"></i> ${c}</span><input type="number" step="0.5" name="bon_${c}" value="${r.bonus[c]}"></label>`).join('')}</div>
@@ -706,9 +760,9 @@ function cHorario(p){
   <form data-form="horas" class="card"><h3 style="font-size:18px">Horas del centro</h3><div class="muted" style="margin:4px 0 10px">Puedes cambiarlas si usas la app en otro centro. Deja una fila vacía para quitarla.</div><div class="scroll"><table><tr><th>Hora</th><th>Desde</th><th>Hasta</th><th>Recreo</th></tr>${Array.from({length:9},(_,i)=>{const x=h.horas[i]||{};return `<tr><td><input name="h_n${i}" value="${esc(x.n||'')}" style="min-width:90px"></td><td><input type="time" name="h_i${i}" value="${x.ini||''}"></td><td><input type="time" name="h_f${i}" value="${x.fin||''}"></td><td><input type="checkbox" name="h_r${i}" ${x.recreo?'checked':''} style="width:auto;min-height:0"></td></tr>`}).join('')}</table></div><div style="margin-top:10px"><button class="btn gold">Guardar horas</button></div></form>`;
 }
 function textoCalculoAuto(p){
-  const r=reglas(p),b=p.curso==='1BACH',bmax=Math.max(...Object.values(r.bonus));
-  let t=`Cada día valoro tu trabajo en clase con un color: cuanto más lleno está el círculo, mejor ha sido tu trabajo. La nota de cada evaluación sale de ese trabajo diario y de los roles que desempeñas en el musical: cada rol aporta puntos según su importancia y, si tienes varios, se suman, hasta un máximo de 10.\nLas faltas sin justificar restan ${fmt(r.falta_sj_resta)} puntos cada una. Las justificadas no restan hasta la tercera de una evaluación y, a partir de ahí, restan de forma progresiva.\nLa nota final del curso es la media de las tres evaluaciones (${r.pesos_eval.join(' %, ')} %).`;
-  t+=b?`\nEl Teatro Vico forma parte de tu nota final con un ${r.vico_peso} %. Participar es obligatorio: si faltas a la función sin justificar, tu nota final no puede superar ${r.vico_tope}.`:`\nSi participas en el montaje y desmontaje del Teatro Vico, tu nota de la 3ª evaluación puede subir hasta ${fmt(bmax)} punto(s), según tu trabajo ese día.`;
+  const r=reglas(p),b=p.curso==='1BACH',bmax=Math.max(...Object.values(r.bonus)),pd=r.peso_diaria,pr=100-pd,pa=r.peso_actuacion;
+  let t=`Cada día valoro tu trabajo en clase con un color: cuanto más lleno está el círculo, mejor ha sido tu trabajo. Al final de cada evaluación valoro también cómo has desempeñado cada uno de tus roles en el musical.\nTu nota de cada evaluación se compone de:\n· Un ${100-pa} % de la parte de clase: un ${pd} % de tu trabajo diario y un ${pr} % de la valoración de tus roles. Cada rol aporta puntos según su importancia y, si tienes varios, se suman, hasta un máximo de 10.\n· Un ${pa} % de la actuación de la evaluación (si hay dos, se reparte a partes iguales). La nota de la actuación es la misma para todo el grupo, sea cual sea tu rol. Si faltas sin justificar, es un 0; si lo justificas, tu nota se calcula solo con la parte de clase, salvo que acordemos un trabajo para recuperarla.\nLas faltas de asistencia sin justificar restan ${fmt(r.falta_sj_resta)} puntos cada una. Las justificadas no restan hasta la tercera de una evaluación y, a partir de ahí, restan de forma progresiva.\nLa nota final del curso es la media de las tres evaluaciones (${r.pesos_eval.join(' %, ')} %).`;
+  t+=b?`\nEl ensayo en el Teatro Vico cuenta dentro de la 3ª evaluación. Además, la función del Teatro Vico supone un ${r.vico_peso} % de tu nota final: la media de las tres evaluaciones es el ${100-r.vico_peso} % restante. Participar es obligatorio: si faltas a la función sin justificar, tu nota final no puede superar ${r.vico_tope}.`:`\nSi participas en el montaje y desmontaje del Teatro Vico, tu nota de la 3ª evaluación puede subir hasta ${fmt(bmax)} punto(s), según tu trabajo ese día.`;
   return t;
 }
 function cColores(p){
@@ -720,8 +774,8 @@ function cColores(p){
 }
 function cSim(p){
   const rs=rolesDe(p),r=reglas(p);
-  return `<form data-form="sim" class="card"><h3 style="margin-bottom:10px">Simulador de notas</h3><div class="muted" style="margin-bottom:8px">Elige roles y un caso para ver qué nota saldría.</div><div class="fg">${rs.map(x=>`<label style="flex-direction:row;align-items:center;gap:8px;color:var(--ink)"><input type="checkbox" name="rol" value="${x.id}" style="width:auto;min-height:0"> ${esc(x.nombre)}</label>`).join('')}</div>
-  <div class="fg" style="margin-top:12px"><label>Evaluación<select name="ev"><option>1</option><option>2</option><option>3</option></select></label><label>Color medio<select name="col">${COLORES.map(c=>`<option>${c}</option>`).join('')}</select></label><label>Faltas sin justificar<input type="number" name="sj" value="0" min="0"></label><label>Faltas justificadas<input type="number" name="j" value="0" min="0"></label></div>
+  return `<form data-form="sim" class="card"><h3 style="margin-bottom:10px">Simulador de notas</h3><div class="muted" style="margin-bottom:8px">Elige los roles de un alumno imaginario y un caso para ver qué nota saldría.</div><div class="fg">${rs.map(x=>`<label style="flex-direction:row;align-items:center;gap:8px;color:var(--ink)"><input type="checkbox" name="rol" value="${x.id}" style="width:auto;min-height:0"> ${esc(x.nombre)}</label>`).join('')}</div>
+  <div class="fg" style="margin-top:12px"><label>Evaluación<select name="ev"><option>1</option><option>2</option><option>3</option></select></label><label>Color medio de los días<select name="col">${COLORES.map(c=>`<option>${c}</option>`).join('')}</select></label><label>Valoración del rol (igual en todos)<select name="vr"><option value="">Sin valorar</option>${COLORES.map(c=>`<option>${c}</option>`).join('')}</select></label><label>Actuación<select name="ac"><option value="">Sin actuación</option>${COLORES.map(c=>`<option>${c}</option>`).join('')}<option value="falta">Falta sin justificar (0)</option><option value="falta_j">Falta justificada</option></select></label><label>Valor si es justificada (opcional)<input type="number" name="avj" min="0" max="10" step="0.1" placeholder="vacío = solo clase"></label><label>Faltas sin justificar<input type="number" name="sj" value="0" min="0"></label><label>Faltas justificadas<input type="number" name="j" value="0" min="0"></label></div>
   <div style="margin-top:12px"><button class="btn gold">Calcular</button></div><div id="simres" style="margin-top:14px"></div></form>`;
 }
 /* ---------- acciones ---------- */
@@ -783,6 +837,21 @@ const A={
     if(confirm(`Todo completo. ¿Cerrar el ${fd(d.fecha)}?`)){await upd('sesiones',s.id,{cerrada:true});view.cerrando=false;view.sel=null;view.evTab=null;toast('Día cerrado');render()}},
   vertodos:()=>{view.cerrando=false;render()},
   reabrir:async()=>{const p=P(),d=selActual(p,agenda(p));if(d&&d.ses){await upd('sesiones',d.ses.id,{cerrada:false});render()}},
+  evfin:el=>{view.evFin=+el.dataset.v;render()},
+  irfin:el=>{view.tab='dia';view.sub='fineval';view.evFin=+el.dataset.e;view.aid=null;view.from=null;window.scrollTo(0,0);render()},
+  valrol:async el=>{const p=P(),e=+el.dataset.e;if(evCerrada(p,e))return toast('Evaluación cerrada: pulsa Reabrir para cambiar una valoración.');
+    const aid=el.dataset.a,rid=el.dataset.r,c=el.dataset.c,cur=DB.valoraciones.find(v=>v.alumno_id===aid&&v.rol_id===rid&&Number(v.evaluacion)===e);
+    if(cur&&cur.color===c){DB.valoraciones=DB.valoraciones.filter(v=>v!==cur);render();const {error}=await sb.from('pe_valoraciones').delete().eq('id',cur.id);if(error)fail(error);return}
+    const nn=c==='naranja'||c==='rojo',eraNn=!!cur&&(cur.color==='naranja'||cur.color==='rojo');
+    const row={id:cur?cur.id:uid(),proyecto_id:p.id,alumno_id:aid,rol_id:rid,evaluacion:e,color:c,motivos:nn?(eraNn&&Array.isArray(cur.motivos)?cur.motivos:[]):null,comentario:cur?(cur.comentario||''):''};
+    DB.valoraciones=DB.valoraciones.filter(v=>v!==cur);DB.valoraciones.push(row);if(nn&&!eraNn)view.motivo={kind:'val',mid:row.id};render();
+    const {error}=await sb.from('pe_valoraciones').upsert(row,{onConflict:'alumno_id,rol_id,evaluacion'});if(error)fail(error)},
+  cerrarval:async()=>{const p=P(),e=view.evFin||evActual(p),pm=DB.valoraciones.filter(v=>v.proyecto_id===p.id&&Number(v.evaluacion)===e&&pendMotivo(v)).length;
+    if(pm)return toast(`Falta el motivo en ${pm} valoración(es) en naranja o rojo. La evaluación no se cierra hasta completarlo.`,7000);
+    const fv=pendientesVal(p,e);if(!confirm(fv?`Quedan ${fv} rol(es) sin valorar: se calcularán solo con la media diaria. ¿Cerrar la ${e}ª evaluación?`:`¿Cerrar la ${e}ª evaluación? A partir de ahora su nota incluye la actuación.`))return;
+    const ex=DB.cierres.find(c=>c.proyecto_id===p.id&&Number(c.evaluacion)===e);if(ex)await upd('cierres',ex.id,{cerrada:true});else await ins('cierres',{proyecto_id:p.id,evaluacion:e,cerrada:true,fecha:hoy()});toast('Evaluación cerrada');render()},
+  reabrirval:async()=>{const p=P(),e=view.evFin||evActual(p),ex=DB.cierres.find(c=>c.proyecto_id===p.id&&Number(c.evaluacion)===e);if(ex){await upd('cierres',ex.id,{cerrada:false});toast('Evaluación reabierta');render()}},
+  evgrupo:async el=>{const e=DB.eventos.find(x=>x.id===el.dataset.id);if(!e)return;const c=el.dataset.c;await upd('eventos',e.id,{color_grupo:e.color_grupo===c?null:c});render()},
   delfest:async el=>{await guardaH({festivos:horarioDe(P()).festivos.filter((_,i)=>i!==+el.dataset.i)})},
   delev:async el=>{if(confirm('¿Borrar el evento?')){await del('eventos',el.dataset.id);render()}},
   ficha:(el,e)=>{e.preventDefault();if(!view.aid)view.from={tab:view.tab,sub:view.sub,conf:view.conf,sel:view.sel,evTab:view.evTab,evRoles:view.evRoles,y:window.scrollY};view.aid=el.dataset.id;view.buscar=false;view.panel=null;view.rolSel=null;modoAlumno=false;if(!['eval','alumnos'].includes(view.tab))view.tab='alumnos';view.go=el.dataset.go||null;window.scrollTo(0,0);render()},
@@ -803,9 +872,9 @@ const A={
   pdfhoja:()=>pdfDoc('Qué significa cada color',htmlHoja(P())),
   hojadef:async()=>{if(confirm('¿Restaurar los textos originales de los cinco colores?'))await guardaR({hoja:HOJA_DEF})},
   calcauto:async()=>{if(confirm('¿Volver al texto automático?'))await guardaR({texto_calculo:''})},
-  motivosel:el=>{view.motivo={mid:el.dataset.id};render()},
+  motivosel:el=>{view.motivo={mid:el.dataset.id,kind:el.dataset.k||'marca'};render()},
   cerrarmotivo:()=>{view.motivo=null;render()},
-  motivotoggle:async el=>{const m=DB.marcas.find(x=>x.id===el.dataset.m);if(!m)return;const n=el.dataset.n,cur=Array.isArray(m.motivos)?m.motivos:[],nu=cur.includes(n)?cur.filter(x=>x!==n):[...cur,n];await upd('marcas',m.id,{motivos:nu});render()},
+  motivotoggle:async el=>{const val=el.dataset.k==='val',m=(val?DB.valoraciones:DB.marcas).find(x=>x.id===el.dataset.m);if(!m)return;const n=el.dataset.n,cur=Array.isArray(m.motivos)?m.motivos:[],nu=cur.includes(n)?cur.filter(x=>x!==n):[...cur,n];await upd(val?'valoraciones':'marcas',m.id,{motivos:nu});render()},
   quitaad:async el=>{await upd('asignaciones',el.dataset.id,{valor_adaptado:null});toast('Adaptado quitado: el rol vuelve a su valor normal');render()},
   delmot:async el=>{await guardaR({motivos:reglas(P()).motivos.filter((_,i)=>i!==+el.dataset.i)})},
   modo:()=>{modoAlumno=!modoAlumno;render()},
@@ -823,6 +892,12 @@ const C={
   motivo:async el=>{const m=DB.marcas.find(x=>x.id===el.dataset.id);if(m)await upd('marcas',m.id,{motivo:el.value})},
   motnom:async el=>{const m=[...reglas(P()).motivos],i=+el.dataset.i;m[i]={...m[i],n:el.value.trim()||m[i].n};await guardaR({motivos:m})},
   motamb:async el=>{const m=[...reglas(P()).motivos],i=+el.dataset.i;m[i]={...m[i],a:el.value};await guardaR({motivos:m})},
+  resest:async el=>{const p=P(),eid=el.dataset.e,aid=el.dataset.a,est=el.value,cur=DB.resultados.find(x=>x.evento_id===eid&&x.alumno_id===aid);
+    if(est==='participa'){if(cur){DB.resultados=DB.resultados.filter(x=>x!==cur);render();const {error}=await sb.from('pe_resultados').delete().eq('id',cur.id);if(error)fail(error)}return}
+    const row={id:cur?cur.id:uid(),proyecto_id:p.id,evento_id:eid,alumno_id:aid,estado:est,valor_manual:est==='falta_j'&&cur?cur.valor_manual:null};
+    DB.resultados=DB.resultados.filter(x=>x!==cur);DB.resultados.push(row);render();const {error}=await sb.from('pe_resultados').upsert(row,{onConflict:'evento_id,alumno_id'});if(error)fail(error)},
+  resval:async el=>{const x=DB.resultados.find(q=>q.id===el.dataset.id);if(x){await upd('resultados',x.id,{valor_manual:el.value===''?null:num(el.value)});render()}},
+  comval:async el=>{const v=DB.valoraciones.find(q=>q.id===el.dataset.id);if(v)await upd('valoraciones',v.id,{comentario:el.value})},
   adapt:async el=>{await upd('asignaciones',el.dataset.id,{valor_adaptado:el.value===''?null:num(el.value)});render()},
   vman:async el=>{await upd('vico',el.dataset.id,{valor_manual:el.value===''?null:num(el.value)});render()},
   rolf:async el=>{await upd('roles',el.dataset.id,{[el.dataset.f]:el.dataset.f==='nombre'?el.value:num(el.value)})},
@@ -845,7 +920,7 @@ const F={
   extra:async d=>{const p=P(),peso=d.peso_otro?num(d.peso_otro):(num(d.peso)||1),clave='extra-'+Date.now().toString(36);const r=await ins('sesiones',{proyecto_id:p.id,fecha:d.fecha,clave,tipo:'extra',nombre:d.nombre.trim(),peso,evaluacion:evDeSeguro(p,d.fecha),cerrada:false,sin_clase:false});if(r){view.sel={fecha:d.fecha,clave};view.cerrando=false;toast('Día extra añadido');render()}},
   nuevo:async d=>{const r=await ins('proyectos',{nombre:limpia(d.nombre),curso:d.curso,optativa:d.curso==='4ESO'?'Creaciones escénico-musicales':'Música, espectáculo y comunicación',fecha_inicio:d.fecha_inicio||null,fecha_fin:d.fecha_fin||null,estado:'activo',reglas:{}});if(!r)return;await ins('roles',rolesIni(r[0].id));view={...view,tab:'conf',conf:'alumnos',pid:r[0].id};toast('Musical creado. Añade ahora los alumnos.');render()},
   datos:async d=>{if(await upd('proyectos',view.pid,{nombre:limpia(d.nombre),optativa:d.optativa,fecha_inicio:d.fecha_inicio||null,fecha_fin:d.fecha_fin||null,notas:d.notas})){toast('Guardado');render()}},
-  evento:async d=>{if(await ins('eventos',{proyecto_id:view.pid,nombre:d.nombre,tipo:d.tipo,evaluacion:+d.evaluacion,fecha:d.fecha||null,sede:d.sede})){render()}},
+  evento:async d=>{if(await ins('eventos',{proyecto_id:view.pid,nombre:d.nombre,tipo:d.tipo,evaluacion:+d.evaluacion,fecha:d.fecha||null,sede:d.sede,peso:num(d.peso)||1})){render()}},
   alumno:async d=>{if(await ins('alumnos',{proyecto_id:view.pid,numero:d.numero?+d.numero:null,nombre:tit(d.nombre),grupo:d.grupo||''})){render()}},
   nota:async d=>{if(await ins('notas',{proyecto_id:view.pid,alumno_id:view.aid,fecha:d.fecha||hoy(),texto:d.texto.trim()})){render()}},
   importar:async d=>{const ya=new Set(DB.alumnos.filter(a=>a.proyecto_id===view.pid).map(a=>nomDe(a).toLowerCase()));const rows=[];String(d.lista||'').split(/\r?\n/).forEach(l=>{const r=parseAl(l);if(r.nombre&&!ya.has(r.nombre.toLowerCase())){ya.add(r.nombre.toLowerCase());rows.push({proyecto_id:view.pid,...r})}});if(!rows.length)return toast('No hay alumnos nuevos.');if(await ins('alumnos',rows)){toast(rows.length+' alumno(s) importados');render()}},
@@ -853,12 +928,15 @@ const F={
   manual:async d=>{if(await upd('alumnos',view.aid,{nota_manual:d.nota_manual===''?null:num(d.nota_manual),comentario_manual:d.comentario_manual,notas_privadas:d.notas_privadas})){toast('Guardado');render()}},
   reglas:async d=>{const p=P(),r=reglas(p);const rub={},bon={};COLORES.forEach(c=>{rub[c]=num(d['rub_'+c]);bon[c]=num(d['bon_'+c])});
     const esc2=[...r.escala_just];[3,4,5,6,7].forEach(i=>esc2[i]=num(d['j'+i]));
-    const nr={rubrica:rub,bonus:bon,pesos_eval:[num(d.pe0),num(d.pe1),num(d.pe2)],falta_sj_resta:num(d.sj_resta),falta_sj_cuenta_cero:!!d.sj_cero,escala_just:esc2,mas_just_resta:num(d.mas_j),aviso_amarillo:num(d.av_a),aviso_rojo:num(d.av_r),vico_peso:num(d.v_peso),vico_w:[num(d.vw1)||1,num(d.vw2)||2],vico_tope:num(d.v_tope),vico_tope_activo:!!d.v_tope_on};
+    const nr={rubrica:rub,bonus:bon,pesos_eval:[num(d.pe0),num(d.pe1),num(d.pe2)],peso_diaria:d.pd===''||d.pd===undefined?70:Math.max(0,Math.min(100,num(d.pd))),peso_actuacion:d.pa===''||d.pa===undefined?20:Math.max(0,Math.min(100,num(d.pa))),falta_sj_resta:num(d.sj_resta),falta_sj_cuenta_cero:!!d.sj_cero,escala_just:esc2,mas_just_resta:num(d.mas_j),aviso_amarillo:num(d.av_a),aviso_rojo:num(d.av_r),vico_peso:num(d.v_peso),vico_w:[num(d.vw1)||1,num(d.vw2)||2],vico_tope:num(d.v_tope),vico_tope_activo:!!d.v_tope_on};
     verVal=!!d.ver;localStorage.setItem('pe_ver',verVal?'1':'0');
     if(await upd('proyectos',p.id,{reglas:{...(p.reglas||{}),...nr}})){toast('Reglas guardadas');render()}},
   sim:(d,f)=>{const p=P(),r=reglas(p),ev=+d.ev,ids=[...f.querySelectorAll('input[name=rol]:checked')].map(x=>x.value);
-    const base=ids.reduce((t,id)=>t+Number((DB.roles.find(q=>q.id===id)||{})['v'+ev]||0),0),media=r.rubrica[d.col],pen=num(d.sj)*r.falta_sj_resta+penalJust(num(d.j),r),real=Math.max(0,base*media/10-pen);
-    $('#simres').innerHTML=`<div class="card"><div class="muted">Valor de los roles: ${fmt(base)} · color medio ${d.col} (${media}) · resta por faltas ${fmt(pen)}</div><div class="big">${fmt(Math.min(10,real))}</div><div class="muted">Trabajo real: ${fmt(real)}${real>10?' (matrícula)':''}</div></div>`},
+    const media=Number(r.rubrica[d.col]),m10=media/10,pd=r.peso_diaria/100,pr=1-pd,base=ids.reduce((t,id)=>t+Number((DB.roles.find(q=>q.id===id)||{})['v'+ev]||0),0);
+    const fr=d.vr?(pd*m10+pr*Number(r.rubrica[d.vr])/10):m10,pen=num(d.sj)*r.falta_sj_resta+penalJust(num(d.j),r),real=Math.max(0,base*fr-pen),clase=Math.min(10,real);
+    let act=null;if(d.ac==='falta')act=0;else if(d.ac==='falta_j')act=(d.avj===''||d.avj===undefined)?null:num(d.avj);else if(d.ac)act=Number(r.rubrica[d.ac]);
+    const wA=r.peso_actuacion/100,nota=act===null?clase:Math.min(10,(1-wA)*clase+wA*act);
+    $('#simres').innerHTML=`<div class="card"><div class="muted">Valor de los roles: ${fmt(base)} · media diaria ${media} · valoración del rol ${d.vr?r.rubrica[d.vr]:'sin valorar'} · resta por faltas ${fmt(pen)}</div><div class="muted" style="margin-top:6px">Clase: <b>${fmt(clase)}</b>${real>10?' (trabajo real '+fmt(real)+')':''}${act!==null?` · Actuación: <b>${fmt(act)}</b> (${r.peso_actuacion} %)`:''}</div><div class="big">${fmt(nota)}</div><div class="muted">${act!==null?'Nota de la evaluación ya cerrada.':'Sin actuación: la nota es solo de clase.'}</div></div>`},
   derivar:async(d,f)=>{const p=P(),ids=[...f.querySelectorAll('input[name=al]:checked')].map(x=>x.value);const r=await ins('proyectos',{nombre:d.nombre,curso:'1BACH',optativa:'Música, espectáculo y comunicación',estado:'activo',reglas:p.reglas||{},origen_id:p.id});if(!r)return;const np=r[0];
     await ins('roles',rolesDe(p).map(x=>({proyecto_id:np.id,nombre:x.nombre,bloque:x.bloque,v1:x.v1,v2:x.v2,v3:x.v3,es_libre:x.es_libre,orden:x.orden})));
     await ins('alumnos',ids.map(id=>{const a=DB.alumnos.find(q=>q.id===id);return {proyecto_id:np.id,nombre:a.nombre,grupo:a.grupo||''}}));
