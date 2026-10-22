@@ -26,7 +26,7 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;line-height:1.15}
 .nav button{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid #9b5870;background:transparent;font-weight:600;white-space:nowrap}
 .nav button.on{background:var(--goldbg);color:#241a22;border-color:var(--gold)}
 .nav .sp{flex:1}
-main{max-width:1100px;margin:0 auto;padding:24px 18px 90px}
+main{max-width:min(1640px,96vw);margin:0 auto;padding:24px 18px 90px}
 .muted{color:var(--mut)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
@@ -51,7 +51,7 @@ th{font-size:12px;color:var(--mut);font-weight:600}
 .sub{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
 .sub button{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--mut)}
 .sub button.on{border-color:var(--gold);color:var(--gold);font-weight:600}
-.phone{max-width:560px;margin:0 auto}
+.phone{width:100%}.phone .seg{max-width:520px}
 .al{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
 .al .t{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:10px}
 .al .t span{font-size:13px;color:var(--mut)}
@@ -95,6 +95,10 @@ button.dia b{display:block;font-size:13px}button.dia span{display:block}button.d
 .prog{height:8px;border-radius:4px;background:var(--chip);overflow:hidden;margin:4px 0 12px}.prog i{display:block;height:100%;background:var(--st-prog)}
 .stchip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:700;border:2px solid var(--k);color:var(--k)}.stchip.fill{background:var(--k);color:var(--bg)}
 .fila{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,430px),1fr));gap:12px;align-items:start}
+.cards>.tj,.cards>.al{margin-bottom:0}
+.strip{position:relative}
+@media(min-width:900px){.strip{flex-wrap:wrap;overflow-x:visible;overflow-y:auto;max-height:206px}}
 .login{max-width:430px;margin:50px auto;text-align:center}.login form{text-align:left}
 @media print{body{background:#fff;color:#000}.curtain,.noprint{display:none!important}.card{background:#fff;border-color:#999}.muted,th{color:#444}}
 </style>
@@ -268,7 +272,7 @@ function render(){
   else if(view.tab==='eval')h=view.aid?vFicha(p)+vFaltas(p)+vNotas(p):vEval(p);
   else if(view.tab==='stats')h=vStats(p);
   else if(view.tab==='conf')h=vConf(p);
-  $('#app').innerHTML=h;window.scrollTo(0,y);const sl=document.querySelector('.dia.sel');if(sl&&sl.parentElement){const c=sl.parentElement;c.scrollLeft=sl.offsetLeft-c.clientWidth/2+sl.clientWidth/2}
+  $('#app').innerHTML=h;window.scrollTo(0,y);const sl=document.querySelector('.dia.sel');if(sl&&sl.parentElement){const c=sl.parentElement;c.scrollLeft=sl.offsetLeft-c.clientWidth/2+sl.clientWidth/2;if(c.scrollHeight>c.clientHeight+4)c.scrollTop=sl.offsetTop-c.clientHeight/2+sl.clientHeight/2}
 }
 function head(p,extra=''){return `<div style="margin-bottom:18px" class="noprint"><div class="muted">${p.curso==='4ESO'?'4º ESO':'1º Bachillerato'} · ${esc(p.optativa||'')}${p.estado==='archivado'?' · archivado':''}</div><div class="titulo"><h1 style="font-size:32px">${esc(p.nombre)}</h1></div>${extra}</div>`}
 function vHome(){
@@ -351,10 +355,10 @@ function vHoy(p){
   <div class="prog"><i style="width:${als.length?(als.length-pend.length)*100/als.length:0}%"></i></div>
   ${locked?'<div class="lockbar"><span>Día cerrado: no se puede cambiar.</span><button class="btn" data-act="reabrir" style="margin-left:auto">Reabrir</button></div>':`<div class="seg">${[1,2,3].map(e=>`<button class="${ev===e?'on':''}" data-act="evsel" data-v="${e}">${e}ª eval.</button>`).join('')}</div>`}
   ${cierre?(pend.length?`<div class="warn r">Faltan ${pend.length} alumno(s) por marcar. El día no se cierra hasta que todos tengan su marca.</div>`:'<div class="warn" style="background:var(--ok);color:#fff">Todos los alumnos tienen marca. Ya puedes cerrar el día.</div>'):''}
-  <div class="${locked?'locked':''}">${lista.length?lista.map(a=>{const m=marks.find(x=>x.alumno_id===a.id),c=m?m.color:null,has=!!c,col=COLORES.includes(c)?`var(--c-${c})`:c==='falta'?'var(--f-bd)':c==='falta_j'?'var(--j-bg)':'var(--line)';
+  <div class="${locked?'locked':''}"><div class="cards">${lista.length?lista.map(a=>{const m=marks.find(x=>x.alumno_id===a.id),c=m?m.color:null,has=!!c,col=COLORES.includes(c)?`var(--c-${c})`:c==='falta'?'var(--f-bd)':c==='falta_j'?'var(--j-bg)':'var(--line)';
     const cv=calcEval(p,a,ev),rl=DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>(DB.roles.find(q=>q.id===x.rol_id)||{}).nombre).filter(Boolean).join(' + ');
     const av=cv.fj>=r.aviso_rojo?'<span class="chip r">'+cv.fj+' justif.</span>':cv.fj>=r.aviso_amarillo?'<span class="chip y">'+cv.fj+' justif.</span>':'';
-    return `<div class="tj ${has?'has':''} ${cierre&&!has?'pen':''}" style="--k:${col}"><div class="t"><b>${nAl(a)}${has?'<span class="tag ok">'+IC.ok+'Marcado</span>':'<span class="tag">Sin marcar</span>'} ${av}</b><span>${esc(rl||'sin rol')}</span></div>${colorBtns(c,'mark',`data-a="${a.id}"`,locked)}${c==='falta_j'?(locked?`<div class="muted" style="margin-top:6px">Motivo: ${esc(m.motivo||'—')}</div>`:`<div class="motivo"><input value="${esc(m.motivo||'')}" placeholder="Motivo (médico, familia…)" aria-label="Motivo de la justificación" data-chg="motivo" data-id="${m.id}"></div>`):''}</div>`}).join(''):(als.length?'':'<div class="card muted">Añade alumnos en Configuración.</div>')}</div>
+    return `<div class="tj ${has?'has':''} ${cierre&&!has?'pen':''}" style="--k:${col}"><div class="t"><b>${nAl(a)}${has?'<span class="tag ok">'+IC.ok+'Marcado</span>':'<span class="tag">Sin marcar</span>'} ${av}</b><span>${esc(rl||'sin rol')}</span></div>${colorBtns(c,'mark',`data-a="${a.id}"`,locked)}${c==='falta_j'?(locked?`<div class="muted" style="margin-top:6px">Motivo: ${esc(m.motivo||'—')}</div>`:`<div class="motivo"><input value="${esc(m.motivo||'')}" placeholder="Motivo (médico, familia…)" aria-label="Motivo de la justificación" data-chg="motivo" data-id="${m.id}"></div>`):''}</div>`}).join(''):(als.length?'':'<div class="card muted">Añade alumnos en Configuración.</div>')}</div></div>
   ${als.length&&!locked?`<div class="row" style="margin-top:8px">${cierre?'<button class="btn" style="flex:1" data-act="vertodos">Ver todos</button>':''}<button class="btn gold" style="flex:1" data-act="cerrar">Cerrar el día</button></div>`:''}
   ${!locked&&!marks.length&&sel.tipo==='clase'?`<div style="margin-top:12px"><button class="btn" data-act="sinclase" data-f="${sel.fecha}" data-k="${sel.clave}">Hoy no hay clase (festivo / sin clase)</button></div>`:''}
   ${sel.tipo==='extra'&&!locked?`<div style="margin-top:12px"><button class="btn red" data-act="delextra" data-f="${sel.fecha}" data-k="${sel.clave}">Borrar este día extra</button></div>`:''}
@@ -368,8 +372,8 @@ function vEventos(p){
 function vVico(p){
   const als=alumnosDe(p),b4=p.curso==='4ESO',r=reglas(p);
   return `<div class="card muted">${b4?'Montaje en el Teatro Vico: cada función da una bonificación en la 3ª evaluación (verde +'+r.bonus.verde+', lima +'+r.bonus.lima+', amarillo +'+r.bonus.amarillo+', naranja +'+r.bonus.naranja+', rojo +'+r.bonus.rojo+'). La media de las dos funciones se suma a la nota.':'Actuación en el Teatro Vico: pesa un '+r.vico_peso+' % de la nota final (ensayo '+r.vico_w[0]+', función '+r.vico_w[1]+'). Falta sin justificar = 0 y tope de '+r.vico_tope+(r.vico_tope_activo?'':' (desactivado)')+'. Falta justificada: pones tú el valor.'}</div>
-  ${als.map(a=>{const c=calcVico(p,a);return `<div class="al"><div class="t"><b>${nAl(a)}</b><span>${b4?'bonificación '+fmt(c.bonus):'nota Vico '+fmt(c.nota)}${c.sinJust?' · <span class="chip r">sin justificar</span>':''}${c.pend?' · <span class="chip y">falta valor manual</span>':''}</span></div>
-  ${[1,2].map(f=>{const x=DB.vico.find(v=>v.alumno_id===a.id&&v.funcion===f);return `<div style="margin-bottom:8px"><div class="muted" style="font-size:12px;margin-bottom:4px">${['Ensayo en el Vico','Función'][f-1]}</div>${colorBtns(x?x.color:null,'vmark',`data-a="${a.id}" data-f="${f}"`)}${x&&x.color==='falta_j'&&!b4?`<label style="margin-top:6px">Valor manual (0-10) por falta justificada<input type="number" min="0" max="10" step="0.1" value="${x.valor_manual??''}" data-chg="vman" data-id="${x.id}"></label>`:''}</div>`}).join('')}</div>`}).join('')||'<div class="card muted">Sin alumnos.</div>'}`;
+  <div class="cards">${als.map(a=>{const c=calcVico(p,a);return `<div class="al"><div class="t"><b>${nAl(a)}</b><span>${b4?'bonificación '+fmt(c.bonus):'nota Vico '+fmt(c.nota)}${c.sinJust?' · <span class="chip r">sin justificar</span>':''}${c.pend?' · <span class="chip y">falta valor manual</span>':''}</span></div>
+  ${[1,2].map(f=>{const x=DB.vico.find(v=>v.alumno_id===a.id&&v.funcion===f);return `<div style="margin-bottom:8px"><div class="muted" style="font-size:12px;margin-bottom:4px">${['Ensayo en el Vico','Función'][f-1]}</div>${colorBtns(x?x.color:null,'vmark',`data-a="${a.id}" data-f="${f}"`)}${x&&x.color==='falta_j'&&!b4?`<label style="margin-top:6px">Valor manual (0-10) por falta justificada<input type="number" min="0" max="10" step="0.1" value="${x.valor_manual??''}" data-chg="vman" data-id="${x.id}"></label>`:''}</div>`}).join('')}</div>`}).join('')||'<div class="card muted">Sin alumnos.</div>'}</div>`;
 }
 function vEval(p){
   const als=alumnosDe(p),b=p.curso==='1BACH',r=reglas(p);
@@ -397,8 +401,8 @@ function vFicha(p){
 function rolesDeAl(a){return DB.asignaciones.filter(x=>x.alumno_id===a.id).map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{},ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined;return {n:ro.nombre||'?',v:Number(ad?x.valor_adaptado:(ro.v1||0))*Number(x.factor??1),ad}}).sort((x,y)=>y.v-x.v)}
 function vAlumnos(p){
   const als=alumnosDe(p);
-  return head(p)+`<div class="muted" style="margin-bottom:12px">Roles de mayor a menor valor. Pulsa un alumno para abrir su ficha.</div>`+(als.map(a=>{const f=calcFinal(p,a),rs=rolesDeAl(a);
-    return `<div class="al al-click" data-act="ficha" data-id="${a.id}" role="button" tabindex="0"><div class="t"><b style="font-size:16px">${nAl(a)}${esAdaptado(a)?' <span class="chip y">Nota adaptada</span>':''}</b><span class="nota" style="color:${f.final===null?'var(--mut)':f.final>=8?'var(--ok)':f.final>=5?'var(--mid)':'var(--bad)'}">${fmt(f.final)}</span></div><div>${rs.length?rs.map(x=>`<span class="rol">${esc(x.n)} <small>${fmt(x.v)}${x.ad?' · adaptado':''}</small></span>`).join(''):'<span class="chip r">Sin rol</span>'}</div></div>`}).join('')||'<div class="card muted">Añade alumnos en Configuración.</div>');
+  return head(p)+`<div class="muted" style="margin-bottom:12px">Roles de mayor a menor valor. Pulsa un alumno para abrir su ficha.</div>`+'<div class="cards">'+(als.map(a=>{const f=calcFinal(p,a),rs=rolesDeAl(a);
+    return `<div class="al al-click" data-act="ficha" data-id="${a.id}" role="button" tabindex="0"><div class="t"><b style="font-size:16px">${nAl(a)}${esAdaptado(a)?' <span class="chip y">Nota adaptada</span>':''}</b><span class="nota" style="color:${f.final===null?'var(--mut)':f.final>=8?'var(--ok)':f.final>=5?'var(--mid)':'var(--bad)'}">${fmt(f.final)}</span></div><div>${rs.length?rs.map(x=>`<span class="rol">${esc(x.n)} <small>${fmt(x.v)}${x.ad?' · adaptado':''}</small></span>`).join(''):'<span class="chip r">Sin rol</span>'}</div></div>`}).join('')||'<div class="card muted">Añade alumnos en Configuración.</div>')+'</div>';
 }
 function vRolesLista(p){
   const bloques=rolesDe(p).map(r=>{const als=DB.asignaciones.filter(x=>x.rol_id===r.id).map(x=>DB.alumnos.find(a=>a.id===x.alumno_id)).filter(Boolean).sort(ordAl);
@@ -499,9 +503,9 @@ function cReparto(p){
   const rs=rolesDe(p),als=alumnosDe(p),sin=als.filter(a=>!DB.asignaciones.some(x=>x.alumno_id===a.id));
   return `<div class="muted" style="margin-bottom:10px">Un alumno puede tener varios roles. La intensidad multiplica el valor del rol. Si un alumno necesita una adaptación, escribe el <b>valor adaptado</b>: ese rol contará ese valor solo para él.</div>
   ${sin.length?`<div class="warn">${sin.length} alumno(s) sin rol: ${esc(sin.map(a=>nomDe(a).split(',')[0]).join(', '))}</div>`:(als.length?'<div class="chip g" style="margin-bottom:12px">Todos los alumnos tienen rol</div>':'')}`+
-  als.map(a=>{const as=DB.asignaciones.filter(x=>x.alumno_id===a.id);
+  '<div class="cards">'+(als.map(a=>{const as=DB.asignaciones.filter(x=>x.alumno_id===a.id);
     return `<div class="al ${as.length?'':'sinrol'}"><div class="t"><b style="font-size:16px">${nAl(a)}${esAdaptado(a)?' <span class="chip y">Nota adaptada</span>':''}</b>${as.length?'':'<span class="chip r">Sin rol</span>'}</div>${as.map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{},ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined;return `<div class="row" style="margin-bottom:8px"><span class="rol">${esc(ro.nombre||'?')} <small>${fmt(ad?x.valor_adaptado:ro.v1)}${ad?' · adaptado':''}</small></span><span style="flex:1"></span><input type="number" step="0.5" min="0" max="10" style="width:150px" placeholder="Valor adaptado" aria-label="Valor adaptado" value="${ad?x.valor_adaptado:''}" data-chg="adapt" data-id="${x.id}"><select style="width:170px" data-chg="factor" data-id="${x.id}">${[[1,'Principal ×1'],[0.6,'Secundario ×0,6'],[0.3,'Puntual ×0,3']].map(([v,l])=>`<option value="${v}" ${Number(x.factor)===v?'selected':''}>${l}</option>`).join('')}</select><button class="btn sm red" data-act="delasg" data-id="${x.id}">Quitar</button></div>`}).join('')}
-    <select data-chg="addrol" data-a="${a.id}"><option value="">+ Añadir rol…</option>${rs.filter(r=>!as.some(x=>x.rol_id===r.id)).map(r=>`<option value="${r.id}">${esc(r.nombre)} (${fmt(r.v1)})</option>`).join('')}</select></div>`}).join('')||'<div class="card muted">Añade alumnos primero.</div>';
+    <select data-chg="addrol" data-a="${a.id}"><option value="">+ Añadir rol…</option>${rs.filter(r=>!as.some(x=>x.rol_id===r.id)).map(r=>`<option value="${r.id}">${esc(r.nombre)} (${fmt(r.v1)})</option>`).join('')}</select></div>`}).join('')||'<div class="card muted">Añade alumnos primero.</div>')+'</div>';
 }
 function cRoles(p){
   const rs=rolesDe(p);
