@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Producciones Escénico-Musicales</title>
 <meta name="theme-color" content="#4d1229">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23241a22'/%3E%3Cpath d='M6 12h52v8H6z' fill='%23dcb45f'/%3E%3Cpath d='M8 20c14 3 16 18 12 38H8z' fill='%238e2748'/%3E%3Cpath d='M56 20c-14 3-16 18-12 38h12z' fill='%238e2748'/%3E%3Ccircle cx='32' cy='40' r='9' fill='%23dcb45f'/%3E%3Cpath d='M27 38q5-4 10 0M28 43q4 3 8 0' stroke='%23241a22' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23241a22%22/%3E%3Crect x=%226%22 y=%229%22 width=%2252%22 height=%228%22 rx=%222%22 fill=%22%23dcb45f%22/%3E%3Cpath d=%22M7 17H28C27 28 19 32 19 42C19 47 18 50 17 53H7Z%22 fill=%22%23b0305c%22/%3E%3Cpath d=%22M57 17H36C37 28 45 32 45 42C45 47 46 50 47 53H57Z%22 fill=%22%23b0305c%22/%3E%3Cpath d=%22M14 17C16 28 13 40 12 53%22 stroke=%22%237a1f3f%22 stroke-width=%222.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M50 17C48 28 51 40 52 53%22 stroke=%22%237a1f3f%22 stroke-width=%222.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Crect x=%226%22 y=%2253%22 width=%2252%22 height=%225%22 rx=%222%22 fill=%22%23dcb45f%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -77,7 +77,7 @@ th{font-size:12px;color:var(--mut);font-weight:600}
 .al-click{cursor:pointer}.al-click:hover{border-color:var(--gold)}.al.sinrol{border-color:var(--bad)}
 .bar{height:12px;border-radius:6px;background:var(--chip);overflow:hidden;display:flex}.bar i{display:block;height:100%}
 .cols{display:flex;align-items:flex-end;gap:3px;height:100px;border-bottom:1px solid var(--line)}.cols div{flex:1;min-width:5px;border-radius:3px 3px 0 0}
-.nav button{display:flex;align-items:center}.nav .ico{width:44px;padding:0;justify-content:center}
+.nav button{display:flex;align-items:center}.nav .ico{width:36px;min-height:36px;padding:0;justify-content:center;border-radius:50%;border-color:transparent;background:rgba(255,255,255,.12)}.nav .ico svg{width:20px;height:20px}
 .tj{position:relative;background:var(--card);border:1px dashed var(--line);border-left:6px dashed var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
 .tj.has{border-style:solid;border-left:6px solid var(--k)}.tj.pen{border-color:var(--bad)}
 .tj .t{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-bottom:10px;flex-wrap:wrap}.tj .t span{font-size:13px;color:var(--mut)}
@@ -249,7 +249,7 @@ const MOON='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="
 function pintaBarra(){
   const p=P();let t='';
   const tabs=p?[['dia','Día a día'],['alumnos','Alumnos'],['archivo','Archivo'],...(p.curso==='1BACH'?[['prod','Producción']]:[]),['eval','Evaluar'],['stats','Estadísticas']]:[];
-  t=`<div class="curtain noprint"><div class="brand"><svg width="38" height="38" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#241a22"/><path d="M6 12h52v8H6z" fill="#dcb45f"/><path d="M8 20c14 3 16 18 12 38H8z" fill="#8e2748"/><path d="M56 20c-14 3-16 18-12 38h12z" fill="#8e2748"/><circle cx="32" cy="40" r="9" fill="#dcb45f"/><path d="M27 38q5-4 10 0M28 43q4 3 8 0" stroke="#241a22" stroke-width="2" fill="none" stroke-linecap="round"/></svg><div><b>Producciones Escénico-Musicales</b><small>by Manuel Esteve</small></div></div>
+  t=`<div class="curtain noprint"><div class="brand"><svg width="38" height="38" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#241a22"/><rect x="6" y="9" width="52" height="8" rx="2" fill="#dcb45f"/><path d="M7 17H28C27 28 19 32 19 42C19 47 18 50 17 53H7Z" fill="#b0305c"/><path d="M57 17H36C37 28 45 32 45 42C45 47 46 50 47 53H57Z" fill="#b0305c"/><path d="M14 17C16 28 13 40 12 53" stroke="#7a1f3f" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M50 17C48 28 51 40 52 53" stroke="#7a1f3f" stroke-width="2.5" fill="none" stroke-linecap="round"/><rect x="6" y="53" width="52" height="5" rx="2" fill="#dcb45f"/></svg><div><b>Producciones Escénico-Musicales</b><small>by Manuel Esteve</small></div></div>
   <nav class="nav" aria-label="Secciones">${tabs.map(([k,l])=>`<button class="${view.tab===k?'on':''}" data-act="tab" data-v="${k}">${l}</button>`).join('')}
   <button class="${view.tab==='home'?'on':''}" data-act="tab" data-v="home">Mis musicales</button>
   ${p?`<button class="${view.tab==='conf'?'on':''}" data-act="tab" data-v="conf">Configuración</button>`:''}
