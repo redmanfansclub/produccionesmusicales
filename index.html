@@ -117,6 +117,8 @@ button.dia b{display:block;font-size:13px}button.dia span{display:block}button.d
 .rolbtn{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 18px;border-radius:999px;border:2px solid var(--gold);color:var(--gold);background:transparent;font-weight:700;cursor:pointer;margin-left:6px}.rolbtn:hover{background:var(--goldbg);color:#241a22}
 .lnk{color:inherit;text-decoration:none;cursor:pointer}.lnk:hover{color:var(--gold);text-decoration:underline}
 .ib{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:transparent;display:flex;align-items:center;justify-content:center;color:var(--mut);flex:none;padding:0}.ib:hover{color:var(--gold);border-color:var(--gold)}
+.tj .rolchip.tg{border:0;font:inherit;font-size:12px;cursor:pointer;opacity:.55}.tj .rolchip.tg.on{opacity:1;background:var(--goldbg);color:#241a22;font-weight:700}.tj .rolchip.tg:disabled{cursor:default}
+.tj .rf{flex:0 0 100%;display:flex;flex-direction:column;gap:6px;padding-top:8px;margin-top:2px;border-top:1px dashed var(--line)}.tj .rf .rr{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.tj .rf .rname{min-width:170px;font-size:13px;font-weight:700;color:var(--mut)}.tj .rf .mk.sf{flex:0 0 auto;grid-template-columns:repeat(5,40px);gap:5px}.tj .rf .cb{min-height:34px;border-radius:8px}
 .tj .acts{margin-left:auto;display:flex;gap:6px}.tj .rolchip.lnk:hover{background:var(--goldbg);color:#241a22;text-decoration:none}
 .weeks .cell{cursor:pointer}.weeks .cell:hover{outline:2px solid var(--gold)}
 .card.resalta{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold) inset}
@@ -153,8 +155,9 @@ const COLORES=['verde','lima','amarillo','naranja','rojo'];
 const MOTIVOS_DEF=[['Uso del móvil','dia'],['Habla durante las explicaciones o los ensayos','dia'],['Interrumpe o molesta a los compañeros','dia'],['Falta de respeto a compañeros o profesorado','ambos'],['No realiza la tarea asignada','ambos'],['Se ausenta de su tarea o de su grupo','dia'],['Pierde el tiempo','dia'],['No atiende a las indicaciones','dia'],['No colabora con su equipo','ambos'],['No trae el material','dia'],['No se sabe el texto, la coreografía o su parte','rol'],['No cumple los plazos o las tareas de su rol','rol'],['Uso inadecuado del material o del espacio','ambos'],['Llega tarde','dia'],['Llamada de atención reiterada','ambos']].map(([n,a])=>({n,a}));
 const HOJA_DEF={verde:'Excelente. Participa con iniciativa, atiende, cumple su tarea y ayuda al grupo.',lima:'Muy bien. Trabaja con constancia y colabora; algún despiste puntual.',amarillo:'Suficiente. Cumple lo básico, pero necesita recordatorios o se despista con frecuencia.',naranja:'Hay que mejorar. Trabaja poco o interrumpe parte de la sesión. Se anota el motivo.',rojo:'Insuficiente. Apenas trabaja o dificulta el trabajo del grupo durante la sesión. Se anota el motivo.'};
 const NOMBRE_COLOR={verde:'Verde',lima:'Lima',amarillo:'Amarillo',naranja:'Naranja',rojo:'Rojo'};
-const MK={marca:{arr:()=>DB.marcas,t:'marcas',ambito:'dia'},val:{arr:()=>DB.valoraciones,t:'valoraciones',ambito:'rol'},apm:{arr:()=>DB.apMarcas,t:'apMarcas',ambito:'dia'},apv:{arr:()=>DB.apValoraciones,t:'apValoraciones',ambito:'rol'}};
+const MK={marca:{arr:()=>DB.marcas,t:'marcas',ambito:'dia'},val:{arr:()=>DB.valoraciones,t:'valoraciones',ambito:'rol'},apm:{arr:()=>DB.apMarcas,t:'apMarcas',ambito:'dia'},apv:{arr:()=>DB.apValoraciones,t:'apValoraciones',ambito:'rol'},mrol:{arr:()=>DB.marcas,t:'marcas',ambito:'dia'}};
 const pendMotivo=m=>(m.color==='naranja'||m.color==='rojo')&&Array.isArray(m.motivos)&&m.motivos.length===0;
+const pendMotivoRol=m=>!!m&&!!m.colores_rol&&Object.entries(m.colores_rol).some(([r,c])=>(c==='naranja'||c==='rojo')&&!(((m.motivos_rol||{})[r])||[]).length);
 const REGLAS_DEF={
   rubrica:{verde:10,lima:8,amarillo:6,naranja:4,rojo:2},
   bonus:{verde:1,lima:0.75,amarillo:0.5,naranja:0.25,rojo:0},
@@ -170,9 +173,17 @@ let DB={proyectos:[],alumnos:[],roles:[],asignaciones:[],sesiones:[],marcas:[],e
 function reglas(p){const r=(p&&p.reglas)||{};return {...REGLAS_DEF,...r,rubrica:{...REGLAS_DEF.rubrica,...(r.rubrica||{})},bonus:{...REGLAS_DEF.bonus,...(r.bonus||{})},hoja:{...HOJA_DEF,...(r.hoja||{})}}}
 function penalJust(n,r){if(n<=2)return 0;const e=r.escala_just;return n<e.length?e[n]:e[e.length-1]+r.mas_just_resta*(n-(e.length-1))}
 const asgEvs=x=>Array.isArray(x.evals)?x.evals.map(Number):[1,2,3];
+const rolesAsig=(aid,ev)=>DB.asignaciones.filter(x=>x.alumno_id===aid&&asgEvs(x).includes(ev)).map(x=>x.rol_id);
+function rolesPorDefecto(aid,ev,fecha){
+  const asig=rolesAsig(aid,ev);if(!asig.length)return [];
+  const prev=DB.marcas.filter(m=>m.alumno_id===aid&&Array.isArray(m.roles_dia)&&m.roles_dia.length).map(m=>({m,se:DB.sesiones.find(x=>x.id===m.sesion_id)})).filter(x=>x.se&&x.se.evaluacion===ev&&!x.se.sin_clase&&x.se.fecha<fecha).sort((x,y)=>y.se.fecha.localeCompare(x.se.fecha));
+  for(const {m} of prev){const r=m.roles_dia.filter(x=>asig.includes(x));if(r.length)return r}
+  return asig.length===1?asig:[];
+}
+const pendRol=(m,ev)=>!!m&&m.color!=='falta'&&m.color!=='falta_j'&&rolesAsig(m.alumno_id,ev).length>1&&!(Array.isArray(m.roles_dia)&&m.roles_dia.some(x=>rolesAsig(m.alumno_id,ev).includes(x)));
 const apDe=(sid,aid)=>DB.apMarcas.find(x=>x.sesion_id===sid&&x.alumno_id===aid);
 const marcaDe=(sid,aid)=>{const mt=DB.marcas.find(x=>x.sesion_id===sid&&x.alumno_id===aid),ap=apDe(sid,aid);
-  if(mt){if(mt.elige_ap&&ap&&mt.color!=='falta'&&mt.color!=='falta_j')return {...mt,color:ap.color,motivos:ap.motivos,via:'apoyo'};return mt}
+  if(mt){if(mt.elige_ap&&ap&&mt.color!=='falta'&&mt.color!=='falta_j')return {...mt,color:ap.color,motivos:ap.motivos,colores_rol:null,via:'apoyo'};return mt}
   return ap?{id:ap.id,sesion_id:sid,alumno_id:aid,color:ap.color,motivo:ap.motivo,motivos:ap.motivos,via:'apoyo',soloAp:true}:null};
 const apVal=(aid,rid,ev)=>DB.apValoraciones.find(v=>v.alumno_id===aid&&v.rol_id===rid&&Number(v.evaluacion)===ev);
 const valEf=(aid,rid,ev)=>{const t=DB.valoraciones.find(v=>v.alumno_id===aid&&v.rol_id===rid&&Number(v.evaluacion)===ev),ap=apVal(aid,rid,ev);
@@ -190,22 +201,24 @@ function calcActuacion(p,a,ev){
   const items=evs.map(e=>{const w=Number(e.peso??1)||1,r=valEvento(p,e,a);if(r.v!==null){sv+=r.v*w;sw+=w}return {e,...r}});
   return {nota:sw?sv/sw:null,items};
 }
+const rolesActivos=(m,roles)=>{if(m&&Array.isArray(m.roles_dia)&&m.roles_dia.length){const a=roles.filter(x=>m.roles_dia.includes(x.rolId));if(a.length)return a}return roles};
 function calcEval(p,a,ev){
   const r=reglas(p);
   const ses=DB.sesiones.filter(s=>s.proyecto_id===p.id&&s.evaluacion===ev&&cerrDia(s,a.grupo_id)&&!s.sin_clase);
-  let sum=0,n=0,fsj=0,fsjW=0,fj=0;
+  const pd=Math.max(0,Math.min(100,Number(r.peso_diaria)))/100,pr=1-pd;
+  const roles=DB.asignaciones.filter(x=>x.alumno_id===a.id&&asgEvs(x).includes(ev)).map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{};const ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined;const va=valEf(a.id,x.rol_id,ev);return {nombre:ro.nombre||'(rol borrado)',rolId:x.rol_id,valor:Number(ad?x.valor_adaptado:(ro['v'+ev]||0))*Number(x.factor??1),adaptado:ad,val:va?va.color:null,dias:0}});
+  let sum=0,n=0,fsj=0,fsjW=0,fj=0;const Dr={};roles.forEach(x=>Dr[x.rolId]=0);
   ses.forEach(s=>{
     const w=Number(s.peso??1);
     const m=marcaDe(s.id,a.id);const c=m?m.color:'verde';
     if(c==='falta_j'){fj++;return}
     if(c==='falta'){fsj++;fsjW+=w;if(r.falta_sj_cuenta_cero)n+=w;return}
-    sum+=Number(r.rubrica[c])*w;n+=w;
+    const cv=Number(r.rubrica[c]);sum+=cv*w;n+=w;
+    rolesActivos(m,roles).forEach(x=>{const cr=m&&m.colores_rol&&m.colores_rol[x.rolId],cvx=cr?Number(r.rubrica[cr]):cv;Dr[x.rolId]+=x.valor*cvx/10*w;x.dias++});
   });
-  const media=n?sum/n:10,m10=media/10;
-  const pd=Math.max(0,Math.min(100,Number(r.peso_diaria)))/100,pr=1-pd;
-  const roles=DB.asignaciones.filter(x=>x.alumno_id===a.id&&asgEvs(x).includes(ev)).map(x=>{const ro=DB.roles.find(q=>q.id===x.rol_id)||{};const ad=x.valor_adaptado!==null&&x.valor_adaptado!==undefined;const va=valEf(a.id,x.rol_id,ev);return {nombre:ro.nombre||'(rol borrado)',rolId:x.rol_id,valor:Number(ad?x.valor_adaptado:(ro['v'+ev]||0))*Number(x.factor??1),adaptado:ad,val:va?va.color:null}});
+  const media=n?sum/n:10;
   const base=roles.reduce((t,x)=>t+x.valor,0);
-  const bruto=roles.reduce((t,x)=>t+x.valor*(x.val?(pd*m10+pr*Number(r.rubrica[x.val])/10):m10),0);
+  const bruto=roles.reduce((t,x)=>{const d=n?Dr[x.rolId]/n:x.valor;return t+(x.val?pd*d+pr*x.valor*Number(r.rubrica[x.val])/10:d)},0);
   const pen=fsjW*r.falta_sj_resta+penalJust(fj,r);
   const real=Math.max(0,bruto-pen);
   const clase=ses.length?Math.min(10,real):null;
@@ -467,7 +480,7 @@ function vHoy(p){
   const extra=YO?'':`<details class="card noprint" style="margin-top:12px"><summary style="cursor:pointer;font-weight:600;color:var(--gold)">Añadir un día extra (ensayo, Vico, función…)</summary><form data-form="extra" style="margin-top:12px"><div class="fg"><label>Qué es<input name="nombre" list="extras" required placeholder="Ensayo extra"><datalist id="extras"><option value="Ensayo extra"><option value="Ensayo en el Teatro Vico"><option value="Función"></datalist></label><label>Fecha<input type="date" name="fecha" value="${hoy()}" required></label><label>Cuánto cuenta<select name="peso"><option value="0.5">La mitad (×0,5)</option><option value="1" selected>Como un día normal (×1)</option><option value="2">El doble (×2)</option></select></label><label>Otro valor (opcional)<input type="number" step="0.1" min="0.1" name="peso_otro" placeholder="por ejemplo 3"></label></div><div><button class="btn gold">Añadir</button></div></form></details>`;
   if(!ag.length)return `<div class="phone"><div class="card"><b>Todavía no hay días de clase.</b><p class="muted">Configura tus días y horas en Configuración → Horario y calendario, o añade un día extra.</p><button class="btn gold" data-act="irhorario">Ir al horario</button></div>${extra}</div>`;
   const sel=selActual(p,ag),est=estadoDe(p,sel),s=sel.ses,ev=s?s.evaluacion:evDeSeguro(p,sel.fecha);
-  const marks=s?DB.marcas.filter(m=>m.sesion_id===s.id):[],pend=als.filter(a=>!marks.some(m=>m.alumno_id===a.id)&&!(s&&apDe(s.id,a.id))),previos=previosDe(p,sel),falMot=als.filter(a=>{const m=marks.find(x=>x.alumno_id===a.id);return m&&pendMotivo(m)});
+  const marks=s?DB.marcas.filter(m=>m.sesion_id===s.id):[],pend=als.filter(a=>!marks.some(m=>m.alumno_id===a.id)&&!(s&&apDe(s.id,a.id))),previos=previosDe(p,sel),falMot=als.filter(a=>{const m=marks.find(x=>x.alumno_id===a.id);return m&&(pendMotivo(m)||pendMotivoRol(m))}),falRol=als.filter(a=>{const m=marks.find(x=>x.alumno_id===a.id);return m&&pendRol(m,ev)});
   const rest=ag.filter(d=>d.tipo==='clase'&&d.fecha>=hoy()&&!['festivo','sinclase','cerrado'].includes(estadoDe(p,d))).length;
   const evOf=d=>d.ses?d.ses.evaluacion:evDeSeguro(p,d.fecha);
   const tab=view.evTab||evOf(sel),lst=listaEval(p,ag,tab),idx=lst.findIndex(d=>d.fecha===sel.fecha&&d.clave===sel.clave);
@@ -484,20 +497,23 @@ function vHoy(p){
   if(est==='sinclase')return `<div class="phone">${cab}<div class="card"><b>Marcado como festivo / sin clase</b><p class="muted">No cuenta para la nota.</p><button class="btn gold" data-act="convertir" data-f="${sel.fecha}" data-k="${sel.clave}">Convertir en día de clase</button></div>${extra}</div>`;
   const lstE=listaEval(p,ag,ev).filter(d=>d.tipo==='clase'&&!['festivo','sinclase'].includes(estadoDe(p,d))),ult=lstE.slice(-2),pv=pendientesVal(p,ev,GID());
   const finBanner=(!evCerrada(p,ev,GID())&&ult.length&&sel.fecha>=ult[0].fecha&&pv>0)?`<div class="warn" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span>Últimos días de la ${ev}ª evaluación: faltan ${pv} valoración(es) de roles.</span><button class="btn sm" data-act="irfin" data-e="${ev}">Ir a Fin de evaluación</button></div>`:'';
-  const locked=est==='cerrado',cierre=!!view.cerrando&&!locked,lista=cierre?als.filter(a=>pend.includes(a)||falMot.includes(a)):als,r=reglas(p);
+  const locked=est==='cerrado',cierre=!!view.cerrando&&!locked,lista=cierre?als.filter(a=>pend.includes(a)||falMot.includes(a)||falRol.includes(a)):als,r=reglas(p);
   return `<div class="phone">${cab}
   <div class="row" style="margin-bottom:8px"><span class="stchip ${locked?'fill':''}" style="--k:${stCol[est]}">${stIc[est]}${stTxt[est]}${est==='curso'||est==='pend'?' · '+(als.length-pend.length)+' de '+als.length:''}</span>${sel.tipo==='clase'?`<span class="muted" style="font-size:13px">Quedan ${rest} clase(s) por delante</span>`:''}<button class="ib" data-act="hoja" style="margin-left:auto;font-weight:800" title="Qué significa cada color" aria-label="Qué significa cada color">?</button></div>
   <div class="prog"><i style="width:${als.length?(als.length-pend.length)*100/als.length:0}%"></i></div>${finBanner}
   ${locked?'<div class="lockbar"><span>Día cerrado: no se puede cambiar.</span><button class="btn" data-act="reabrir" style="margin-left:auto">Reabrir</button></div>':''}
-  ${cierre?((pend.length||falMot.length)?`<div class="warn r">${pend.length?`Faltan ${pend.length} alumno(s) por marcar. `:''}${falMot.length?`Falta el motivo de ${falMot.length} alumno(s) en naranja o rojo. `:''}El día no se cierra hasta completarlo.</div>`:'<div class="warn" style="background:var(--ok);color:#fff">Todo completo. Ya puedes cerrar el día.</div>'):''}
+  ${cierre?((pend.length||falMot.length||falRol.length)?`<div class="warn r">${pend.length?`Faltan ${pend.length} alumno(s) por marcar. `:''}${falMot.length?`Falta el motivo de ${falMot.length} alumno(s) en naranja o rojo. `:''}${falRol.length?`Falta elegir el rol de ${falRol.length} alumno(s). `:''}El día no se cierra hasta completarlo.</div>`:'<div class="warn" style="background:var(--ok);color:#fff">Todo completo. Ya puedes cerrar el día.</div>'):''}
   <div class="${locked?'locked':''}"><div class="cards lista-hoy">${lista.length?lista.map(a=>{const m=marks.find(x=>x.alumno_id===a.id),ap=s?apDe(s.id,a.id):null,c=m?m.color:null,has=!!c||!!ap,col=COLORES.includes(c)?`var(--c-${c})`:c==='falta'?'var(--f-bd)':c==='falta_j'?'var(--j-bg)':'var(--line)';
     const cv=calcEval(p,a,ev),rls=DB.asignaciones.filter(x=>x.alumno_id===a.id&&asgEvs(x).includes(ev)).map(x=>DB.roles.find(q=>q.id===x.rol_id)).filter(Boolean);
-    const chips=rls.length?rls.map(ro=>`<a href="#" class="rolchip lnk" data-act="verrol" data-id="${ro.id}" title="Ver quién tiene este rol">${esc(ro.nombre)}</a>`).join(''):`<span class="rolchip" ${PUEDE_ROLES()?`data-act="rolespanel" data-id="${a.id}" style="cursor:pointer"`:''}>sin rol${PUEDE_ROLES()?' · añadir':''}</span>`;
+    const tmpKey=sel.fecha+'|'+sel.clave+'|'+a.id,actv=(m&&Array.isArray(m.roles_dia)&&m.roles_dia.length)?m.roles_dia:((view.rolesTmp&&view.rolesTmp[tmpKey])||(m?[]:rolesPorDefecto(a.id,ev,sel.fecha))),multi=rls.length>1,needR=multi&&!actv.some(x=>rls.some(q=>q.id===x))&&!(m&&(c==='falta'||c==='falta_j'));
+    const chips=rls.length?rls.map(ro=>`<button type="button" class="rolchip tg ${actv.includes(ro.id)||!multi?'on':''}" data-act="roldia" data-a="${a.id}" data-r="${ro.id}" ${locked||!multi?'disabled':''} title="${multi?'Pulsa los roles que ha hecho hoy':'Su único rol'}">${esc(ro.nombre)}</button>`).join('')+(needR&&!locked?'<span class="chip r">¿Qué rol ha hecho?</span>':''):`<span class="rolchip" ${PUEDE_ROLES()?`data-act="rolespanel" data-id="${a.id}" style="cursor:pointer"`:''}>sin rol${PUEDE_ROLES()?' · añadir':''}</span>`;
     const lk=`data-act="ficha" data-id="${a.id}" data-go="faltas" style="cursor:pointer" title="Ver sus faltas"`;
     const av=cv.fj>=r.aviso_rojo?`<span class="chip r" ${lk}>${cv.fj} justif.</span>`:cv.fj>=r.aviso_amarillo?`<span class="chip y" ${lk}>${cv.fj} justif.</span>`:'';
     const motChips=(m&&(c==='naranja'||c==='rojo'))?(Array.isArray(m.motivos)?(m.motivos.length?`<span class="chip" style="cursor:pointer" data-act="motivosel" data-id="${m.id}" title="Cambiar los motivos">${esc(m.motivos[0])}${m.motivos.length>1?' +'+(m.motivos.length-1):''}</span>`:`<span class="chip r" style="cursor:pointer" data-act="motivosel" data-id="${m.id}">Falta el motivo</span>`):`<span class="chip y" style="cursor:pointer" data-act="motivosel" data-id="${m.id}">sin motivo</span>`):'';
     const apChip=ap?`<span class="chip" style="display:inline-flex;align-items:center;gap:6px" title="Valoración del apoyo de lengua">Apoyo <i class="sh c-${ap.color}" style="--p:${pct(p,ap.color)}%;width:14px;height:14px"></i></span>${m&&c!=='falta'&&c!=='falta_j'&&c!==ap.color?`<button class="btn sm" data-act="elige" data-k="marca" data-id="${m.id}">${m.elige_ap?'Usar la mía':'Usar la suya'}</button>`:''}`:'';
-    return `<div class="tj ${has?'has':''} ${cierre&&(!has||falMot.includes(a))?'pen':''}" style="--k:${col}"><div class="who"><b><a href="#" class="lnk" data-act="ficha" data-id="${a.id}">${nAl(a)}</a>${locked?'<span class="lockico" aria-hidden="true">'+IC.fin+'</span>':''}</b><span class="sub2">${chips}${has?'<span class="tag ok">'+IC.ok+'Marcado'+(!c&&ap?' (apoyo)':'')+'</span>':'<span class="tag">Sin marcar</span>'}${av}${motChips}${apChip}</span></div>${colorBtns(c,'mark',`data-a="${a.id}"`,locked,c==='falta_j'?(locked?`<div class="motivo-in muted">Motivo: ${esc(m.motivo||'—')}</div>`:`<div class="motivo-in"><input value="${esc(m.motivo||'')}" placeholder="Motivo (médico, familia…)" aria-label="Motivo de la justificación" data-chg="motivo" data-id="${m.id}"></div>`):'')}<div class="acts">${PUEDE_ROLES()?`<button class="ib" data-act="rolespanel" data-id="${a.id}" aria-label="Cambiar roles de ${esc(nomDe(a))}" title="Cambiar roles">${IC.edit}</button>`:''}<button class="ib" data-act="nota" data-id="${a.id}" aria-label="Nota rápida sobre ${esc(nomDe(a))}" title="Nota rápida">${IC.nota}</button></div></div>`}).join(''):(als.length?'':'<div class="card muted">Añade alumnos en Configuración.</div>')}</div></div>
+    const idsAct=(m&&Array.isArray(m.roles_dia))?m.roles_dia.filter(x=>rls.some(q=>q.id===x)):[];
+    const miniRoles=(m&&c!=='falta'&&c!=='falta_j'&&idsAct.length>=2)?`<div class="rf">${idsAct.map(rid=>{const ro=rls.find(q=>q.id===rid),cr=(m.colores_rol||{})[rid],mv=((m.motivos_rol||{})[rid])||[],nn2=cr==='naranja'||cr==='rojo';return `<div class="rr"><span class="rname">${esc(ro.nombre)}</span>${colorBtns(cr||c,'rolcolor',`data-a="${a.id}" data-r="${rid}"`,locked,null,true)}${nn2?(mv.length?`<span class="chip" style="cursor:pointer" data-act="motivosel" data-k="mrol" data-id="${m.id}" data-r="${rid}">${esc(mv[0])}${mv.length>1?' +'+(mv.length-1):''}</span>`:`<span class="chip r" style="cursor:pointer" data-act="motivosel" data-k="mrol" data-id="${m.id}" data-r="${rid}">Falta el motivo</span>`):''}</div>`}).join('')}</div>`:'';
+    return `<div class="tj ${has?'has':''} ${cierre&&(!has||falMot.includes(a)||falRol.includes(a))?'pen':''}" style="--k:${col}"><div class="who"><b><a href="#" class="lnk" data-act="ficha" data-id="${a.id}">${nAl(a)}</a>${locked?'<span class="lockico" aria-hidden="true">'+IC.fin+'</span>':''}</b><span class="sub2">${chips}${has?'<span class="tag ok">'+IC.ok+'Marcado'+(!c&&ap?' (apoyo)':'')+'</span>':'<span class="tag">Sin marcar</span>'}${av}${motChips}${apChip}</span></div>${colorBtns(c,'mark',`data-a="${a.id}"`,locked,c==='falta_j'?(locked?`<div class="motivo-in muted">Motivo: ${esc(m.motivo||'—')}</div>`:`<div class="motivo-in"><input value="${esc(m.motivo||'')}" placeholder="Motivo (médico, familia…)" aria-label="Motivo de la justificación" data-chg="motivo" data-id="${m.id}"></div>`):'')}<div class="acts">${PUEDE_ROLES()?`<button class="ib" data-act="rolespanel" data-id="${a.id}" aria-label="Cambiar roles de ${esc(nomDe(a))}" title="Cambiar roles">${IC.edit}</button>`:''}<button class="ib" data-act="nota" data-id="${a.id}" aria-label="Nota rápida sobre ${esc(nomDe(a))}" title="Nota rápida">${IC.nota}</button></div>${miniRoles}</div>`}).join(''):(als.length?'':'<div class="card muted">Añade alumnos en Configuración.</div>')}</div></div>
   ${als.length&&!locked?`<div class="row" style="margin-top:8px">${cierre?'<button class="btn" style="flex:1" data-act="vertodos">Ver todos</button>':''}<button class="btn gold" style="flex:1" data-act="cerrar">Cerrar el día</button></div>`:''}
   ${!YO&&!locked&&!marks.length&&sel.tipo==='clase'?`<div style="margin-top:12px"><button class="btn" data-act="sinclase" data-f="${sel.fecha}" data-k="${sel.clave}">Hoy no hay clase (festivo / sin clase)</button></div>`:''}
   ${sel.tipo==='extra'&&!locked?`<div style="margin-top:12px"><button class="btn red" data-act="delextra" data-f="${sel.fecha}" data-k="${sel.clave}">Borrar este día extra</button></div>`:''}
@@ -735,7 +751,7 @@ function detalleEv(p,a,x,e,alu){
   const r=reglas(p),forma=(c,v)=>`<i class="sh c-${c}" style="--p:${pct(p,c)}%;width:14px;height:14px"></i>`;
   const rl=x.roles.map(q=>`<span class="chip" style="display:inline-flex;align-items:center;gap:6px">${esc(q.nombre)} ${q.val?forma(q.val)+(alu?'':' '+fmt(Number(r.rubrica[q.val]))):'<span class="muted">sin valorar</span>'}</span>`).join(' ');
   const ac=x.actItems.map(({e:ev,v,c,falta,faltaJ,na,pend})=>`<span class="chip" style="display:inline-flex;align-items:center;gap:6px">${esc(ev.nombre)} ${falta?'· falta':c?forma(c)+(alu?'':' '+fmt(v)):faltaJ?'· justificada'+(!alu&&v!==null?' '+fmt(v):''):'· sin nota'}</span>`).join(' ');
-  return `${rl?`<div style="margin-top:10px"><span class="muted" style="font-size:12px">Valoración de roles:</span> ${rl}</div>`:''}${ac?`<div style="margin-top:6px"><span class="muted" style="font-size:12px">Actuación:</span> ${ac}</div>`:''}${alu?'':`<div class="muted" style="font-size:13px;margin-top:8px">${x.clase===null?'':`Clase ${fmt(x.clase)}`}${x.act!==null?` · Actuación ${fmt(x.act)} (${r.peso_actuacion} %)`:''}${x.cerrada?'':' · evaluación abierta: la nota es solo de clase'}</div>`}`;
+  return `${rl?`<div style="margin-top:10px"><span class="muted" style="font-size:12px">Valoración de roles:</span> ${rl}</div>`:''}${ac?`<div style="margin-top:6px"><span class="muted" style="font-size:12px">Actuación:</span> ${ac}</div>`:''}${(!alu&&x.roles.length>1&&x.ses)?`<div style="margin-top:6px"><span class="muted" style="font-size:12px">Días por rol:</span> ${x.roles.map(q=>`<span class="chip">${esc(q.nombre)} · ${q.dias}</span>`).join(' ')}</div>`:''}${alu?'':`<div class="muted" style="font-size:13px;margin-top:8px">${x.clase===null?'':`Clase ${fmt(x.clase)}`}${x.act!==null?` · Actuación ${fmt(x.act)} (${r.peso_actuacion} %)`:''}${x.cerrada?'':' · evaluación abierta: la nota es solo de clase'}</div>`}`;
 }
 function vFaltas(p){
   if(modoAlumno)return '';const a=DB.alumnos.find(x=>x.id===view.aid);if(!a)return '';
@@ -759,8 +775,8 @@ function panelRoles(p){
 }
 function overlays(p){
   if(!p)return '';
-  if(view.motivo){const kind=view.motivo.kind||'marca',kd=MK[kind],m=kd.arr().find(x=>x.id===view.motivo.mid);if(m){const rolK=kd.ambito==='rol',a=DB.alumnos.find(x=>x.id===m.alumno_id),se=m.sesion_id?DB.sesiones.find(x=>x.id===m.sesion_id):null,ro=m.rol_id?DB.roles.find(x=>x.id===m.rol_id):null,r=reglas(p),cat=r.motivos.filter(x=>rolK?x.a!=='dia':x.a!=='rol'),sel=Array.isArray(m.motivos)?m.motivos:[];
-    return `<div class="ov" data-act="cerrarmotivo"></div><div class="modal" role="dialog" aria-modal="true"><h3 style="display:flex;align-items:center;gap:10px"><i class="sh c-${m.color}" style="--p:${pct(p,m.color)}%;width:26px;height:26px"></i>¿Por qué ${m.color}?</h3><div class="muted">${esc(nomDe(a))}${se?' · '+fd(se.fecha):''}${ro?' · rol «'+esc(ro.nombre)+'»':''}. Elige al menos un motivo: queda como evidencia.</div><div class="mchips">${cat.map(x=>`<button type="button" class="mchip ${sel.includes(x.n)?'on':''}" data-act="motivotoggle" data-k="${kind}" data-m="${m.id}" data-n="${esc(x.n)}">${esc(x.n)}</button>`).join('')||'<span class="muted">No hay motivos definidos.</span>'}</div><label>Comentario (opcional)<input value="${esc(rolK?(m.comentario||''):(m.motivo||''))}" data-chg="${rolK?'comval':'motivo'}" data-k="${kind}" data-id="${m.id}" placeholder="Algo más que quieras anotar…"></label><div class="row" style="margin-top:12px"><button class="btn gold" data-act="cerrarmotivo">Listo</button>${sel.length?'':'<span class="muted" style="font-size:13px">Sin motivo no se podrá cerrar.</span>'}</div></div>`}}
+  if(view.motivo){const kind=view.motivo.kind||'marca',kd=MK[kind],m=kd.arr().find(x=>x.id===view.motivo.mid);if(m){const isMr=kind==='mrol',rid=view.motivo.rol,rolK=kd.ambito==='rol',a=DB.alumnos.find(x=>x.id===m.alumno_id),se=m.sesion_id?DB.sesiones.find(x=>x.id===m.sesion_id):null,ro=(isMr?rid:m.rol_id)?DB.roles.find(x=>x.id===(isMr?rid:m.rol_id)):null,colM=isMr?((m.colores_rol||{})[rid]||m.color):m.color,r=reglas(p),cat=r.motivos.filter(x=>rolK?x.a!=='dia':x.a!=='rol'),sel=isMr?(((m.motivos_rol||{})[rid])||[]):(Array.isArray(m.motivos)?m.motivos:[]);
+    return `<div class="ov" data-act="cerrarmotivo"></div><div class="modal" role="dialog" aria-modal="true"><h3 style="display:flex;align-items:center;gap:10px"><i class="sh c-${colM}" style="--p:${pct(p,colM)}%;width:26px;height:26px"></i>¿Por qué ${colM}?</h3><div class="muted">${esc(nomDe(a))}${se?' · '+fd(se.fecha):''}${ro?' · rol «'+esc(ro.nombre)+'»':''}. Elige al menos un motivo: queda como evidencia.</div><div class="mchips">${cat.map(x=>`<button type="button" class="mchip ${sel.includes(x.n)?'on':''}" data-act="motivotoggle" data-k="${kind}" data-m="${m.id}" data-r="${rid||''}" data-n="${esc(x.n)}">${esc(x.n)}</button>`).join('')||'<span class="muted">No hay motivos definidos.</span>'}</div>${isMr?'':`<label>Comentario (opcional)<input value="${esc(rolK?(m.comentario||''):(m.motivo||''))}" data-chg="${rolK?'comval':'motivo'}" data-k="${kind}" data-id="${m.id}" placeholder="Algo más que quieras anotar…"></label>`}<div class="row" style="margin-top:12px"><button class="btn gold" data-act="cerrarmotivo">Listo</button>${sel.length?'':'<span class="muted" style="font-size:13px">Sin motivo no se podrá cerrar.</span>'}</div></div>`}}
   if(view.hoja){const r=reglas(p);return `<div class="ov" data-act="cerrarhoja"></div><div class="modal" role="dialog" aria-modal="true"><h3>Qué significa cada color</h3>${COLORES.map(c=>`<div class="hoja-row"><i class="sh c-${c}" style="--p:${pct(p,c)}%;width:30px;height:30px"></i><div><b>${NOMBRE_COLOR[c]}</b><div class="muted">${esc(r.hoja[c])}</div></div></div>`).join('')}<div class="row" style="margin-top:12px"><button class="btn" data-act="cerrarhoja">Cerrar</button><button class="btn gold" data-act="pdfhoja">PDF para el aula</button></div></div>`}
   if(view.panel&&PUEDE_ROLES())return panelRoles(p);
   if(view.nota){const a=DB.alumnos.find(x=>x.id===view.nota.aid);if(a)return `<div class="ov" data-act="cerrarnota"></div><div class="modal" role="dialog" aria-modal="true"><h3>Nota sobre ${esc(nomDe(a))}</h3><div class="muted" style="margin-bottom:10px">Se guarda en su registro de notas con la fecha ${fd(view.nota.fecha)}.</div><form data-form="notarapida"><textarea name="texto" required placeholder="Está mirando el móvil…"></textarea><div class="row"><button class="btn gold">Guardar nota</button><button type="button" class="btn" data-act="cerrarnota">Cancelar</button></div></form></div>`}
@@ -893,7 +909,8 @@ const A={
       if(vacio){const {error}=await sb.from('pe_sesiones').delete().eq('id',s.id);if(error)fail(error)}
       return}
     const nn=nc==='naranja'||nc==='rojo',eraNn=!!m&&(m.color==='naranja'||m.color==='rojo');
-    const row={id:m?m.id:uid(),proyecto_id:p.id,sesion_id:s.id,alumno_id:aid,color:nc,motivo:(nc==='falta_j'||nn)&&m?(m.motivo||''):'',motivos:nn?(eraNn&&Array.isArray(m.motivos)?m.motivos:[]):null};DB.marcas.push(row);if(nn&&!eraNn)view.motivo={mid:row.id};render();
+    const tk=d.fecha+'|'+d.clave+'|'+aid,rd=(nc==='falta'||nc==='falta_j')?null:((m&&Array.isArray(m.roles_dia)&&m.roles_dia.length)?m.roles_dia:((view.rolesTmp&&view.rolesTmp[tk])||rolesPorDefecto(aid,s.evaluacion,d.fecha)));if(view.rolesTmp)delete view.rolesTmp[tk];
+    const row={id:m?m.id:uid(),proyecto_id:p.id,sesion_id:s.id,alumno_id:aid,color:nc,motivo:(nc==='falta_j'||nn)&&m?(m.motivo||''):'',motivos:nn?(eraNn&&Array.isArray(m.motivos)?m.motivos:[]):null,roles_dia:rd,colores_rol:null,motivos_rol:null};DB.marcas.push(row);if(nn&&!eraNn)view.motivo={mid:row.id};render();
     const {error}=await sb.from('pe_marcas').upsert(row,{onConflict:'sesion_id,alumno_id'});if(error)fail(error)},
   sinclase:async el=>{const p=P(),f=el.dataset.f,k=el.dataset.k||'clase',s=sesDe(p,f,k),n=s?DB.marcas.filter(m=>m.sesion_id===s.id).length:0;
     if(!confirm(n?`Ese día tiene ${n} marca(s) que se borrarán. ¿Marcarlo como festivo / sin clase?`:'¿Marcar ese día como festivo / sin clase? No contará para la nota.'))return;
@@ -909,13 +926,23 @@ const A={
     const row={id:x?x.id:uid(),proyecto_id:p.id,alumno_id:aid,funcion:f,color:nc,valor_manual:nc==='falta_j'&&x?x.valor_manual:null};DB.vico.push(row);render();
     const {error}=await sb.from('pe_vico').upsert(row,{onConflict:'alumno_id,funcion'});if(error)fail(error)},
   cerrar:async()=>{const p=P(),d=selActual(p,agenda(p));if(!d)return;const s=await sesionSel(p);if(!s)return;
-    const mm=DB.marcas.filter(m=>m.sesion_id===s.id),gA=alumnosDe(p,GID()),idsG=new Set(gA.map(a=>a.id)),n=gA.filter(a=>!mm.some(m=>m.alumno_id===a.id)&&!apDe(s.id,a.id)).length,nm=mm.filter(m=>idsG.has(m.alumno_id)&&pendMotivo(m)).length;
-    if(n||nm){view.cerrando=true;toast(`${n?`Faltan ${n} alumno(s) por marcar. `:''}${nm?`Falta el motivo en ${nm} marca(s). `:''}El día no se cierra hasta completarlo.`,6500);render();return}
+    const mm=DB.marcas.filter(m=>m.sesion_id===s.id),gA=alumnosDe(p,GID()),idsG=new Set(gA.map(a=>a.id)),n=gA.filter(a=>!mm.some(m=>m.alumno_id===a.id)&&!apDe(s.id,a.id)).length,nm=mm.filter(m=>idsG.has(m.alumno_id)&&(pendMotivo(m)||pendMotivoRol(m))).length,nr=mm.filter(m=>idsG.has(m.alumno_id)&&pendRol(m,s.evaluacion)).length;
+    if(n||nm||nr){view.cerrando=true;toast(`${n?`Faltan ${n} alumno(s) por marcar. `:''}${nm?`Falta el motivo en ${nm} marca(s). `:''}${nr?`Falta elegir el rol de ${nr} alumno(s). `:''}El día no se cierra hasta completarlo.`,6500);render();return}
     if(confirm(`Todo completo. ¿Cerrar el ${fd(d.fecha)}?`)){await setCierreDia(s.id,GID(),true);view.cerrando=false;view.sel=null;view.evTab=null;toast('Día cerrado');render()}},
   vertodos:()=>{view.cerrando=false;render()},
   reabrir:async()=>{const p=P(),d=selActual(p,agenda(p));if(d&&d.ses){await setCierreDia(d.ses.id,GID(),false);render()}},
   gsel:el=>{view.gid=el.dataset.id;view.sel=null;render()},
   evfin:el=>{view.evFin=+el.dataset.v;render()},
+  rolcolor:async el=>{const p=P(),sel=selActual(p,agenda(p)),s=sel&&sel.ses;if(!s)return;if(cerrDia(s,GID()))return toast('Día cerrado: pulsa Reabrir para cambiar.');
+    const m=DB.marcas.find(x=>x.sesion_id===s.id&&x.alumno_id===el.dataset.a);if(!m||m.color==='falta'||m.color==='falta_j')return;
+    const rid=el.dataset.r,c=el.dataset.c,cr={...(m.colores_rol||{})},mr={...(m.motivos_rol||{})},cur=cr[rid]||m.color;
+    if(c===m.color||c===cur){delete cr[rid];delete mr[rid]}else{cr[rid]=c;if(c==='naranja'||c==='rojo'){mr[rid]=mr[rid]||[];view.motivo={kind:'mrol',mid:m.id,rol:rid}}else delete mr[rid]}
+    await upd('marcas',m.id,{colores_rol:Object.keys(cr).length?cr:null,motivos_rol:Object.keys(mr).length?mr:null});render()},
+  roldia:async el=>{const p=P(),aid=el.dataset.a,rid=el.dataset.r,sel=selActual(p,agenda(p));if(!sel)return;const s=sel.ses;if(s&&cerrDia(s,GID()))return toast('Día cerrado: pulsa Reabrir para cambiar.');
+    const evn=s?s.evaluacion:evDeSeguro(p,sel.fecha),m=s?DB.marcas.find(x=>x.sesion_id===s.id&&x.alumno_id===aid):null,key=sel.fecha+'|'+sel.clave+'|'+aid;
+    const cur=(m&&Array.isArray(m.roles_dia)&&m.roles_dia.length)?m.roles_dia:((view.rolesTmp&&view.rolesTmp[key])||(m?[]:rolesPorDefecto(aid,evn,sel.fecha))),nu=cur.includes(rid)?cur.filter(x=>x!==rid):[...cur,rid];
+    if(m&&m.color!=='falta'&&m.color!=='falta_j'){const patch={roles_dia:nu};if(cur.includes(rid)){const cr={...(m.colores_rol||{})},mr={...(m.motivos_rol||{})};delete cr[rid];delete mr[rid];patch.colores_rol=Object.keys(cr).length?cr:null;patch.motivos_rol=Object.keys(mr).length?mr:null}await upd('marcas',m.id,patch)}else{(view.rolesTmp=view.rolesTmp||{})[key]=nu}
+    render()},
   elige:async el=>{const val=el.dataset.k==='val',m=(val?DB.valoraciones:DB.marcas).find(x=>x.id===el.dataset.id);if(!m)return;await upd(val?'valoraciones':'marcas',m.id,{elige_ap:!m.elige_ap});toast(m.elige_ap?'Se usa la valoración del apoyo':'Se usa la tuya');render()},
   apmark:async el=>{const p=P(),aid=el.dataset.a,c=el.dataset.c,vv=view.apDia,ag=agenda(p).filter(d=>d.tipo==='clase'&&d.fecha<=hoy()&&!d.festivo&&!(d.ses&&d.ses.sin_clase)),cur=(vv&&ag.find(d=>d.fecha===vv.f&&d.clave===vv.k))||ag[ag.length-1];if(!cur)return;
     let s=cur.ses;if(!s){const r=await ins('sesiones',{proyecto_id:p.id,fecha:cur.fecha,clave:cur.clave,tipo:'clase',nombre:'',peso:1,evaluacion:evDeSeguro(p,cur.fecha),cerrada:false,sin_clase:false});if(!r)return;s=r[0]}
@@ -968,9 +995,11 @@ const A={
   pdfhoja:()=>pdfDoc('Qué significa cada color',htmlHoja(P())),
   hojadef:async()=>{if(confirm('¿Restaurar los textos originales de los cinco colores?'))await guardaR({hoja:HOJA_DEF})},
   calcauto:async()=>{if(confirm('¿Volver al texto automático?'))await guardaR({texto_calculo:''})},
-  motivosel:el=>{view.motivo={mid:el.dataset.id,kind:el.dataset.k||'marca'};render()},
+  motivosel:el=>{view.motivo={mid:el.dataset.id,kind:el.dataset.k||'marca',rol:el.dataset.r||null};render()},
   cerrarmotivo:()=>{view.motivo=null;render()},
-  motivotoggle:async el=>{const kd=MK[el.dataset.k||'marca'],m=kd.arr().find(x=>x.id===el.dataset.m);if(!m)return;const n=el.dataset.n,cur=Array.isArray(m.motivos)?m.motivos:[],nu=cur.includes(n)?cur.filter(x=>x!==n):[...cur,n];await upd(kd.t,m.id,{motivos:nu});render()},
+  motivotoggle:async el=>{const kd=MK[el.dataset.k||'marca'],m=kd.arr().find(x=>x.id===el.dataset.m);if(!m)return;const n=el.dataset.n;
+    if(el.dataset.k==='mrol'){const rid=el.dataset.r,mr={...(m.motivos_rol||{})},cur=mr[rid]||[];mr[rid]=cur.includes(n)?cur.filter(x=>x!==n):[...cur,n];await upd('marcas',m.id,{motivos_rol:mr});render();return}
+    const cur=Array.isArray(m.motivos)?m.motivos:[],nu=cur.includes(n)?cur.filter(x=>x!==n):[...cur,n];await upd(kd.t,m.id,{motivos:nu});render()},
   quitaad:async el=>{await upd('asignaciones',el.dataset.id,{valor_adaptado:null});toast('Adaptado quitado: el rol vuelve a su valor normal');render()},
   copiaenlace:async el=>{const x=DB.profesores.find(q=>q.id===el.dataset.id);if(!x)return;const url=location.href.split('#')[0].split('?')[0]+'?t='+x.token;try{await navigator.clipboard.writeText(url);toast('Enlace copiado')}catch(e){prompt('Copia este enlace:',url)}},
   regenlink:async el=>{const x=DB.profesores.find(q=>q.id===el.dataset.id);if(!x)return;if(confirm('¿Crear un enlace nuevo para '+x.nombre+'? El anterior dejará de funcionar.')){await upd('profesores',x.id,{token:uid().replace(/-/g,'')+uid().replace(/-/g,'').slice(0,8)});toast('Enlace nuevo creado');render()}},
