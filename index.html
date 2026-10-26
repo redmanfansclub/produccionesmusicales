@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CEM · Creación Escénico-Musical</title>
 <meta name="theme-color" content="#4d1229">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23241a22%22/%3E%3Crect x=%226%22 y=%229%22 width=%2252%22 height=%228%22 rx=%222%22 fill=%22%23dcb45f%22/%3E%3Cpath d=%22M7 17H28C27 28 19 32 19 42C19 47 18 50 17 53H7Z%22 fill=%22%23b0305c%22/%3E%3Cpath d=%22M57 17H36C37 28 45 32 45 42C45 47 46 50 47 53H57Z%22 fill=%22%23b0305c%22/%3E%3Cpath d=%22M14 17C16 28 13 40 12 53%22 stroke=%22%237a1f3f%22 stroke-width=%222.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M50 17C48 28 51 40 52 53%22 stroke=%22%237a1f3f%22 stroke-width=%222.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Crect x=%226%22 y=%2253%22 width=%2252%22 height=%225%22 rx=%222%22 fill=%22%23dcb45f%22/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23241a22%22/%3E%3Crect x=%226%22 y=%229%22 width=%2252%22 height=%228%22 rx=%222%22 fill=%22%23dcb45f%22/%3E%3Cpath d=%22M7 17H28C27 28 19 32 19 42C19 47 18 50 17 53H7Z%22 fill=%22%23b0305c%22/%3E%3Cpath d=%22M57 17H36C37 28 45 32 45 42C45 47 46 50 47 53H57Z%22 fill=%22%23b0305c%22/%3E%3Cpath d=%22M14 17C16 28 13 40 12 53%22 stroke=%22%237a1f3f%22 stroke-width=%222.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Cpath d=%22M50 17C48 28 51 40 52 53%22 stroke=%22%237a1f3f%22 stroke-width=%222.5%22 fill=%22none%22 stroke-linecap=%22round%22/%3E%3Crect x=%226%22 y=%2253%22 width=%2252%22 height=%225%22 rx=%222%22 fill=%22%23dcb45f%22/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="CEM">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,500&family=Cinzel:wght@600;700&family=Cinzel+Decorative:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -146,7 +150,7 @@ button.dia b{display:block;font-size:13px}button.dia span{display:block}button.d
 <main id="app"></main>
 <div id="toast" role="status"></div>
 <script>
-addEventListener('error',e=>aviso(e.message));addEventListener('unhandledrejection',e=>aviso((e.reason&&e.reason.message)||String(e.reason)));
+addEventListener('error',e=>{const m=(e&&e.message)||'';if(!m||/^Script error\.?$/i.test(m)||/ResizeObserver loop/i.test(m))return;aviso(m)});addEventListener('unhandledrejection',e=>aviso((e.reason&&e.reason.message)||String(e.reason)));
 function aviso(m){let b=document.getElementById('errb');if(!b){b=document.createElement('div');b.id='errb';b.className='warn r';b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99;margin:0;border-radius:0';document.body.prepend(b)}b.textContent='Error: '+m+'. Recarga la página; si persiste, avísame.'}
 document.body.classList.toggle('light',(localStorage.getItem('pe_theme')||(matchMedia('(prefers-color-scheme: light)').matches?'l':'d'))==='l');
 if(!window.supabase){document.getElementById('app').innerHTML='<div class="card"><b>No se pudo cargar la librería de Supabase.</b><p class="muted">Un bloqueador de contenido o la red lo impide. Prueba en una ventana privada o con otra conexión.</p></div>';throw new Error('Supabase no cargó')}
